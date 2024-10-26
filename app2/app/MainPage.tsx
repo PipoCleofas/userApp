@@ -5,6 +5,7 @@ import { useNavigation } from 'expo-router';
 import useLocation from '../hooks/useLocation'
 import useHandleLogin from '@/hooks/useHandleLogin';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface MarkerType {
   latitude: number;
@@ -36,6 +37,7 @@ export default function MainPage() {
   const { location, errorMsg, isFetching, latitude, longitude, title } = useLocation();  // Get location data from useLocation
   const { markerUnameEmoji, markerEmoji, markerImageSize, imageChanger,uname } = useHandleLogin();
 
+
   
 
   const defaultRegion = {
@@ -46,67 +48,88 @@ export default function MainPage() {
   };
 
   useEffect(() => {
-    const fetchMarkers = async () => {
+    const fetchAndUpdateMarker = async () => {
       try {
-        const response = await fetch('http://192.168.100.127:3000/marker/getMarker');
-        const data = await response.json();
+        const username = await AsyncStorage.getItem('usernameSP');
+        const userId = await AsyncStorage.getItem('userId')
+
+        console.log('Username:', username);
   
-        if (Array.isArray(data)) {
-          setMarkers(data);  
-        } else {
-          console.error('Error', 'Invalid data format from API');
+        if (!username) {
+          console.error('Username not found in AsyncStorage');
+          return;
         }
   
-        // Assuming uname is available
-        const responseMarker = await axios.get(`http://192.168.100.127:3000/serviceprovider/${uname}/checkMarkerTitleExists`, {
-          params: {
-            title: uname,  
-          },
-        });
+        // Fetch existing markers
+        try {
+          const response = await fetch('http://192.168.100.127:3000/marker/getMarker');
+          const data = await response.json();
+          if (Array.isArray(data)) setMarkers(data);
+        } catch (fetchError: any) {
+          console.error('Error fetching markers:', fetchError.message);
+        }
   
-        if (responseMarker.data.data) {
-          const markerId = responseMarker.data.data[0].id; 
-          const newTitle = uname;  // Set new title based on uname
-          const newLatitude = 34.05;  // Replace with actual latitude
-          const newLongitude = -118.25;  // Replace with actual longitude
-  
-          const updateResponse = await axios.put(`http://192.168.100.127:3000/serviceprovider/updateMarker/${markerId}`, {
-            newTitle: newTitle,
-            newLatitude: newLatitude,
-            newLongitude: newLongitude,
+        // Check marker existence
+        try {
+          const checkResponse = await axios.get(`http://192.168.100.127:3000/marker/checkMarkerTitleExists`, {
+            params: { title: username },
           });
   
-          if (updateResponse.status === 200) {
-            console.log('Marker updated successfully');
-          } else {
-            console.log('Marker update failed');
+          if (checkResponse.status === 200 && checkResponse.data?.data) {
+            try {
+              const updateResponse = await axios.put(`http://192.168.100.127:3000/marker/updateMarker/${username}`, {
+                newLatitude: latitude,
+                newLongitude: longitude,
+              });
+              console.log(updateResponse.status === 200 ? 'Marker updated successfully' : 'Marker update failed');
+            } catch (updateError: any) {
+              console.error('Error updating marker:', updateError.message);
+            }
           }
+        } catch (checkError: any) {
+          if (checkError.response?.status === 404) {
+            try {
+              console.log("Attempting to create marker with:", {
+                latitude,
+                longitude,
+                description: 'test', // Adjust if necessary
+                UserID: userId,
+              });
   
-        } else {
-          // Marker doesn't exist, create a new one
-          const newMarkerData = {
-            latitude: 34.05,  // Replace with actual latitude
-            longitude: -118.25,  // Replace with actual longitude
-            description: 'Marker description',  // Replace with actual description
-          };
+              const createResponse = await axios.post(`http://192.168.100.127:3000/marker/${username}/submitMarkerSP`, {
+                latitude,
+                longitude,
+                description: 'test',
+                UserID: userId,
+                title: username  // Add this line
+              });
+              
   
-          const submitResponse = await axios.post(`http://192.168.100.127:3000/serviceprovider/${uname}/submitMarkerSP`, newMarkerData);
-  
-          if (submitResponse.status === 200) {
-            console.log('Marker created successfully:', submitResponse.data.message);
+              console.log(createResponse.status === 201 ? 'Marker created successfully' : 'Marker creation failed');
+            } catch (createError: any) {
+              console.error('Error creating marker:', createError.message);
+            }
           } else {
-            console.log('Marker creation failed');
+            console.error('Error checking marker existence:', checkError.message);
           }
         }
-  
-      } catch (error) {
-        console.error('Error fetching markers or handling marker operations:', error);
-        console.error('Error', 'Failed to load or manage markers');
+      } catch (error: any) {
+        console.error('Unexpected error in fetchAndUpdateMarker:', error.message);
       }
     };
   
-    fetchMarkers();
-  }, [uname]);  
+    const intervalId = setInterval(fetchAndUpdateMarker, 3000);
+    return () => clearInterval(intervalId);
+  }, [latitude, longitude]);
+  
+
+
+
+
+
+
+
+
   
 
   useEffect(() => {

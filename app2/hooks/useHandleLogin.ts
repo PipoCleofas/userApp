@@ -27,8 +27,9 @@ export default function useHandleClicks(){
       try {
           const loginErr = validateLogin(uname, password);
           setLoginError(loginErr);
-          console.log(uname, password);
-  
+          console.log('Received username:', uname);
+          console.log('Received password:', password);
+            
           if (loginErr) {
               console.log(loginErr);
               return;
@@ -43,18 +44,24 @@ export default function useHandleClicks(){
           
 
           if (response.data.success) {
-              console.log('Login successful');
-  
-              const userId = response.data.userId; 
-              await AsyncStorage.setItem('username', uname as string);
-              await AsyncStorage.setItem('userId', userId.toString());  
-              console.log('Username and User ID stored in AsyncStorage:', uname, userId);
-  
-              navigation.navigate('MainPage' as never);
-          } else {
-              console.log('Login failed:', response.data.message);
-              setLoginError(response.data.message);
-          }
+            console.log('Login successful');
+            
+            const userId = response.data.userId;
+            if (userId) {  
+                await AsyncStorage.setItem('usernameSP', uname as string);
+                await AsyncStorage.setItem('userId', userId.toString());
+                console.log('Username and User ID stored in AsyncStorage:', uname, userId);
+                
+                navigation.navigate('MainPage' as never);
+            } else {
+                console.error('User ID not found in response');
+                setLoginError('User ID not found in response');
+            }
+        } else {
+            console.log('Login failed:', response.data.message);
+            setLoginError(response.data.message);
+        }
+        
       } catch (err: any) {
           handleAxiosError(err);
       }
@@ -101,20 +108,6 @@ export default function useHandleClicks(){
         }
       }
 
-    function changeMarkerImage(uname: string){
-        switch (uname) {
-            case 'BFP':
-              return require('../assets/images/fire.png');
-            case 'PNP':
-              return require('../assets/images/police.webp');
-            case 'Medical':
-              return require('../assets/images/medic.png');
-            case 'NDRRMC':
-              return require('../assets/images/ndrrmc.png');
-          }
-    }
-
-    
     function handleAxiosError (error: any): void  {
         if (error.response) {
         console.error('Response error:', error.response.data);

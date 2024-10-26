@@ -79,34 +79,55 @@ router.put('/updateMarkerTitle/:id', (req, res) => {
 
 router.post('/:SPtype/submitMarkerSP', validateMarker, (req, res) => {
   const { latitude, longitude, description, UserID } = req.body;
-  const SPtype = req.params.SPtype;  
+  const title = req.params.SPtype;  // Using SPtype as title
 
-  const query = 'INSERT INTO markerrr (latitude, longitude, title, description, UserID) VALUES (?, ?, ?, ?, ?)';
+  const checkQuery = 'SELECT * FROM markerrr WHERE title = ?';
 
-  connection.query(query, [latitude, longitude, SPtype, description, UserID], (error, results) => {
+  connection.query(checkQuery, [title], (error, results) => {
     if (error) {
-      console.error('Database error:', error.message);
+      console.error('Database error:', error.message, error);
       return res.status(500).send('Database error');
     }
 
-    res.status(200).json({
-      message: 'Data saved successfully',
-      id: results.insertId  
-    });
+    if (results.length > 0) {
+      const updateQuery = 'UPDATE markerrr SET latitude = ?, longitude = ?, description = ? WHERE title = ?';
+      connection.query(updateQuery, [latitude, longitude, description, title], (error, updateResults) => {
+        if (error) {
+          console.error('Database error during update:', error.message, error);
+          return res.status(500).send('Database error');
+        }
+        return res.status(200).json({
+          message: 'Marker updated successfully',
+          updatedRows: updateResults.affectedRows
+        });
+      });
+    } else {
+      const insertQuery = 'INSERT INTO markerrr (latitude, longitude, title, description, UserID) VALUES (?, ?, ?, ?, ?)';
+      connection.query(insertQuery, [latitude, longitude, title, description, UserID], (error, insertResults) => {
+        if (error) {
+          console.error('Database error during insert:', error.message, error);
+          return res.status(500).send('Database error');
+        }
+        res.status(201).json({
+          message: 'Marker created successfully',
+          id: insertResults.insertId
+        });
+      });
+    }
   });
 });
 
 
-router.put('/updateMarker/:id', (req, res) => {
-  const id = req.params.id;  
-  const { newTitle, newLatitude, newLongitude } = req.body; 
+router.put('/updateMarker/:title', (req, res) => {
+  const title = req.params.title;  
+  const { newLatitude, newLongitude } = req.body;  
 
-  if (!newTitle || newLatitude === undefined || newLongitude === undefined) {
-    return res.status(400).send('New title, latitude, and longitude are required');
+  if (newLatitude === undefined || newLongitude === undefined) {
+    return res.status(400).send('Latitude and longitude are required');
   }
 
-  const query = `UPDATE marker SET title = ?, latitude = ?, longitude = ? WHERE id = ?`;
-  const values = [newTitle, newLatitude, newLongitude, id];  // Set the new values
+  const query = `UPDATE markerrr SET latitude = ?, longitude = ? WHERE title = ?`;
+  const values = [newLatitude, newLongitude, title];  
 
   connection.query(query, values, (error, results) => {
     if (error) {
@@ -122,15 +143,15 @@ router.put('/updateMarker/:id', (req, res) => {
   });
 });
 
-router.get('/:SPtype/checkMarkerTitleExists', (req, res) => {
-  const { title } = req.query; 
+
+router.get('/checkMarkerTitleExists', (req, res) => {
+  const { title } = req.query;  // Extract 'title' from the query parameters
 
   if (!title) {
     return res.status(400).json({ message: 'Title is required' });
   }
 
   const checkQuery = 'SELECT * FROM markerrr WHERE title = ?';
-
   connection.query(checkQuery, [title], (error, results) => {
     if (error) {
       console.error('Database error:', error);
@@ -143,13 +164,14 @@ router.get('/:SPtype/checkMarkerTitleExists', (req, res) => {
         data: results 
       });
     } else {
-      return res.status(400).json({ 
+      return res.status(404).json({ 
         message: 'No marker with this title exists', 
         data: null 
       });
     }
   });
 });
+
 
 
 
