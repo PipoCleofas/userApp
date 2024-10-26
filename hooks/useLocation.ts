@@ -60,8 +60,6 @@ const useLocation = () => {
       console.log('Calculating')
       break;
    }
-
-
   }
 
   const fetchLocation = async () => {

@@ -4,6 +4,7 @@ import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator } fr
 import { useNavigation } from 'expo-router';
 import useLocation from '../hooks/useLocation'
 import useHandleLogin from '@/hooks/useHandleLogin';
+import axios from 'axios';
 
 interface MarkerType {
   latitude: number;
@@ -33,7 +34,7 @@ export default function MainPage() {
   const [canSelectLocation, setCanSelectLocation] = useState<any>();
 
   const { location, errorMsg, isFetching, latitude, longitude, title } = useLocation();  // Get location data from useLocation
-  const { markerUnameEmoji, markerEmoji, markerImageSize, imageChanger } = useHandleLogin();
+  const { markerUnameEmoji, markerEmoji, markerImageSize, imageChanger,uname } = useHandleLogin();
 
   
 
@@ -49,27 +50,71 @@ export default function MainPage() {
       try {
         const response = await fetch('http://192.168.100.127:3000/marker/getMarker');
         const data = await response.json();
-
+  
         if (Array.isArray(data)) {
           setMarkers(data);  
         } else {
           console.error('Error', 'Invalid data format from API');
         }
+  
+        // Assuming uname is available
+        const responseMarker = await axios.get(`http://192.168.100.127:3000/serviceprovider/${uname}/checkMarkerTitleExists`, {
+          params: {
+            title: uname,  
+          },
+        });
+  
+        if (responseMarker.data.data) {
+          const markerId = responseMarker.data.data[0].id; 
+          const newTitle = uname;  // Set new title based on uname
+          const newLatitude = 34.05;  // Replace with actual latitude
+          const newLongitude = -118.25;  // Replace with actual longitude
+  
+          const updateResponse = await axios.put(`http://192.168.100.127:3000/serviceprovider/updateMarker/${markerId}`, {
+            newTitle: newTitle,
+            newLatitude: newLatitude,
+            newLongitude: newLongitude,
+          });
+  
+          if (updateResponse.status === 200) {
+            console.log('Marker updated successfully');
+          } else {
+            console.log('Marker update failed');
+          }
+  
+        } else {
+          // Marker doesn't exist, create a new one
+          const newMarkerData = {
+            latitude: 34.05,  // Replace with actual latitude
+            longitude: -118.25,  // Replace with actual longitude
+            description: 'Marker description',  // Replace with actual description
+          };
+  
+          const submitResponse = await axios.post(`http://192.168.100.127:3000/serviceprovider/${uname}/submitMarkerSP`, newMarkerData);
+  
+          if (submitResponse.status === 200) {
+            console.log('Marker created successfully:', submitResponse.data.message);
+          } else {
+            console.log('Marker creation failed');
+          }
+        }
+  
       } catch (error) {
-        console.error('Error fetching markers:', error);
-        console.error('Error', 'Failed to load markers');
+        console.error('Error fetching markers or handling marker operations:', error);
+        console.error('Error', 'Failed to load or manage markers');
       }
     };
   
     fetchMarkers();
-  }, []);
+  }, [uname]);  
+  
 
   useEffect(() => {
     const updateMarkerEmoji = async () => {
-      await imageChanger();  // Call imageChanger to update the marker emoji
+      await imageChanger();  
     };
   
-    updateMarkerEmoji();  // Trigger the update when the component mounts
+    updateMarkerEmoji();  
   }, []);
 
   useEffect(() => {

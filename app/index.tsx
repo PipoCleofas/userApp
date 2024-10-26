@@ -113,7 +113,6 @@ export default function Index() {
         if (Array.isArray(data)) {
           setMarkers(data);  
 
-          // If location is available, check if there are nearby markers
           if (location) {
             data.forEach((marker: MarkerType) => {
               const distance = haversineDistance(

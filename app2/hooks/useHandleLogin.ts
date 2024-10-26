@@ -33,14 +33,15 @@ export default function useHandleClicks(){
               console.log(loginErr);
               return;
           }
-  
+
           const response = await axios.get('http://192.168.100.127:3000/serviceprovider/getServiceProvider', {
               params: {
                   username: uname,
                   password: password,
               },
           });
-  
+          
+
           if (response.data.success) {
               console.log('Login successful');
   
@@ -58,20 +59,22 @@ export default function useHandleClicks(){
           handleAxiosError(err);
       }
   };
+
+  
   
      
-    const validateLogin = (username: string | null, password: string | null) => {
-        if (!username || username.trim() === "") {
-          return "Username cannot be empty.";
-        }
-      
-        if (!password || password.trim() === "") {
-          return "Password cannot be empty.";
-        }
-      
-        return null; 
-    };
-      
+  const validateLogin = (username: string | null, password: string | null) => {
+      if (!username || username.trim() === "") {
+        return "Username cannot be empty.";
+      }
+    
+      if (!password || password.trim() === "") {
+        return "Password cannot be empty.";
+      }
+    
+      return null; 
+  };
+    
     async function imageChanger() {
         try {
           const uname = await AsyncStorage.getItem('username');
@@ -135,5 +138,6 @@ export default function useHandleClicks(){
         loginError,
         markerUnameEmoji,
         imageChanger,
+        uname
     }
 }

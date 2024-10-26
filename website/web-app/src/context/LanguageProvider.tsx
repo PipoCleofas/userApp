@@ -15,7 +15,6 @@ interface LanguageContextProps {
   };
 }
 
-// Create the context with default value as undefined
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
 // Define the provider component props
