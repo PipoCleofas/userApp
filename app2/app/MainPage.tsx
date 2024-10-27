@@ -52,6 +52,9 @@ export default function MainPage() {
       try {
         const username = await AsyncStorage.getItem('usernameSP');
         const userId = await AsyncStorage.getItem('userId')
+        const lat = await latitude;
+        const long = await longitude;
+
 
         console.log('Username:', username);
   
@@ -90,15 +93,15 @@ export default function MainPage() {
           if (checkError.response?.status === 404) {
             try {
               console.log("Attempting to create marker with:", {
-                latitude,
-                longitude,
+                lat,
+                long,
                 description: 'test', // Adjust if necessary
                 UserID: userId,
               });
   
               const createResponse = await axios.post(`http://192.168.100.127:3000/marker/${username}/submitMarkerSP`, {
-                latitude,
-                longitude,
+                lat,
+                long,
                 description: 'test',
                 UserID: userId,
                 title: username  // Add this line
