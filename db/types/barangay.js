@@ -21,11 +21,7 @@ function validateUserData(req, res, next) {
   next();
 }
 
-// changed barangay table => requestid to userid, barangay /submit added userid to add, added in userservice
-
-
-
-router.post('/submit', validateUserData, (req, res) => {
+router.post('/getBarangays', validateUserData, (req, res) => {
   const { barangayname, sitio, UserID } = req.body;
 
   const query = 'INSERT INTO barangay (BarangayName, Sitio, UserID) VALUES (?, ?, ?)';
@@ -36,6 +32,28 @@ router.post('/submit', validateUserData, (req, res) => {
       return res.status(500).send('Database error');
     }
     res.status(201).send('Data saved successfully');
+  });
+});
+
+router.get('/getBarangay', (req, res) => {
+  const { username, password } = req.query;
+
+  const verify = `SELECT * FROM barangay WHERE BarangayName = ? AND Password = ?`;
+
+  connection.query(verify, [username, password], (error, results) => {
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).send('Database error');
+    }
+
+    if (results.length > 0) {
+      const user = results[0];
+      return res.status(200).json({
+        barangayname: user.BarangayName
+      });
+    } else {
+      return res.status(401).json({ message: 'Invalid username or password' });
+    }
   });
 });
 

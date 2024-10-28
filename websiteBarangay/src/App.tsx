@@ -1,71 +1,100 @@
-import React, { useEffect } from 'react';
+import logoo from '../utils/logoo.gif';
+import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
-import axios from "axios";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons' 
+import {useHandleClicks} from '../hooks/useHandleClicks'
 
-function ServiceRequestList() {
-  const [requests, setRequests] = useState<any>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const {handlePasswordChange,handleUsernameChange,error,onLoginClick,username,password} = useHandleClicks();
 
-  useEffect(() => {
-    async function handleRequests() {
-      try {
-        const response = await axios.get('http://192.168.100.28:3000/servicerequest/getRequests');
-        console.log(response.data);
-        setRequests(response.data);
-      } catch (error) {
-        console.error(error);
-        setError('Failed to fetch requests');
-      } finally {
-        setLoading(false); // Set loading to false after request completes
-      }
-    }
-
-    handleRequests();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>; // Loading state
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>; // Error state
-  }
-
+  const onLogin = (e: any) => {
+    onLoginClick(e, navigate, username, password);
+  };
 
   return (
-      <div style={{ flex: 1, padding: '20px' }}>
-        {requests && requests.map((values :any, index :any) => (
-          <div key={index} style={requestCardStyle}>
-            <p>User ID: {values.userid}</p>
-            <p>Request Type: {values.requesttype}</p>
-            <p>Status: {values.status.toLowerCase() === 'pending' ? (
-              <span style={{ color: 'orange' }}>{values.status}</span>
-            ) : values.status}</p>
-            <p>Address: {values.address}</p>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div className="login-container" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', width: '300px', textAlign: 'center' }}>
+        <img
+          src={logoo}
+          alt="logo"
+          style={{
+            alignSelf: 'center',
+            width: '23pc',
+            height: '21pc',
+            marginBottom: '-80px',
+            marginInlineStart: '-56px',
+            marginTop: '-90px'
+          }}
+        />
+        <h2 style={{ marginTop: '15px', marginBottom: '20px' }}>LOGIN</h2>
+        <form onSubmit={onLogin} style={{ margin: '10px 0' }}>
+          <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+            <label style={{ fontSize: 14, display: 'block', marginBottom: '5px' }}>Username:</label>
+            <input
+              type="text"
+              name="username"
+              style={{
+                width: '100%',
+                padding: '8px',
+                backgroundColor: '#F08080',
+                border: 'none',
+                borderRadius: '10px',
+              }}
+              onChange={(e) => handleUsernameChange(e.target.value)}
+            />
           </div>
-        ))}
+          <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+            <label style={{ fontSize: 14, display: 'block', marginBottom: '5px' }}>Password:</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  backgroundColor: '#F08080',
+                  border: 'none',
+                  borderRadius: '10px',
+                }}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                }}
+              >
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              </span>
+            </div>
+          </div>
+
+          {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
+
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '10px',
+              backgroundColor: 'maroon',
+              border: 'none',
+              borderRadius: '10px',
+              color: 'white',
+              fontSize: 16,
+            }}
+            onClick={onLogin}
+          >
+            Sign In
+          </button>
+        </form>
       </div>
+    </div>
   );
 }
-
-//Styles
-const buttonStyle = {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    backgroundColor: '#ffffff',
-    border: '1px solid #ccc',
-    cursor: 'pointer',
-    textAlign: 'left'
-  };
-
-  const requestCardStyle = {
-    backgroundColor: '#e9ecef',
-    padding: '20px',
-    borderRadius: '10px',
-    marginBottom: '20px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)'
-  };
-
-export default ServiceRequestList;
