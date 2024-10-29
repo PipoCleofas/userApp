@@ -22,11 +22,11 @@ function validateUserData(req, res, next) {
 }
 
 router.post('/getBarangays', validateUserData, (req, res) => {
-  const { barangayname, sitio, UserID } = req.body;
+  const { barangayname, sitio } = req.body;
 
-  const query = 'INSERT INTO barangay (BarangayName, Sitio, UserID) VALUES (?, ?, ?)';
+  const query = 'INSERT INTO barangay (BarangayName, Sitio) VALUES (?, ?)';
 
-  connection.query(query, [barangayname, sitio, UserID], (error, results) => {
+  connection.query(query, [barangayname, sitio], (error, results) => {
     if (error) {
       console.error('Database error:', error.message);
       return res.status(500).send('Database error');

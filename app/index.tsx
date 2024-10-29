@@ -6,6 +6,7 @@ import useHandleClicks from '@/hooks/useHandleClicks';
 import { useNavigation } from 'expo-router';
 import Notification from '@/components/notification-holder/Notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDataInput } from '@/website/web-app/src/hooks/useDataInput';
 
 // Define the type for the marker object
 interface MarkerType {
@@ -54,6 +55,8 @@ export default function Index() {
 
   async function emerAssReq(service: string, markerEmoji: any, imageWidth: number = 65, imageHeight: number = 60) {
     const serviceChosen = await AsyncStorage.setItem('serviceChosen', service)
+
+    
     EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'pending');
     setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
 

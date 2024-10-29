@@ -86,6 +86,8 @@ const useHandleClicks = () => {
       // gets the id
       const USERID = await AsyncStorage.getItem('id');
 
+      const address = await AsyncStorage.getItem('address');
+
       try {
         // Submit marker data
         const markerResponse = await axios.post('http://192.168.100.127:3000/marker/submit', {
@@ -105,7 +107,8 @@ const useHandleClicks = () => {
         const serviceRequestResponse = await axios.post('http://192.168.100.127:3000/servicerequest/submit', {
           UserID: USERID,
           requesttype: requestType,  
-          requeststatus: requestStatus,                    
+          requeststatus: requestStatus,  
+          address: address                  
         }, {
           headers: {
             'Content-Type': 'application/json',

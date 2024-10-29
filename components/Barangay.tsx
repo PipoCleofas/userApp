@@ -37,7 +37,7 @@ const barangaysInTarlacCity = [
   { label: 'San Francisco', value: 'San Francisco' },
   { label: 'San Isidro', value: 'San Isidro' },
   { label: 'San Jose', value: 'San Jose' },
-  { label: 'San Juan de Mata', value: 'San Juan de Mata' },   
+  { label: 'San Juan de Mata', value: 'San Juan de Mata' },
   { label: 'San Luis', value: 'San Luis' },
   { label: 'San Manuel', value: 'San Manuel' },
   { label: 'San Miguel', value: 'San Miguel' },
@@ -61,6 +61,7 @@ const barangaysInTarlacCity = [
   { label: 'Villa San Isidro', value: 'Villa San Isidro' },
   { label: 'Villa Sol', value: 'Villa Sol' }
 ];
+
 
 interface BarangayProps {
   value: string | null;

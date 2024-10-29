@@ -3,82 +3,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {Action, Citizen} from '@/app/types/user'
 
-
-// Function to submit a new user and update the state
-// Function to submit a new user and dispatch an action
-export const userSubmit = async (
-    state: Citizen,
-    dispatch: React.Dispatch<Action>
-  ) => {
-    try {
-      const userResponse = await axios.post(
-        'http://192.168.100.127:3000/user/submit',
-        {
-          lname: state.lastname,
-          fname: state.firstname,
-          mname: state.middlename,
-          password: state.password,
-          repassword: state.repassword,
-          birthday: state.birthdate?.toString(),
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-      
-      const { userId } = userResponse.data;
-
-
-      if (userId) {
-        await AsyncStorage.setItem('firstId', userId.toString());
-        console.log('User ID saved to AsyncStorage:', userId);
-      } else {
-        throw new Error('User ID is missing from the backend response');
-      }
-
-
-      // Save user details in AsyncStorage
-      if (state.firstname) await AsyncStorage.setItem('fname', state.firstname);
-      if (state.lastname) await AsyncStorage.setItem('lname', state.lastname);
-      if (state.middlename) await AsyncStorage.setItem('mname', state.middlename);
   
-      // Dispatch the post action to update the state
-      dispatch({
-        actionType: 'post',
-        data: {
-          lastname: state.lastname,
-          firstname: state.firstname,
-          middlename: state.middlename,
-          birthdate:  state.birthdate,
-          password: state.password,
-          repassword: state.repassword
-        },
-      });
-  
-      console.log('User data saved:', userResponse.data);
-    } catch (error) {
-      handleAxiosError(error);
-  
-      // Dispatch an error action
-      dispatch({
-        actionType: 'error',
-        data: { error: error instanceof Error ? error.message : 'Unknown error' },
-      });
-    }
-  };
-  
-  // Function to update the user and dispatch an action
   export const updateUser = async (
     username: string,
-    dispatch: React.Dispatch<Action> // Accept dispatch as a parameter
+    dispatch: React.Dispatch<Action> 
   ) => {
     try {
-      // Fetch values from AsyncStorage and handle undefined
-      const fn = (await AsyncStorage.getItem('fname')) ?? null; // Convert undefined to null
-      const ln = (await AsyncStorage.getItem('lname')) ?? null; // Convert undefined to null
-      const mn = (await AsyncStorage.getItem('mname')) ?? null; // Convert undefined to null
+      const fn = (await AsyncStorage.getItem('fname')) ?? null; 
+      const ln = (await AsyncStorage.getItem('lname')) ?? null; 
+      const mn = (await AsyncStorage.getItem('mname')) ?? null; 
   
       const response = await axios.put(`http://192.168.100.127:3000/user/updateUser/${username}`, {
         fname: fn,
@@ -90,7 +23,6 @@ export const userSubmit = async (
         },
       });
   
-      // Dispatch the put action to update the username
       dispatch({
         actionType: 'put',
         data: { username },
@@ -112,46 +44,65 @@ export const userSubmit = async (
     username: string,
     password: string,
     dispatch: React.Dispatch<Action>
-) => {
+  ) => {
     try {
-        const response = await axios.get(`http://192.168.100.127:3000/user/getUser`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            params: {
-                username,
-                password,
-            },
-        });
-
-        const user = response.data;
-        const id = user?.id;
-
+      const response = await axios.get(`http://192.168.100.127:3000/user/getUser`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        params: {
+          username,
+          password,
+        },
+      });
+  
+      const user = response.data;
+  
+      if (user) {
+        const { id, address, username: storedUsername } = user;
+  
         if (id) {
-            await AsyncStorage.setItem('id', id.toString());
-
-            dispatch({
-                actionType: 'get',
-                data: {
-                    username: user.username,
-                    password: user.password,
-                },
-            });
+          await AsyncStorage.setItem('id', id.toString());
+          console.log('User ID stored in AsyncStorage');
         } else {
-            dispatch({
-                actionType: 'error',
-                data: { error: 'User ID not found' }, // Only this error message is shown in the app
-            });
-        }
-    } catch (error: any) {
-        dispatch({
+          dispatch({
             actionType: 'error',
-            data: { error: 'Invalid username or password' }, // Friendly error message
+            data: { error: 'User ID not found' },
+          });
+        }
+  
+        if (address) {
+          await AsyncStorage.setItem('address', address);
+          console.log('Address stored in AsyncStorage' + address);
+        } else {
+          dispatch({
+            actionType: 'error',
+            data: { error: 'Address not found' },
+          });
+        }
+  
+        if (storedUsername) {
+          dispatch({
+            actionType: 'get',
+            data: { username: storedUsername },
+          });
+        }
+      } else {
+        dispatch({
+          actionType: 'error',
+          data: { error: 'User data not found' },
         });
-        // You can silently catch the error without showing detailed logs.
-        // handleAxiosError(error); // You can remove or customize this to avoid console errors
+      }
+    } catch (error: any) {
+      console.log('Error fetching user:', error.message);  // Logs detailed error message
+      dispatch({
+        actionType: 'error',
+        data: { error: 'Invalid username or password' },
+      });
     }
-};
+  };
+  
+  
 
 
   

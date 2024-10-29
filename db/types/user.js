@@ -25,19 +25,18 @@ function validateUserData(req, res, next) {
 
 
 router.post('/submit', validateUserData, (req, res) => {
-  const { lname, fname, mname, password, birthday, Email, PhoneNumber, AdminID } = req.body;
+  const { lname, fname, mname, password, birthday, address } = req.body;
 
-  const query = `INSERT INTO user (LastName, FirstName, MiddleName, Password, Birthday, Email, PhoneNumber, AdminID) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT INTO user (LastName, FirstName, MiddleName, Password, Birthday, Address) 
+                 VALUES (?, ?, ?, ?, ?, ?)`;
 
-  connection.query(query, [lname, fname, mname, password, birthday, Email, PhoneNumber, AdminID], (error, results) => {
+  connection.query(query, [lname, fname, mname, password, birthday, address], (error, results) => {
     if (error) {
       console.error('Database error:', error.message);
       return res.status(500).send('Database error');
     }
 
-    // Check if insertion was successful and return the inserted UserID
-    const insertedUserId = results.insertId; // This is the auto-incremented ID
+    const insertedUserId = results.insertId; 
     res.status(201).json({ message: 'Data saved successfully', userId: insertedUserId });
   });
 });
@@ -64,6 +63,7 @@ router.get('/getUser', (req, res) => {
         fname: user.FirstName,
         lname: user.LastName,
         mname: user.MiddleName,
+        address: user.Address
       });
     } else {
       return res.status(401).json({ message: 'Username or password is incorrect' });

@@ -6,8 +6,9 @@ import useHandleClicks from './useHandleClicks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {InitialCitizen,reducerCitizen, validateLogin} from '@/app/types/user'
 import {handleBirthdayChange} from '@/app/utils/validateUser'
-import {userSubmit, updateUser, getUser} from '@/app/services/userservice'
+import {updateUser, getUser} from '@/app/services/userservice'
 import  {validateName,validateBirthday,validatePassword, validateBarangayAndSitio,validateUsernamePhoto, validatePhotos} from '@/app/utils/validateUser'
+import {Action, Citizen} from '@/app/types/user'
 
 const useCheckPassword = () => {
   const navigation = useNavigation();
@@ -48,39 +49,7 @@ const useCheckPassword = () => {
       data: { [key]: value }, 
     });
   };
-
  
-  // provider login
-  const handleProviderLogin = async () => {
-    try {
-      if (!providerName || !providerPassword) {
-        setProviderLoginError('Fill up the required fields.')
-        return;
-      }
-  
-      const response = await axios.get(`http://192.168.100.127:3000/serviceprovider/getServiceProvider`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        params: {
-          username: providerName,
-          password: providerPassword,
-        },
-      });
-  
-      // Check if the login was successful
-      if (response.data.success) {
-        navigation.navigate('index' as never);
-      } else {
-        setProviderLoginError(response.data.message)
-      }
-    } catch (error: any) {
-      console.error("Login error: ", error);
-    }
-  };
-  
-
-  
 
    // barangay and sitio
 
@@ -128,19 +97,28 @@ const useCheckPassword = () => {
       await userSubmit(state, dispatch);
   
       const id = await AsyncStorage.getItem('firstId');
+
+      console.log(barangay)
+
+      if (barangay) {
+        await AsyncStorage.setItem('address', barangay);
+      } else {
+        console.log('Barangay is null, not storing in AsyncStorage');
+      }
+      
+
+
+
+
       if (!id) {
         throw new Error('User ID not found in AsyncStorage');
       }
+
+     
   
       console.log('Retrieved User ID:', id);
   
-      const barangayResponse = await axios.post(
-        'http://192.168.100.127:3000/barangay/submit',
-        { barangayname: barangay, sitio, UserID: id },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-  
-      console.log('Barangay data saved:', barangayResponse.data);
+     
   
       navigation.navigate('CitizenPhoto' as never);
   
@@ -205,7 +183,7 @@ const useCheckPassword = () => {
 
       let userLoginError = null; 
 
-      await getUser(state.username ?? 'Lebron James', state.password ?? 'Lebron', (action) => {
+      await getUser(state.username ?? 'Lebron', state.password ?? 'Lebron', (action) => {
           dispatch(action);
           if (action.actionType === 'error') {
               userLoginError = action.data.error; 
@@ -243,7 +221,6 @@ const useCheckPassword = () => {
   
 
   // for photo
-  
   const handlePhotoSelection = async (
     setUri: React.Dispatch<React.SetStateAction<string | null>>, 
     setBase64: React.Dispatch<React.SetStateAction<string | null>>, 
@@ -381,6 +358,67 @@ const useCheckPassword = () => {
     console.error('Error config:', error.config);
 };
 
+const userSubmit = async (
+  state: Citizen,
+  dispatch: React.Dispatch<Action>
+) => {
+  try {
+    const userResponse = await axios.post(
+      'http://192.168.100.127:3000/user/submit',
+      {
+        lname: state.lastname,
+        fname: state.firstname,
+        mname: state.middlename,
+        password: state.password,
+        repassword: state.repassword,
+        birthday: state.birthdate?.toString(),
+        address: barangay
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+    
+    const { userId } = userResponse.data;
+
+
+    if (userId) {
+      await AsyncStorage.setItem('firstId', userId.toString());
+      console.log('User ID saved to AsyncStorage:', userId);
+    } else {
+      throw new Error('User ID is missing from the backend response');
+    }
+
+
+    if (state.firstname) await AsyncStorage.setItem('fname', state.firstname);
+    if (state.lastname) await AsyncStorage.setItem('lname', state.lastname);
+    if (state.middlename) await AsyncStorage.setItem('mname', state.middlename);
+
+    dispatch({
+      actionType: 'post',
+      data: {
+        lastname: state.lastname,
+        firstname: state.firstname,
+        middlename: state.middlename,
+        birthdate:  state.birthdate,
+        password: state.password,
+        repassword: state.repassword
+      },
+    });
+
+    console.log('User data saved:', userResponse.data);
+  } catch (error) {
+    handleAxiosError(error);
+
+    // Dispatch an error action
+    dispatch({
+      actionType: 'error',
+      data: { error: error instanceof Error ? error.message : 'Unknown error' },
+    });
+  }
+};
   return {
    
     handleNextPress,
@@ -418,7 +456,6 @@ const useCheckPassword = () => {
 
     setProviderName,
     setProviderPassword,
-    handleProviderLogin,
 
     providerLoginError,
 

@@ -9,13 +9,15 @@ export const serviceRequestSubmit = async(
 ) => {
 
 
+    const address = await AsyncStorage.getItem('address');
     const USERID = await AsyncStorage.getItem('id');
 
     try{
     const serviceRequestResponse = await axios.post('http://192.168.100.127:3000/servicerequest/submit', {
         UserID: USERID,
         requesttype: state.requestType,  
-        requeststatus: state.requestStatus,                    
+        requeststatus: state.requestStatus,  
+        address: address                  
       }, {
         headers: {
           'Content-Type': 'application/json',
