@@ -111,33 +111,22 @@ const useHandleClicks = () => {
                 marker.latitude,
                 marker.longitude
               );
-              if (distance >= 14000) { 
-                handleArrivalTime(14000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              } else if (distance == 13000){
-                handleArrivalTime(13000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 12000){
-                handleArrivalTime(12000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 10000){
-                handleArrivalTime(10000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 8000){
-                handleArrivalTime(8000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 5000){
-                handleArrivalTime(5000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 3000){
-                handleArrivalTime(3000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance <= 1000){
-                handleArrivalTime(1000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else {
-                console.log('Not calculated')
+              const distanceThresholds = [14000, 13000, 12000, 10000, 8000, 5000, 3000, 1000];
+              let calculated = false;
+              
+              for (const threshold of distanceThresholds) {
+                if (distance >= threshold) {
+                  handleArrivalTime(threshold, true);
+                  console.log(`Coming in ${arrivalTime} minute/s`);
+                  calculated = true;
+                  break;
+                }
               }
+              
+              if (!calculated) {
+                console.log('Not calculated');
+              }
+              
             });
           }
         } else {

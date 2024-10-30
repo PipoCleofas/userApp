@@ -11,7 +11,7 @@ export default function useHandleClicks(){
     const [markerEmoji, setMarkerEmoji] = useState<any>();
     const [markerUnameEmoji, setMarkerUnameEmoji] = useState<any>();
 
-    const [markerImageSize, setMarkerImageSize] =useState<{width: any, height: any}> ({ width: 65, height: 70 });
+    const [markerImageSize, setMarkerImageSize] =useState<{width: any, height: any}> ({ width: 60, height: 60 });
 
     const navigation = useNavigation();
 
@@ -84,7 +84,7 @@ export default function useHandleClicks(){
     
     async function imageChanger() {
         try {
-          const uname = await AsyncStorage.getItem('username');
+          const uname = await AsyncStorage.getItem('usernameSP');
           if (uname) {
             switch (uname) {
               case 'BFP':

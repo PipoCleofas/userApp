@@ -15,13 +15,13 @@ interface MarkerType {
 
 const getMarkerImage = (title: string) => {
   switch (title) {
-    case 'BFP':
+    case 'BFP Assistance Request':
       return require('../assets/images/fire.png');
-    case 'PNP':
+    case 'PNP Assistance Request':
       return require('../assets/images/police.webp');
-    case 'Medical':
+    case 'Medical Assistance Request':
       return require('../assets/images/medic.png');
-    case 'NDRRMC':
+    case 'NDRRMC Assistance Request':
       return require('../assets/images/ndrrmc.png');
 
   }
@@ -63,17 +63,16 @@ export default function MainPage() {
           return;
         }
   
-        // Fetch existing markers
         try {
           const response = await fetch(`http://192.168.100.127:3000/marker/getMarker/${username}`);
           const data = await response.json();
           console.log(data)
           if (Array.isArray(data)) setMarkers(data);
+
         } catch (fetchError: any) {
           console.error('Error fetching markers:', fetchError.message);
         }
   
-        // Check marker existence
         try {
           const checkResponse = await axios.get(`http://192.168.100.127:3000/marker/checkMarkerTitleExists`, {
             params: { title: username },
@@ -96,7 +95,7 @@ export default function MainPage() {
               console.log("Attempting to create marker with:", {
                 lat,
                 long,
-                description: 'test', // Adjust if necessary
+                description: 'test',
                 UserID: userId,
               });
   
@@ -105,7 +104,7 @@ export default function MainPage() {
                 long,
                 description: 'test',
                 UserID: userId,
-                title: username  // Add this line
+                title: username  
               });
               
   
@@ -138,11 +137,14 @@ export default function MainPage() {
 
   useEffect(() => {
     const updateMarkerEmoji = async () => {
-      await imageChanger();  
+      const result = await imageChanger();
+      console.log("Updated marker emoji:", result); // Debugging output
     };
   
     updateMarkerEmoji();  
-  }, []);
+  }, [latitude, longitude, title]); 
+  
+  
 
   useEffect(() => {
     if (latitude && longitude && title) {
@@ -181,24 +183,26 @@ export default function MainPage() {
               style={{ width: markerImageSize.width, height: markerImageSize.height }}
             />
           </Marker>
+          {markers.map((marker, index) => {
+              console.log("Rendering marker with title:", marker.title); 
+              return (
+                <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: marker.latitude,
+                    longitude: marker.longitude,
+                  }}
+                  title={marker.title} 
+                  description={`Latitude: ${marker.latitude}, Longitude: ${marker.longitude}`}
+                >
+                  <Image
+                    source={getMarkerImage(marker.title)} 
+                    style={{ width: 45, height: 45 }}  
+                  />
+                </Marker>
+              );
+            })}
 
-          {/* Render other markers */}
-          {markers.map((marker, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              title={marker.title} // Title from database
-              description={`Latitude: ${marker.latitude}, Longitude: ${marker.longitude}`}
-            >
-              <Image
-                source={getMarkerImage(marker.title)}  // Use title to determine marker image
-                style={{ width: 10, height: 10 }}  // Adjust size as needed
-              />
-            </Marker>
-          ))}
         </MapView>
       )}
 
@@ -255,8 +259,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonPressed: {
-    borderWidth: 2,         // Add a border to show when pressed
-    borderColor: '#FFD700', // Gold color for the border
+    borderWidth: 2,         
+    borderColor: '#FFD700', 
   },
   iconsRow: {
     flexDirection: 'row',
