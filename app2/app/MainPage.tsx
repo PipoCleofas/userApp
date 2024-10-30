@@ -65,8 +65,9 @@ export default function MainPage() {
   
         // Fetch existing markers
         try {
-          const response = await fetch('http://192.168.100.127:3000/marker/getMarker');
+          const response = await fetch(`http://192.168.100.127:3000/marker/getMarker/${username}`);
           const data = await response.json();
+          console.log(data)
           if (Array.isArray(data)) setMarkers(data);
         } catch (fetchError: any) {
           console.error('Error fetching markers:', fetchError.message);
@@ -194,7 +195,7 @@ export default function MainPage() {
             >
               <Image
                 source={getMarkerImage(marker.title)}  // Use title to determine marker image
-                style={{ width: 40, height: 40 }}  // Adjust size as needed
+                style={{ width: 10, height: 10 }}  // Adjust size as needed
               />
             </Marker>
           ))}

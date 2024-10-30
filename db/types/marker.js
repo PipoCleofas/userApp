@@ -36,33 +36,36 @@ router.post('/submit', validateMarker ,(req, res) => {
   });
 });
 
+router.get('/getMarker/:marker', (req, res) => {
+  const marker = req.params.marker;
 
-// markers
+  if (!marker) {
+    return res.status(400).send('Marker is required');
+  }
 
-router.get('/getMarker', (req, res) => {
-  const query = `SELECT * FROM markerrr WHERE title != 'Canceled Service'`;
+  const query = `SELECT * FROM markerrr WHERE title = CONCAT(?, ' Assistance Request')`;
 
-  connection.query(query, (error, results) => {
+  connection.query(query, [marker], (error, results) => {
     if (error) {
-      console.error('Database error:', error);
-      return res.status(500).json({ error: 'Database error' });
+      console.error('Database error:', error.message);
+      return res.status(500).send('Database error');
     }
 
-    return res.status(200).json(results); 
+    return res.status(200).json(results);
   });
 });
 
-router.put('/updateMarkerTitle/:id', (req, res) => {
-  const id = req.params.id;  // Get the ID from the URL parameter
-  const { newTitle } = req.body;  // Get the new title from the request body
 
+
+router.put('/updateMarkerTitle/:id', (req, res) => {
+  const id = req.params.id;  
+  const { newTitle } = req.body;  
   if (!newTitle) {
     return res.status(400).send('New title is required');
   }
 
   const query = `UPDATE marker SET title = ? WHERE id = ?`;
-  const values = [newTitle, id];  // Set the new title and id
-
+  const values = [newTitle, id]; 
   connection.query(query, values, (error, results) => {
     if (error) {
       console.error('Database error:', error.message);
