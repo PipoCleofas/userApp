@@ -6,12 +6,20 @@ import * as SMS from 'expo-sms';
 import {useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
+// Define the type for the marker object
+interface MarkerType {
+  latitude: number;
+  longitude: number;
+  title: string;  // Add the title field
+  distance?: number;
+}
 
 // request status = 'pending' | 'approved' | 'rejected'
   
 const useHandleClicks = () => {
-    const {latitude, longitude, fetchLocation} = useLocation();
+  const [markers, setMarkers] = useState<MarkerType[]>([]); // State to store markers
+
+    const {latitude, longitude, fetchLocation, handleArrivalTime, arrivalTime, location} = useLocation();
     const {isAvailable,setResult} = useSMS();
   
 
@@ -68,10 +76,79 @@ const useHandleClicks = () => {
         navigation.navigate('CitizenLogin' as never);
     };
     
-
+    const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+      const toRad = (value: number) => (value * Math.PI) / 180; 
+      const R = 6371e3; // Radius of Earth in meters
+      const φ1 = toRad(lat1);
+      const φ2 = toRad(lat2);
+      const Δφ = toRad(lat2 - lat1);
+      const Δλ = toRad(lon2 - lon1);
+  
+      const a =
+        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+      const distance = R * c; // Distance in meters
+      return distance;
+    };
     
 
+    const fetchMarkers = async (serviceChosen: string) => {
+      try {
+        const response = await fetch(`http://192.168.100.127:3000/marker/getService/${serviceChosen}`); 
+        const data = await response.json();
   
+        if (Array.isArray(data)) {
+          setMarkers(data);  
+
+          if (location) {
+            data.forEach((marker: MarkerType) => {
+              const distance = haversineDistance(
+                location.coords.latitude,
+                location.coords.longitude,
+                marker.latitude,
+                marker.longitude
+              );
+              if (distance >= 14000) { 
+                handleArrivalTime(14000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              } else if (distance == 13000){
+                handleArrivalTime(13000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              }else if (distance == 12000){
+                handleArrivalTime(12000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              }else if (distance == 10000){
+                handleArrivalTime(10000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              }else if (distance == 8000){
+                handleArrivalTime(8000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              }else if (distance == 5000){
+                handleArrivalTime(5000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              }else if (distance == 3000){
+                handleArrivalTime(3000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              }else if (distance <= 1000){
+                handleArrivalTime(1000, true)
+                console.log(`Coming in ${arrivalTime} minute/s`)
+              }else {
+                console.log('Not calculated')
+              }
+            });
+          }
+        } else {
+          console.error('Error', 'Invalid data format from API');
+        }
+      } catch (error) {
+        console.error('Error fetching markers:', error);
+        console.error('Error', 'Failed to load markers');
+      }
+    };
+
 
   
 
@@ -80,20 +157,16 @@ const useHandleClicks = () => {
 
       setMarkerEmoji(markeremoji);
       setMarkerImageSize({ width: imageWidth, height: imageHeight });
-      // Fetch the location
     
-
-      // gets the id
       const USERID = await AsyncStorage.getItem('id');
 
       const address = await AsyncStorage.getItem('address');
 
       try {
-        // Submit marker data
         const markerResponse = await axios.post('http://192.168.100.127:3000/marker/submit', {
           latitude,
           longitude,
-          title: requestType,
+          title: `${requestType} Assistance Request`,
           description: "Emergency Assistance Request",
           UserID: USERID 
         }, {
@@ -103,7 +176,6 @@ const useHandleClicks = () => {
         });
         console.log('Marker submission success:', markerResponse.data);
     
-        // Submit service request data
         const serviceRequestResponse = await axios.post('http://192.168.100.127:3000/servicerequest/submit', {
           UserID: USERID,
           requesttype: requestType,  
@@ -114,20 +186,24 @@ const useHandleClicks = () => {
             'Content-Type': 'application/json',
           },
         });
+
+        const returnedID = await serviceRequestResponse.data.UserID;
+
+        fetchMarkers(requestType)
+
+        console.log("Returned Request Type:", requestType);
+        console.log("Returned ID:", returnedID);
+
+
         console.log('Service request success:', serviceRequestResponse.data);
         console.log('Request type set to: ' + requestType);
 
         const markerID = markerResponse.data.id;
-        
-        
-      
 
       } catch (error: any) {
         handleAxiosError(error);
       }
-    
-      // Send SMS notification
-      // sendSMS("Emergency Assistance Request");
+
     };
     
     
@@ -239,7 +315,8 @@ const useHandleClicks = () => {
         onFileUpload,
 
         markerEmoji,
-        markerImageSize
+        markerImageSize,
+        markers
         
     }
 

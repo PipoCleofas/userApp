@@ -21,16 +21,22 @@ router.post('/submit', validateUserData, (req, res) => {
     return res.status(500).send('No database connection');
   }
 
-  const query = `INSERT INTO servicerequesttt (UserID, RequestType, RequestStatus, Address) VALUES (?,?, ?,?)`;
+  const query = `INSERT INTO servicerequesttt (UserID, RequestType, RequestStatus, Address) VALUES (?, ?, ?, ?)`;
 
   connection.query(query, [UserID, requesttype, requeststatus, address], (error, results) => {
     if (error) {
       console.error('Database error:', error.message);
       return res.status(500).send('Database error');
     }
-    res.status(201).send('Service request submitted successfully');
+    
+    res.status(201).json({
+      message: 'Service request submitted successfully',
+      requestType: requesttype,
+      UserID: UserID
+    });
   });
 });
+
 
 router.get('/getRequests', (req, res) => {
   const verify = 'SELECT * FROM servicerequesttt';

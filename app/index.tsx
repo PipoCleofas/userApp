@@ -8,13 +8,7 @@ import Notification from '@/components/notification-holder/Notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDataInput } from '@/website/web-app/src/hooks/useDataInput';
 
-// Define the type for the marker object
-interface MarkerType {
-  latitude: number;
-  longitude: number;
-  title: string;  // Add the title field
-  distance?: number;
-}
+
 
 const getMarkerImage = (title: string) => {
   switch (title) {
@@ -32,14 +26,14 @@ const getMarkerImage = (title: string) => {
 
 export default function Index() {
 
-  const [markers, setMarkers] = useState<MarkerType[]>([]); // State to store markers
  
   const { location, errorMsg, isFetching, arrivalTime, handleArrivalTime } = useLocation();
   const { 
     EmergencyAssistanceRequest,
     RouteAssistance,
     markerEmoji,
-    markerImageSize
+    markerImageSize,
+    markers
   } = useHandleClicks();
 
   const [triggerNotification, setTriggerNotification] = useState(false);
@@ -92,85 +86,10 @@ export default function Index() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Haversine formula to calculate distance between two coordinates (in meters)
-  const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const toRad = (value: number) => (value * Math.PI) / 180; // Convert degrees to radians
-    const R = 6371e3; // Radius of Earth in meters
-    const φ1 = toRad(lat1);
-    const φ2 = toRad(lat2);
-    const Δφ = toRad(lat2 - lat1);
-    const Δλ = toRad(lon2 - lon1);
 
-    const a =
-      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-      Math.cos(φ1) * Math.cos(φ2) *
-      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distance = R * c; // Distance in meters
-    return distance;
-  };
-
-  useEffect(() => {
-    const fetchMarkers = async () => {
-      try {
-        const response = await fetch('http://192.168.100.127:3000/marker/getMarker'); 
-        const data = await response.json();
+    
   
-        if (Array.isArray(data)) {
-          setMarkers(data);  
-
-          if (location) {
-            data.forEach((marker: MarkerType) => {
-              const distance = haversineDistance(
-                location.coords.latitude,
-                location.coords.longitude,
-                marker.latitude,
-                marker.longitude
-              );
-              if (distance >= 14000) { 
-                handleArrivalTime(14000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              } else if (distance == 13000){
-                handleArrivalTime(13000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 12000){
-                handleArrivalTime(12000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 10000){
-                handleArrivalTime(10000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 8000){
-                handleArrivalTime(8000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 5000){
-                handleArrivalTime(5000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance == 3000){
-                handleArrivalTime(3000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else if (distance <= 1000){
-                handleArrivalTime(1000, true)
-                console.log(`Coming in ${arrivalTime} minute/s`)
-              }else {
-                console.log('Not calculated')
-              }
-            });
-          }
-        } else {
-          console.error('Error', 'Invalid data format from API');
-        }
-      } catch (error) {
-        console.error('Error fetching markers:', error);
-        console.error('Error', 'Failed to load markers');
-      }
-    };
-
-    fetchMarkers();
-    const intervalId = setInterval(fetchMarkers, 15000); 
-
-    return () => clearInterval(intervalId); 
-  }, [location]); 
   
 
 

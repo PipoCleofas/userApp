@@ -77,6 +77,27 @@ router.put('/updateMarkerTitle/:id', (req, res) => {
   });
 });
 
+router.get('/getService/:service', (req, res) => {
+  const service = req.params.service;
+
+  if (!service) {
+    return res.status(400).send('Service is required');
+  }
+
+  const query = 'SELECT * FROM markerrr WHERE title = ?';
+
+  connection.query(query, [service], (error, results) => {
+    if (error) {
+      console.error('Database error:', error.message);
+      return res.status(500).send('Database error');
+    }
+
+    return res.status(200).json(results);
+  });
+});
+
+
+
 router.post('/:SPtype/submitMarkerSP', validateMarker, (req, res) => {
   const { latitude, longitude, description, UserID } = req.body;
   const title = req.params.SPtype;  // Using SPtype as title

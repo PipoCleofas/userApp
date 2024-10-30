@@ -34,7 +34,6 @@ export function useGetItems() {
             console.log(clientResponse.data);
             setClients(clientResponse.data);
   
-            // Extract and log client IDs
             const clientIds = clientResponse.data.map(client => client.UserID);
             
             console.log('Client IDs:', clientIds);
@@ -46,7 +45,6 @@ export function useGetItems() {
             console.log(requestResponse.data);
             setRequests(requestResponse.data);
   
-            // Extract and log request IDs
             const requestIds = requestResponse.data.map(request => request.UserID);
             setMarkerIDs(requestIds);
             console.log('Request IDs:', requestIds);
