@@ -1,15 +1,17 @@
 import AdminDashboardComponentLeft from '../components/AdminDashboardComponentsleft';
 import AdminDashboardComponentRight from '../components/AdminDashboardComponentright';
 import '../../utils/Home.css';
-import { useLanguageContext } from '../context/LanguageProvider';  
+import { LanguageProvider, useLanguageContext } from '../context/LanguageProvider';  
 
 export default function AdminDashboard() {
-  const { translations, language } = useLanguageContext(); 
+  const { language } = useLanguageContext(); 
   
   return (
+    <LanguageProvider>
     <div className='admin-dashboard'>
-      <AdminDashboardComponentLeft />
-      <AdminDashboardComponentRight />
+      <AdminDashboardComponentLeft key={language} />
+      <AdminDashboardComponentRight key={language} />
     </div>
-  );
+    </LanguageProvider>
+    );
 }

@@ -1,15 +1,17 @@
 import ViewRequestleft from '../components/ViewRequestleft';
 import ViewRequestRight from '../components/ViewRequestRight';
 import '../../utils/Home.css';
-import { useLanguageContext } from '../context/LanguageProvider';  // Import useLanguageContext
+import { LanguageProvider, useLanguageContext } from '../context/LanguageProvider';
 
 export default function ViewRequest() {
-  const { translations, language } = useLanguageContext(); // Access translations and current language
+  const { language } = useLanguageContext(); // Access language from context
   
   return (
+    <LanguageProvider> 
     <div className='admin-dashboard'>
-      <ViewRequestleft />
-      <ViewRequestRight />
+      <ViewRequestleft key={language} />
+      <ViewRequestRight key={language} />
     </div>
-  );
+    </LanguageProvider>  
+    );
 }

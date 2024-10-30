@@ -1,10 +1,9 @@
 import ComboBox from '../components/comboboxholder/Combobox';
-import { useLanguageContext } from '../context/LanguageProvider'; // Correct import path
+import { useLanguageContext } from '../context/LanguageProvider';
 
 export default function SettingsRight() {
-  const { language, changeLanguage } = useLanguageContext(); // Access language context
+  const { language, changeLanguage } = useLanguageContext();
 
-  // Define the language options for the ComboBox
   const data = [
     { label: 'English', value: 'English' },
     { label: 'Filipino', value: 'Filipino' },
@@ -12,8 +11,7 @@ export default function SettingsRight() {
 
   return (
     <div>
-      <h3>Choose Language</h3> {/* Optional heading for context */}
-      {/* Pass changeLanguage function and the current language to ComboBox */}
+      <h3>Choose Language</h3>
       <ComboBox onValueChange={changeLanguage} data={data} value={language} />
     </div>
   );
