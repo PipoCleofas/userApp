@@ -3,11 +3,13 @@ import { useGetItems } from '../hooks/useGetItems';
 import { updateStatusRequest } from '../services/servicerequest';
 import { updateMarkerRequest } from '../services/marker'; 
 import axios from 'axios';
+import { useLanguageContext } from '../context/LanguageProvider';
 
 export default function ViewRequestRight() {
     const { checkAccounts, requests } = useGetItems();
     const [loading, setLoading] = useState(true);
-
+    const { translations, language } = useLanguageContext();
+    const t = translations[language]; // Get translations for current language
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,7 +27,7 @@ export default function ViewRequestRight() {
             const requestIds = requests.map(request => request.UserID);
     
             for (let id of requestIds) {
-                const response = await axios.put(`http://192.168.100.127:3000/marker/updateMarkerTitle/${id}`, {
+                const response = await axios.put(`http://192.168.100.28:3000/marker/updateMarkerTitle/${id}`, {
                     newTitle: 'Cancelled Service'  
                 }, {
                     headers: {
@@ -92,7 +94,7 @@ export default function ViewRequestRight() {
                                 }}
                                 onClick={() => handleStatusUpdate('approved', request.UserID)}
                             >
-                                Approve
+                                {t.approve}
                             </button>
                             <button
                                 style={{
@@ -107,7 +109,7 @@ export default function ViewRequestRight() {
                                 }}
                                 onClick={() => handleStatusUpdate('rejected', request.UserID)}
                             >
-                                Reject
+                                {t.reject}
                             </button>
                         </div>
                     </div>

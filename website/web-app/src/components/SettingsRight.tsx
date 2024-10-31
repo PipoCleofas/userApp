@@ -2,7 +2,8 @@ import ComboBox from '../components/comboboxholder/Combobox';
 import { useLanguageContext } from '../context/LanguageProvider';
 
 export default function SettingsRight() {
-  const { language, changeLanguage } = useLanguageContext();
+  const { translations, language, changeLanguage } = useLanguageContext();
+  const t = translations[language];
 
   const data = [
     { label: 'English', value: 'English' },
@@ -11,7 +12,7 @@ export default function SettingsRight() {
 
   return (
     <div>
-      <h3>Choose Language</h3>
+      <h3>{t.chooselang}</h3>
       <ComboBox onValueChange={changeLanguage} data={data} value={language} />
     </div>
   );
