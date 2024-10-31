@@ -24,12 +24,14 @@
    ### For database
    ```bash
    cd BarangayEmergency/db
+   npm install mysql2 express cors
    node index.js
    ```
    ### For website (admins)
    ```bash
    cd BarangayEmergency/website/web-app
    npm install - if not already installed
+   npm install vite - if not already installed
    npm run dev
    ```
 
@@ -37,6 +39,7 @@
    ```bash
    cd BarangayEmergency/websiteBarangay
    npm install - if not already installed
+   npm install vite - if not already installed
    npm run dev
    ```
 
