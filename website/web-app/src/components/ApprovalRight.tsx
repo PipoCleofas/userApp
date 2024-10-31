@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useGetItems } from '../hooks/useGetItems';
+import { useLanguageContext } from '../context/LanguageProvider';
 
 export default function ApprovalRight() {
     const { checkAccounts, clients } = useGetItems();
     const [loading, setLoading] = useState(true);
     const [updatingStatus, setUpdatingStatus] = useState<number | null>(null); // Stores the userId currently being updated
+    const { translations, language } = useLanguageContext();
+    const t = translations[language]; // Get translations for current language
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,7 +97,7 @@ export default function ApprovalRight() {
                             onClick={() => updateUserStatus('approved', user.UserID)}
                             disabled={updatingStatus === user.UserID} 
                         >
-                            {updatingStatus === user.UserID ? 'Approving...' : 'Approve'}
+                             {t.approve}
                         </button>
                         <button
                             style={{
@@ -112,7 +115,7 @@ export default function ApprovalRight() {
                             onClick={() => updateUserStatus('rejected', user.UserID)}
                             disabled={updatingStatus === user.UserID}
                         >
-                            {updatingStatus === user.UserID ? 'Rejecting...' : 'Reject'}
+                            {t.reject}
                         </button>
                     </div>
                 </div>
