@@ -64,7 +64,7 @@ router.put('/updateMarkerTitle/:id', (req, res) => {
     return res.status(400).send('New title is required');
   }
 
-  const query = `UPDATE marker SET title = ? WHERE id = ?`;
+  const query = `UPDATE markerrr SET title = ? WHERE UserID = ?`;
   const values = [newTitle, id]; 
   connection.query(query, values, (error, results) => {
     if (error) {

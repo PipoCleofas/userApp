@@ -170,6 +170,14 @@ const useHandleClicks = () => {
         if (requestType === 'Canceled Service') {
           if (USERID !== null) {
             await updateStatusRequest(requestStatus ?? '', parseInt(USERID));
+            
+            const markerUpdateResponse = await axios.put(`http://192.168.100.127:3000/marker/updateMarkerTitle/${USERID}`, {
+              newTitle: 'Cancelled Service Assistance Request'
+            }, {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+            });
           } else {
             console.error("USERID is null");
           }
