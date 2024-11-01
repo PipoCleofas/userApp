@@ -58,7 +58,7 @@ export default function Index() {
   }
 
   function cancelService() {
-    EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'rejected');
+    EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'Cancelled Service');
     setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
   }
 

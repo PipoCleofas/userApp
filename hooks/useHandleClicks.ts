@@ -140,7 +140,21 @@ const useHandleClicks = () => {
 
 
   
-
+    const updateStatusRequest = async (status: string, userId: number) => {
+      try {
+          const response = await axios.put(`http://192.168.100.127:3000/servicerequest/updateRequest/${status}`, {
+              UserID: userId
+          }, {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+          });
+  
+          console.log('Status updated successfully:', response.data);
+      } catch (error) {
+          handleAxiosError(error);
+      }
+  };
 
     const EmergencyAssistanceRequest = async (requestType: string, markeremoji: any, imageWidth: number = 65, imageHeight: number = 70, requestStatus: string | null) => {
 
@@ -152,6 +166,15 @@ const useHandleClicks = () => {
       const address = await AsyncStorage.getItem('address');
 
       try {
+
+        if (requestType === 'Canceled Service') {
+          if (USERID !== null) {
+            await updateStatusRequest(requestStatus ?? '', parseInt(USERID));
+          } else {
+            console.error("USERID is null");
+          }
+        }
+        
         const markerResponse = await axios.post('http://192.168.100.127:3000/marker/submit', {
           latitude,
           longitude,
