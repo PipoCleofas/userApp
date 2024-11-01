@@ -47,7 +47,7 @@ router.post('/submit', validateUserData, (req, res) => {
 router.get('/getUser', (req, res) => {
   const { username, password } = req.query;
 
-  const verify = `SELECT * FROM user WHERE Username = ? AND Password = ?`;
+  const verify = `SELECT * FROM user WHERE Username = ? AND Password = ? AND Status = "approved" `;
 
   connection.query(verify, [username, password], (error, results) => {
     if (error) {
@@ -72,7 +72,7 @@ router.get('/getUser', (req, res) => {
 });
 
 router.get('/getUserList', (req, res) => {
-  const verify = 'SELECT * FROM user';
+  const verify = 'SELECT * FROM user WHERE Status = "pending"';
 
   connection.query(verify, (error, results) => {
     if (error) {
@@ -80,15 +80,37 @@ router.get('/getUserList', (req, res) => {
       return res.status(500).send('Database error');
     }
 
-    if (results.length > 0) {
-      // Return the entire array of users
-      return res.status(200).json(results);
-    } else {
-      return res.status(401).json({ message: 'No account found' });
-    }
+    return res.status(200).json(results.length > 0 ? results : []);
   });
 });
 
+
+router.put('/updateUserStatus/:newStatus', (req, res) => {
+  const newStatus = req.params.newStatus; 
+  const { id } = req.body;    
+
+  console.log('Received data:', { newStatus, id });
+
+  if (!id) {
+    return res.status(400).send('Id is required');
+  }
+
+  const query = `UPDATE user SET status = ? WHERE UserID = ?`;
+  const values = [newStatus, id]; 
+
+  connection.query(query, values, (error, results) => {
+    if (error) {
+      console.error('Database error:', error.message);
+      return res.status(500).send('Database error');
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).send('User not found');
+    }
+
+    res.status(200).send('Status updated successfully');
+  });
+});
 
 
 router.put('/updateUser/:newUsername', (req, res) => {

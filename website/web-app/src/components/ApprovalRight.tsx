@@ -38,6 +38,9 @@ export default function ApprovalRight() {
             console.log('User status updated:', response.data);
     
             await checkAccounts('clients');
+            
+            
+
         } catch (error) {
             console.error('Error updating user status:', error);
         } finally {
