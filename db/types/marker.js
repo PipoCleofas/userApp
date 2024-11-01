@@ -43,7 +43,7 @@ router.get('/getMarker/:marker', (req, res) => {
     return res.status(400).send('Marker is required');
   }
 
-  const query = `SELECT * FROM markerrr WHERE title = CONCAT(?, ' Assistance Request')`;
+  const query = `SELECT * FROM markerrr WHERE title = CONCAT(?, ' Assistance Request') AND description = 'approved'`;
 
   connection.query(query, [marker], (error, results) => {
     if (error) {
@@ -55,6 +55,28 @@ router.get('/getMarker/:marker', (req, res) => {
   });
 });
 
+router.put('/updateMarkerDesc/:id', (req, res) => {
+  const id = req.params.id;  
+  const { newDesc } = req.body;  
+  if (!newDesc) {
+    return res.status(400).send('New description is required');
+  }
+
+  const query = `UPDATE markerrr SET description = ? WHERE UserID = ?`;
+  const values = [newDesc, id]; 
+  connection.query(query, values, (error, results) => {
+    if (error) {
+      console.error('Database error:', error.message);
+      return res.status(500).send('Database error');
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).send('Marker not found');
+    }
+
+    res.status(200).send('Marker title updated successfully');
+  });
+});
 
 
 router.put('/updateMarkerTitle/:id', (req, res) => {

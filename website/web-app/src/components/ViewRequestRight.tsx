@@ -27,15 +27,25 @@ export default function ViewRequestRight() {
             const requestIds = requests.map(request => request.UserID);
     
             for (let id of requestIds) {
-                const response = await axios.put(`http://192.168.100.28:3000/marker/updateMarkerTitle/${id}`, {
+                /*const markerTitleResponse = await axios.put(`http://192.168.100.127:3000/marker/updateMarkerTitle/${id}`, {
                     newTitle: 'Cancelled Service'  
                 }, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                });
+                });*/
+
+                if(status === 'approved'){
+                    const markerDescResponse = await axios.put(`http://192.168.100.127:3000/marker/updateMarkerDesc/${id}`, {
+                        newDesc: 'approved'  
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                }
+                
     
-                console.log(`Title updated for marker ID ${id}:`);
             }
     
             // Log after the for loop
