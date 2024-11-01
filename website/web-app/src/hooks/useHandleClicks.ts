@@ -22,6 +22,8 @@ export const useHandleClicks = () => {
   
     try {
       const isAdminValid = await checkAccounts('admin', username, password);
+
+      localStorage.setItem('username', username); 
   
       if (isAdminValid) {
         navigate('/AdminDashboard'); 
