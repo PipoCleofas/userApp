@@ -48,6 +48,12 @@ export default function AdminDashboardComponentLeft() {
           >
             {translations[language].settings}  
           </li>
+          <li 
+            onClick={() => handleNavClick(navigate, '/history')}
+            style={{ marginBottom: '20px', padding: '20px', border: 'none', borderRadius: '0' }}
+            >
+              History
+          </li>
         </ul>
       </div>
     </div>
