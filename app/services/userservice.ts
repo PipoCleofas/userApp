@@ -82,6 +82,8 @@ import {Action, Citizen} from '@/app/types/user'
         }
   
         if (storedUsername) {
+          await AsyncStorage.setItem('username', storedUsername); 
+
           dispatch({
             actionType: 'get',
             data: { username: storedUsername },

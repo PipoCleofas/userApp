@@ -195,9 +195,13 @@ const useHandleClicks = () => {
           },
         });
         console.log('Marker submission success:', markerResponse.data);
-    
+        
+        let  username = await AsyncStorage.getItem('username')
+        console.log(username)
+
         const serviceRequestResponse = await axios.post('http://192.168.100.127:3000/servicerequest/submit', {
           UserID: USERID,
+          Username: username,
           requesttype: requestType,  
           requeststatus: requestStatus,  
           address: address                  

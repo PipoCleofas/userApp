@@ -15,15 +15,15 @@ function validateUserData(req, res, next) {
 }
 
 router.post('/submit', validateUserData, (req, res) => {
-  const { UserID, requesttype, requeststatus, address } = req.body;
+  const { UserID, Username, requesttype, requeststatus, address } = req.body;
 
   if (!connection) {
     return res.status(500).send('No database connection');
   }
 
-  const query = `INSERT INTO servicerequesttt (UserID, RequestType, RequestStatus, Address) VALUES (?, ?, ?, ?)`;
+  const query = 'INSERT INTO servicerequesttt (UserID, Username, RequestType, RequestStatus, Address) VALUES (?, ?, ?, ?, ?)';
 
-  connection.query(query, [UserID, requesttype, requeststatus, address], (error, results) => {
+  connection.query(query, [UserID, Username, requesttype, requeststatus, address], (error, results) => {
     if (error) {
       console.error('Database error:', error.message);
       return res.status(500).send('Database error');
@@ -36,7 +36,6 @@ router.post('/submit', validateUserData, (req, res) => {
     });
   });
 });
-
 
 router.get('/getRequests', (req, res) => {
   const verify = 'SELECT * FROM servicerequesttt';

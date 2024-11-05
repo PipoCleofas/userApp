@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator, Pressable, Modal, TextInput } from 'react-native';
 import { useNavigation } from 'expo-router';
 import useLocation from '../hooks/useLocation'
 import useHandleLogin from '@/hooks/useHandleLogin';
@@ -38,6 +38,14 @@ export default function MainPage() {
   const { markerUnameEmoji, markerEmoji, markerImageSize, imageChanger,uname } = useHandleLogin();
 
 
+  const [modalVisible,setModalVisible] = useState<boolean>(false)
+
+  const [serviceProvided,setServiceProvided] = useState<string | null>()
+  const [nameInNeed,setNameInNeed] = useState<string | null>()
+  const [message,setMessage] = useState<string | null>('')
+
+
+  const [messageError,setMessageError] = useState<string | null>()
   
 
   const defaultRegion = {
@@ -124,13 +132,32 @@ export default function MainPage() {
     const intervalId = setInterval(fetchAndUpdateMarker, 3000);
     return () => clearInterval(intervalId);
   }, [latitude, longitude]);
-  
 
+  // done
+  async function handleSendMessage(){
+    try{
+     
+     if(!serviceProvided && !nameInNeed && !message){
+        setMessageError('Fill up the requirements')
+        return;
+     }
 
+     const finalMessage = `The Service Provided is ${serviceProvided}. The name of the person in need is ${nameInNeed}. ${message}`
 
+     const messageSubmitResponse = await axios.post("http://192.168.100.127:3000/messaging/submit", {
+        message: finalMessage
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }); 
 
-
-
+      setModalVisible(!modalVisible)
+      
+    }catch(err: any){
+      console.log(err)
+    }
+  }
 
 
   
@@ -155,8 +182,65 @@ export default function MainPage() {
     }
   }, [latitude, longitude, title]); 
 
+
+
+
   return (
     <View style={styles.container}>
+
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => {
+        setModalVisible(!modalVisible);
+      }}
+    >
+      <View style={modalStyles.modalBackground}>
+        <View style={modalStyles.modalView}>
+          <Text style={modalStyles.label}>Name of the person in need</Text>
+          <TextInput
+            style={modalStyles.input}
+            onChangeText={(e) => setNameInNeed(e)}
+            maxLength={30}
+          />
+
+          <Text style={modalStyles.label}>Service Provided</Text>
+          <TextInput
+            style={modalStyles.input}
+            onChangeText={(e) => setServiceProvided(e)}
+            maxLength={6}
+          />
+
+          <Text style={modalStyles.label}>Message (include time and date)</Text>
+          <TextInput
+            style={[modalStyles.input, modalStyles.textArea]}
+            onChangeText={(e) => setMessage(e)}
+            multiline={true}
+            maxLength={100}
+          />
+
+          {messageError && <Text style={modalStyles.errorText}>{messageError}</Text>}
+
+          <View style={modalStyles.buttonContainer}>
+            <Pressable
+              style={modalStyles.button}
+              onPress={() => handleSendMessage()}
+            >
+              <Text style={modalStyles.buttonText}>Send</Text>
+            </Pressable>
+
+            <Pressable
+              style={modalStyles.button}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={modalStyles.buttonText}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+
       {isFetching && <Text>Fetching location...</Text>}
       {errorMsg && <Text>{errorMsg}</Text>}
       {!isFetching && location && (
@@ -211,12 +295,9 @@ export default function MainPage() {
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.button, isPressed ? styles.buttonPressed : null]}
-              onPress={() => {
-                setIsPressed(!isPressed);
-                setCanSelectLocation(!canSelectLocation);
-              }}
+              onPress={() => setModalVisible(!modalVisible)}
             >
-              <Text style={styles.buttonText}>Route Assistance</Text>
+              <Text style={styles.buttonText}>Send Updates</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -352,59 +433,74 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 6,
+    textAlign: 'center',
+  },
   
 });
 
 const modalStyles = StyleSheet.create({
-  centeredView: {
+  modalBackground: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
   },
   modalView: {
-    margin: 20,
+    width: '80%',
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
+    borderRadius: 10,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
   },
-  buttonModal: {
-    flexDirection: 'column',
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#333',
   },
-  servicesContainerStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  input: {
+    width: '100%',
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 15,
+    fontSize: 16,
+    color: '#333',
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top', // For multiline input
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
     marginBottom: 10,
   },
-  serviceButton: {
-    width: 120,
-    height: 60,
-    backgroundColor: '#AD5765',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 8,
-    borderRadius: 10,
-    padding: 10,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  closeButton: {
-    backgroundColor: 'red',
-    marginTop: 20,
+  button: {
+    flex: 1,
+    backgroundColor: '#2196F3',
+    paddingVertical: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-    padding: 10,
   },
-  textStyle: {
+  buttonText: {
     color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
 });

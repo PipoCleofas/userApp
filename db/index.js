@@ -74,11 +74,10 @@ const { router: photoRouter, setConnectionPhoto } = require('./types/photo');
 setConnectionPhoto(connection);
 app.use('/photo', photoRouter);
 
+const { router: messagingRouter, setConnectionMessaging } = require('./types/messaging');
+setConnectionMessaging(connection);
+app.use('/messaging', messagingRouter);
 
-
-app.get('/test', (req, res) => {
-  res.send('Server is working');
-});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

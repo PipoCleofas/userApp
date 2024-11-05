@@ -42,6 +42,7 @@ function ServiceRequestList() {
         {requests && requests.map((values :any, index :any) => (
           <div key={index} style={requestCardStyle}>
             <p style={{ color: 'orange' }}>User ID: {values.UserID}</p>
+            <p style={{ color: 'orange' }}>Username: {values.Username}</p>
             <p style={{ color: 'orange' }}>Request Type: {values.RequestType}</p>
             <p style={{ color: 'orange' }}>Status: {values.RequestStatus === 'pending' ? (
               <span style={{ color: 'orange' }}>{values.RequestStatus}</span>
