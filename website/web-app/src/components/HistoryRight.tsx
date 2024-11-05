@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useGetItems } from '../hooks/useGetItems';
-import { useLanguageContext } from '../context/LanguageProvider';
 
 export default function MessagesRight() {
     const { checkAccounts, clients, messages } = useGetItems();
     const [loading, setLoading] = useState(true);
-    const { translations, language } = useLanguageContext();
-    const t = translations[language]; 
 
     useEffect(() => {
         const fetchData = async () => {
