@@ -153,6 +153,9 @@ export default function MainPage() {
       }); 
 
       setModalVisible(!modalVisible)
+      setMessageError(null)
+
+
       
     }catch(err: any){
       console.log(err)
