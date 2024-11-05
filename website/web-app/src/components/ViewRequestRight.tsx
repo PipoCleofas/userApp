@@ -73,7 +73,8 @@ export default function ViewRequestRight() {
             boxSizing: 'border-box' 
         }}>
             {requests
-                .filter((request: any) => request.RequestStatus === 'pending') // Only show requests with status 'pending'
+                .filter((request: any) => request.RequestStatus === 'pending') // Filter for pending requests
+                .slice(0, 3) // Limit to 3 requests
                 .map((request: any, index) => (
                     <div
                         key={index}
@@ -126,4 +127,5 @@ export default function ViewRequestRight() {
                 ))}
         </div>
     );
+    
 }

@@ -31,25 +31,46 @@ router.post('/submit', validateUserData, (req, res) => {
         return res.status(500).send('Database error');
       }
       
-      res.status(201).json({message: 'Message sent successfully'});
+      res.status(201).json({results});
     });
   });
 
-  router.get('/getMessage', (req, res) => {
-    const verify = 'SELECT * FROM messaging';
-  
-    connection.query(verify, (error, results) => {
-      if (error) {
-        console.error('Database error:', error);
-        return res.status(500).send('Database error');
-      }
-  
-      if (results.length > 0) {
-        return res.status(200).json(results);
-      } else {
-        return res.status(401).json({ message: 'No messages found.' });
-      }
+  router.put('/updateMessage', (req, res) => {
+    const { id, status } = req.body; 
+    if (!id) {
+        return res.status(400).send('Message ID is required');
+    }
+
+    const query = `UPDATE messaging SET status = ? WHERE id = ?`;
+    const values = [status || 'processed', id]; 
+
+    connection.query(query, values, (error, results) => {
+        if (error) {
+            console.error('Database error:', error.message);
+            return res.status(500).send('Database error');
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).send('Message not found');
+        }
+
+        res.status(200).send('Messaging status updated successfully');
     });
+});
+
+
+router.get('/getMessage', (req, res) => {
+  const query = 'SELECT * FROM messaging WHERE status = "new"';
+
+  connection.query(query, (error, results) => {
+      if (error) {
+          console.error('Database error:', error);
+          return res.status(500).send('Database error');
+      }
+
+      res.status(200).json(results.length > 0 ? results : []);
   });
+});
+
 
 module.exports = { router, setConnectionMessaging };

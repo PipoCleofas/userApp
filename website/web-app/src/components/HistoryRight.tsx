@@ -1,24 +1,37 @@
 import { useEffect, useState } from 'react';
 import { useGetItems } from '../hooks/useGetItems';
+import axios from 'axios';
 
 export default function MessagesRight() {
-    const { checkAccounts, clients, messages } = useGetItems();
+    const { checkAccounts, messages } = useGetItems();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
-            const success = await checkAccounts('messages');
-            if (success) {
-                console.log('Clients fetched successfully:', messages);
-            }
+            await checkAccounts('messages');
             setLoading(false);
         };
 
         fetchData();
-    }, [checkAccounts, clients]);
+    }, [checkAccounts]);
 
     if (loading) {
         return <div>Loading...</div>;
+    }
+
+    async function updateMessageStatus(id: number) {
+        try {
+            await axios.put(`http://192.168.100.127:3000/messaging/updateMessage`, {
+                id
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log(`Message with ID ${id} updated successfully`);
+        } catch (err) {
+            console.error('Error updating message status:', err);
+        }
     }
 
     return (
@@ -34,7 +47,7 @@ export default function MessagesRight() {
             boxSizing: 'border-box' 
         }}>
             {messages && messages.length > 0 ? (
-                messages.map((message) => (
+                messages.slice(0, 6).map((message) => (
                     <div
                         key={message.id} 
                         style={{
@@ -48,7 +61,21 @@ export default function MessagesRight() {
                         }}
                     >
                         <p style={{ marginBottom: '10px', fontSize: '18px' }}>Message: {message.message}</p>
-                        <div style={{ display: 'flex', gap: '10px' }} />
+                        <button
+                            style={{
+                                padding: '10px 20px',
+                                fontSize: '16px',
+                                borderRadius: '5px',
+                                border: 'none',
+                                cursor: 'pointer',
+                                backgroundColor: '#5cb85c',
+                                color: '#fff',
+                                transition: 'background-color 0.3s',
+                            }}
+                            onClick={() => updateMessageStatus(message.id)}
+                        >
+                            Got it!
+                        </button>
                     </div>
                 ))
             ) : (
@@ -57,3 +84,4 @@ export default function MessagesRight() {
         </div>
     );
 }
+

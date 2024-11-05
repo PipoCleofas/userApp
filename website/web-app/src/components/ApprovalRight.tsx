@@ -66,7 +66,7 @@ export default function ApprovalRight() {
             margin: 0, 
             boxSizing: 'border-box' 
         }}>
-            {filteredClients.map((user) => (
+            {filteredClients.slice(0, 3).map((user) => (
                 <div
                     key={user.UserID}
                     style={{
@@ -100,7 +100,7 @@ export default function ApprovalRight() {
                             onClick={() => updateUserStatus('approved', user.UserID)}
                             disabled={updatingStatus === user.UserID} 
                         >
-                             {t.approve}
+                            {t.approve}
                         </button>
                         <button
                             style={{
@@ -125,5 +125,6 @@ export default function ApprovalRight() {
             ))}
         </div>
     );
+    
 }
 
