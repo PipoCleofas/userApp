@@ -47,7 +47,7 @@ export default function MessagesRight() {
                             maxWidth: '500px',
                         }}
                     >
-                        <p style={{ marginBottom: '10px', fontSize: '18px' }}>User ID: {message.message}</p>
+                        <p style={{ marginBottom: '10px', fontSize: '18px' }}>Message: {message.message}</p>
                         <div style={{ display: 'flex', gap: '10px' }} />
                     </div>
                 ))
