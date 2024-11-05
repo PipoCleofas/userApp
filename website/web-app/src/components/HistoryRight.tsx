@@ -47,7 +47,7 @@ export default function MessagesRight() {
             boxSizing: 'border-box' 
         }}>
             {messages && messages.length > 0 ? (
-                messages.slice(0, 6).map((message) => (
+                messages.slice(0, 4).map((message) => (
                     <div
                         key={message.id} 
                         style={{
