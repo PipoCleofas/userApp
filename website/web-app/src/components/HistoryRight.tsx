@@ -34,6 +34,12 @@ export default function MessagesRight() {
         }
     }
 
+    // Divide messages into three groups for each column
+    const groupedMessages = [[], [], []];
+    messages.forEach((message, index) => {
+        groupedMessages[index % 3].push(message);
+    });
+
     return (
         <div style={{ 
             minHeight: '100vh', 
@@ -41,47 +47,44 @@ export default function MessagesRight() {
             padding: '40px', 
             backgroundColor: '#f5d2d1', 
             display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center',
-            margin: 0, 
-            boxSizing: 'border-box' 
+            justifyContent: 'center',
+            gap: '20px',
+            boxSizing: 'border-box'
         }}>
-            {messages && messages.length > 0 ? (
-                messages.slice(0, 4).map((message) => (
-                    <div
-                        key={message.id} 
-                        style={{
-                            backgroundColor: '#e0e0e0',
-                            padding: '20px',
-                            marginBottom: '20px',
-                            borderRadius: '10px',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                            width: '100%',
-                            maxWidth: '500px',
-                        }}
-                    >
-                        <p style={{ marginBottom: '10px', fontSize: '18px' }}>Message: {message.message}</p>
-                        <button
-                            style={{
-                                padding: '10px 20px',
-                                fontSize: '16px',
-                                borderRadius: '5px',
-                                border: 'none',
-                                cursor: 'pointer',
-                                backgroundColor: '#5cb85c',
-                                color: '#fff',
-                                transition: 'background-color 0.3s',
-                            }}
-                            onClick={() => updateMessageStatus(message.id)}
-                        >
-                            Got it!
-                        </button>
-                    </div>
-                ))
-            ) : (
-                <p>No messages available.</p>
-            )}
+            {groupedMessages.map((group, colIndex) => (
+                <div key={colIndex} style={{
+                    backgroundColor: '#f5d2d1',
+                    padding: '20px',
+                    borderRadius: '10px',
+                    flex: '1',
+                    maxWidth: '300px',
+                    minHeight: '400px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    overflowY: 'auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px' // Space between messages
+                }}>
+                    {group.length > 0 ? (
+                        group.map((message) => (
+                            <div
+                                key={message.id} 
+                                style={{
+                                    backgroundColor: '#e0e0e0',
+                                    padding: '15px',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                                    flex: '1' // Makes each message take up available width
+                                }}
+                            >
+                                <p style={{ fontSize: '14px', margin: 0 }}>Message: {message.message}</p>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No messages available.</p>
+                    )}
+                </div>
+            ))}
         </div>
     );
 }
-

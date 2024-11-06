@@ -28,7 +28,7 @@ export function useHandleClicks() {
                 setError('Username or password cannot be empty')
             }
 
-            const response = await axios.get('http://192.168.100.127:3000/barangay/getBarangay', {
+            const response = await axios.get('http://192.168.1.5:3000/barangay/getBarangay', {
                 params: {
                     username: username,
                     password: password

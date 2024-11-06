@@ -5,7 +5,6 @@ import App from './App';
 import AdminLogin from './pages/AdminLogin';
 import Approval from './pages/Approval';
 import AdminDashboard from './pages/AdminDashboard';
-import ViewRequest from './pages/ViewRequest';
 import Settings from './pages/Settings';
 import History from './pages/HIstory';
 import { LanguageProvider } from './context/LanguageProvider';  
@@ -20,7 +19,6 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/login" element={<AdminLogin />} />
           <Route path="/approval" element={<Approval />} />
           <Route path="/admindashboard" element={<AdminDashboard />} />
-          <Route path="/viewrequest" element={<ViewRequest />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/history" element={<History />} />
 

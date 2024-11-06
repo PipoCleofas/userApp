@@ -43,7 +43,7 @@ router.get('/getMarker/:marker', (req, res) => {
     return res.status(400).send('Marker is required');
   }
 
-  const query = `SELECT * FROM markerrr WHERE title = CONCAT(?, ' Assistance Request') AND description = 'approved'`;
+  const query = `SELECT * FROM markerrr WHERE title = CONCAT(?, ' Assistance Request')`;
 
   connection.query(query, [marker], (error, results) => {
     if (error) {

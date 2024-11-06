@@ -60,7 +60,7 @@ router.post('/submit', validateUserData, (req, res) => {
 
 
 router.get('/getMessage', (req, res) => {
-  const query = 'SELECT * FROM messaging WHERE status = "new"';
+  const query = 'SELECT * FROM messaging';
 
   connection.query(query, (error, results) => {
       if (error) {

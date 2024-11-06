@@ -36,14 +36,6 @@ export function useGetItems() {
           setError(null);
           return true;
         }
-        case 'requests': {
-          const requestResponse = await axios.get<Request[]>('http://192.168.100.127:3000/servicerequest/getRequests');
-          setRequests(requestResponse.data);
-          setMarkerIDs(requestResponse.data.map(request => request.UserID));
-          console.log('Request IDs:', requestResponse.data.map(request => request.UserID));
-          setError(null);
-          return true;
-        }
         case 'messages': {
           const messagesResponse = await axios.get<Messages[]>('http://192.168.100.127:3000/messaging/getMessage');
           setMessages(messagesResponse.data);  

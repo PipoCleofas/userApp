@@ -99,6 +99,9 @@ export default function useHandleClicks(){
               case 'NDRRMC':
                 setMarkerUnameEmoji(require('../assets/images/ndrrmc.png'));
                 break;
+              case 'PDRRMO':
+                setMarkerUnameEmoji(require('../assets/images/ndrrmc.png'));
+                break;
             }
           } else {
             console.log('No username found in AsyncStorage');

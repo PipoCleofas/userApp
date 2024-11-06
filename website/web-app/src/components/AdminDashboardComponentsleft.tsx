@@ -30,12 +30,6 @@ export default function AdminDashboardComponentLeft() {
             {translations[language].home} 
           </li>
           <li 
-            onClick={() => handleNavClick(navigate, '/viewrequest')}
-            style={{ marginBottom: '20px', padding: '20px', border: 'none', borderRadius: '0' }}
-          >
-            {translations[language].viewRequest}  
-          </li>
-          <li 
             onClick={() => handleNavClick(navigate, '/approval')}
             style={{ marginBottom: '20px', padding: '20px', border: 'none', borderRadius: '0' }}
           >

@@ -3,7 +3,7 @@ import { useNavigation } from "expo-router";
 import useLocation from "./useLocation";
 import useSMS from "./useSMS";
 import * as SMS from 'expo-sms';
-import {useState } from "react";
+import {useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Define the type for the marker object
@@ -19,7 +19,7 @@ interface MarkerType {
 const useHandleClicks = () => {
   const [markers, setMarkers] = useState<MarkerType[]>([]); // State to store markers
 
-    const {latitude, longitude, fetchLocation, handleArrivalTime, arrivalTime, location} = useLocation();
+    const {latitude, longitude, fetchLocation, handleArrivalTime, arrivalTime, location, setArrivalTime} = useLocation();
     const {isAvailable,setResult} = useSMS();
   
 
@@ -77,33 +77,34 @@ const useHandleClicks = () => {
     };
     
     const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-      const toRad = (value: number) => (value * Math.PI) / 180; 
+      const toRad = (value: number) => (value * Math.PI) / 180;
       const R = 6371e3; // Radius of Earth in meters
       const φ1 = toRad(lat1);
       const φ2 = toRad(lat2);
       const Δφ = toRad(lat2 - lat1);
       const Δλ = toRad(lon2 - lon1);
-  
+    
       const a =
         Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
         Math.cos(φ1) * Math.cos(φ2) *
         Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
-      const distance = R * c; // Distance in meters
-      return distance;
+    
+      return R * c; 
     };
     
 
     const fetchMarkers = async (serviceChosen: string) => {
       try {
-        const response = await fetch(`http://192.168.100.127:3000/marker/getService/${serviceChosen}`); 
+        const response = await fetch(`http://192.168.100.127:3000/marker/getService/${serviceChosen}`);
         const data = await response.json();
-  
+    
         if (Array.isArray(data)) {
-          setMarkers(data);  
-
+          setMarkers(data);
+    
           if (location) {
+            let foundThreshold = null;
+    
             data.forEach((marker: MarkerType) => {
               const distance = haversineDistance(
                 location.coords.latitude,
@@ -111,23 +112,29 @@ const useHandleClicks = () => {
                 marker.latitude,
                 marker.longitude
               );
+    
               const distanceThresholds = [14000, 13000, 12000, 10000, 8000, 5000, 3000, 1000];
               let calculated = false;
-              
+    
               for (const threshold of distanceThresholds) {
                 if (distance >= threshold) {
-                  handleArrivalTime(threshold, true);
-                  console.log(`Coming in ${arrivalTime} minute/s`);
+                  console.log(`Distance is ${distance}, calling handleArrivalTime with threshold ${threshold}`);
+                  foundThreshold = threshold; // Store the last threshold that matches
                   calculated = true;
                   break;
                 }
               }
-              
+    
               if (!calculated) {
                 console.log('Not calculated');
               }
-              
             });
+    
+            if (foundThreshold !== null) {
+              handleArrivalTime(foundThreshold); // Set arrival time based on the last threshold
+            } else {
+              setArrivalTime('Calculating'); // Default if no threshold matched
+            }
           }
         } else {
           console.error('Error', 'Invalid data format from API');
@@ -137,6 +144,11 @@ const useHandleClicks = () => {
         console.error('Error', 'Failed to load markers');
       }
     };
+    
+    // Use useEffect to monitor and log arrivalTime when it changes
+    useEffect(() => {
+      console.log(`Updated arrival time: ${arrivalTime}`);
+    }, [arrivalTime]);
 
 
   
@@ -239,7 +251,7 @@ const useHandleClicks = () => {
     
         try {
       
-          const markerResponse = await axios.post('http://192.168.100.28:3000/marker/submit', {
+          const markerResponse = await axios.post('http://192.168.100.127:3000/marker/submit', {
              
               title: "Emergency Assistance Request",
               description: "Emergency Assistance Request",

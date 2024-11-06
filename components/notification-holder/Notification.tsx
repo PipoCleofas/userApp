@@ -14,6 +14,8 @@ const Notification: React.FC<NotificationProps> = ({ message, trigger }) => {
     if (trigger) {
       setVisible(true);
       // Fade in
+      console.log("Notification triggered with message:", message); // Debug log
+
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 300,
@@ -29,7 +31,7 @@ const Notification: React.FC<NotificationProps> = ({ message, trigger }) => {
         }).start(() => setVisible(false)); // Hide notification after fade-out
       }, 3000);
     }
-  }, [trigger]);
+  }, [trigger,message]);
 
   return (
     visible && (

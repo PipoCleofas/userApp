@@ -30,12 +30,6 @@ export default function Approvalleft() {
             {translations[language].home} 
           </li>
           <li 
-            onClick={() => handleNavClick(navigate, '/viewrequest')}
-            style={{ marginBottom: '20px', padding: '20px', border: 'none', borderRadius: '0' }}
-          >
-            {translations[language].viewRequest} 
-          </li>
-          <li 
             style={{ marginBottom: '20px', padding: '20px', border: 'none', borderRadius: '0' }}
           >
             {translations[language].approval}  

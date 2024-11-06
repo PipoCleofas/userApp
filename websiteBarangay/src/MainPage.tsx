@@ -10,7 +10,7 @@ function ServiceRequestList() {
   useEffect(() => {
     async function handleRequests() {
       try {
-        const response = await axios.get('http://192.168.100.127:3000/servicerequest/getRequests');
+        const response = await axios.get('http://192.168.1.5:3000/servicerequest/getRequests');
         console.log(response.data);
         setRequests(response.data);
       } catch (error) {

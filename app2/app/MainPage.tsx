@@ -23,7 +23,8 @@ const getMarkerImage = (title: string) => {
       return require('../assets/images/medic.png');
     case 'NDRRMC Assistance Request':
       return require('../assets/images/ndrrmc.png');
-
+    case 'PDRRMO Assistance Request':
+      return require('../assets/images/ndrrmc.png');
   }
 };
 

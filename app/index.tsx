@@ -20,6 +20,8 @@ const getMarkerImage = (title: string) => {
       return require('./pictures/medic.png');
     case 'NDRRMC':
       return require('./pictures/ndrrmc.png');
+    case 'PDRRMO':
+      return require('./pictures/ndrrmc.png');
 
   }
 };
@@ -51,11 +53,28 @@ export default function Index() {
     const serviceChosen = await AsyncStorage.setItem('serviceChosen', service)
 
     
-    EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'pending');
+    EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'approved');
     setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
 
     
   }
+
+  // for notification
+  useEffect(() => {
+    console.log("Arrival time updated:", arrivalTime); // Check if arrivalTime is updating
+
+    if (arrivalTime && arrivalTime !== 'Calculating') {
+      setTriggerNotification(true);
+
+      console.log("Trigger notification set to true"); // Debug log
+
+      
+      // Set a delay to allow the notification to display before resetting the trigger
+      const resetTrigger = setTimeout(() => setTriggerNotification(false), 3000); // 3 seconds delay
+      
+      return () => clearTimeout(resetTrigger);
+    }
+  }, [arrivalTime]);
 
   function cancelService() {
     EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'Cancelled Service');
@@ -86,13 +105,6 @@ export default function Index() {
     return () => clearTimeout(timer);
   }, []);
 
-
-
-    
-  
-  
-
-
   return (
     <View style={styles.container}>
         {isLoading ? (
@@ -102,6 +114,8 @@ export default function Index() {
         </View>
       ) : (
         <>
+      {console.log("Rendering Notification with trigger:", triggerNotification)}
+
       <Notification
         message={`Coming in ${arrivalTime} minute/s`}
         trigger={triggerNotification}
@@ -143,8 +157,8 @@ export default function Index() {
 
                 <Pressable
                   style={[modalStyles.serviceButton]}
-                  onPress={() => emerAssReq('NDRRMC', require('./pictures/ndrrmc.png'))}>
-                  <Text style={modalStyles.textStyle}>NDRRMC</Text>
+                  onPress={() => emerAssReq('PDRRMO', require('./pictures/ndrrmc.png'))}>
+                  <Text style={modalStyles.textStyle}>PDRRMO</Text>
                 </Pressable>
               </View>
 

@@ -33,12 +33,6 @@ export default function SettingsLeft() {
             {t.home}
           </li>
           <li
-            onClick={() => handleNavClick(navigate, '/viewrequest')}
-            style={{ marginBottom: '20px', padding: '20px', border: 'none', borderRadius: '0' }}
-          >
-            {t.viewRequest}
-          </li>
-          <li
             onClick={() => handleNavClick(navigate, '/approval')}
             style={{ marginBottom: '20px', padding: '20px', border: 'none', borderRadius: '0' }}
           >
