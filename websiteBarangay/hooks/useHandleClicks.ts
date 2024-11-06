@@ -23,12 +23,12 @@ export function useHandleClicks() {
         e.preventDefault();
         
         try {
-
-            if(!username && !password){
-                setError('Username or password cannot be empty')
+            if (!username || !password) {
+                setError('Username or password cannot be empty');
+                return; 
             }
-
-            const response = await axios.get('http://192.168.1.5:3000/barangay/getBarangay', {
+    
+            const response = await axios.get('http://192.168.100.127:3000/barangay/getBarangay', {
                 params: {
                     username: username,
                     password: password
@@ -38,18 +38,22 @@ export function useHandleClicks() {
             if (response.status === 200) {
                 console.log('Login successful:', response.data);
                 setError(''); 
+    
+                localStorage.setItem('username', username);
+    
                 navigate('/mainpage'); 
             } 
         } catch (error: any) {
             if (error.response && error.response.status === 401) {
                 setError(error.response.data.message);
-                console.error(error)
+                console.error(error);
             } else {
                 console.error("Error during login click:", error);
                 setError('An unexpected error occurred. Please try again.');
             }
         }
     };
+    
     
 
     return {

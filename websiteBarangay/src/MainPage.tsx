@@ -10,13 +10,24 @@ function ServiceRequestList() {
   useEffect(() => {
     async function handleRequests() {
       try {
-        const response = await axios.get('http://192.168.1.5:3000/servicerequest/getRequests');
+        const uname = localStorage.getItem('username');
+        
+        if (!uname) {
+          setError('Username not found. Please log in again.');
+          setLoading(false);
+          return;
+        }
+        
+        const response = await axios.get('http://192.168.100.127:3000/servicerequest/getRequestsBarangay', {
+          params: { barangay: uname }
+        });
+        
         console.log(response.data);
         setRequests(response.data);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           setError('No service request found');
-          console.log(error);
+          console.error(error);
         } else {
           const message = handleAxiosError(error);
           setError(message || 'An error occurred while fetching data.');
@@ -25,8 +36,10 @@ function ServiceRequestList() {
         setLoading(false); // Set loading to false after request completes
       }
     }
+    
     handleRequests();
   }, []);
+  
 
   if (loading) {
     return <div>Loading...</div>; // Loading state

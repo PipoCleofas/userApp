@@ -55,6 +55,27 @@ router.get('/getRequests', (req, res) => {
   });
 });
 
+router.get('/getRequestsBarangay', (req, res) => {
+  const { barangay } = req.query; 
+
+  const verify = 'SELECT * FROM servicerequesttt WHERE Address = ?';
+
+  connection.query(verify, [barangay], (error, results) => {
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).send('Database error');
+    }
+
+    if (results.length > 0) {
+      // Return the array of service requests
+      return res.status(200).json(results);
+    } else {
+      return res.status(404).json({ message: 'No service requests found.' }); 
+    }
+  });
+});
+
+
 router.put('/updateRequest/:newStatus', (req, res) => {
   const newStatus = req.params.newStatus; 
   const { UserID } = req.body;    
