@@ -191,7 +191,7 @@ const useCheckPassword = () => {
       });
 
       if (!userLoginError) {
-          navigation.navigate('index' as never); 
+          navigation.navigate('MainPage' as never); 
       } else {
           console.log('Login failed, will not navigate:', userLoginError);
       }

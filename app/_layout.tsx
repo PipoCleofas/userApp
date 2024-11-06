@@ -5,7 +5,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import Welcome from './Welcome';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -27,12 +26,11 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack initialRouteName="Welcome">
-        <Stack.Screen name="Welcome" options={{headerShown: false}} />
         <Stack.Screen name="Signup" options={{headerShown: false}} />
         <Stack.Screen name="CitizenLogin" options={{headerShown: false}} />
         <Stack.Screen name="CitizenPhoto" options={{headerShown: false}} />
         <Stack.Screen name="UsernamePhoto" options={{headerShown: false}} />
-
+        <Stack.Screen name="MainPage" options={{headerShown: false}} />
         <Stack.Screen name="CitizenSignup" options={{headerShown: false}} />
         <Stack.Screen name="index" options={{headerShown: false}} />
         <Stack.Screen name="+not-found" options={{headerShown: false}}/>
