@@ -11,8 +11,7 @@ export default function SettingsLeft() {
   const t = translations[language];
   
   const [username, setUsername] = useState<string | null>(null);
-
-  useEffect(() => {
+   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
     setUsername(storedUsername);
   }, []);

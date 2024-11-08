@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-import { useState } from 'react';
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 function ServiceRequestList() {
   const [requests, setRequests] = useState<any>([]);
@@ -33,7 +32,7 @@ function ServiceRequestList() {
           setError(message || 'An error occurred while fetching data.');
         }
       } finally {
-        setLoading(false); // Set loading to false after request completes
+        setLoading(false);
       }
     }
     
@@ -42,64 +41,70 @@ function ServiceRequestList() {
   
 
   if (loading) {
-    return <div>Loading...</div>; // Loading state
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>; // Error state
+    return <div>Error: {error}</div>;
   }
 
-
   return (
-      <div style={{ flex: 1, padding: '20px' }}>
-        {requests && requests.map((values :any, index :any) => (
-          <div key={index} style={requestCardStyle}>
-            <p style={{ color: 'orange' }}>User ID: {values.UserID}</p>
-            <p style={{ color: 'orange' }}>Username: {values.Username}</p>
-            <p style={{ color: 'orange' }}>Request Type: {values.RequestType}</p>
-            <p style={{ color: 'orange' }}>Status: {values.RequestStatus === 'pending' ? (
-              <span style={{ color: 'orange' }}>{values.RequestStatus}</span>
-            ) : values.RequestStatus}</p>
-            <p style={{ color: 'orange' }}>Address: {values.Address}</p>
-          </div>
-        ))}
-      </div>
+    <div style={containerStyle}>
+      {requests && requests.map((values: any, index: any) => (
+        <div key={index} style={requestCardStyle}>
+          <p style={{ color: 'black', fontFamily: 'Courier New', fontWeight: 'bold' }}>User ID: {values.UserID}</p>
+          <p style={{ color: 'black', fontFamily: 'Courier New', fontWeight: 'bold' }}>Username: {values.Username}</p>
+          <p style={{ color: 'black', fontFamily: 'Courier New', fontWeight: 'bold' }}>Request Type: {values.RequestType}</p>
+          <p style={{ color: 'black', fontFamily: 'Courier New', fontWeight: 'bold' }}>Status: {values.RequestStatus === 'pending' ? (
+            <span style={{ color: 'black' }}>{values.RequestStatus}</span>
+          ) : values.RequestStatus}</p>
+          <p style={{ color: 'black', fontFamily: 'Courier New', fontWeight: 'bold' }}>Address: {values.Address}</p>
+        </div>
+      ))}
+    </div>
   );
 }
 
-//Styles
-const buttonStyle = {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    backgroundColor: '#ffffff',
-    border: '1px solid #ccc',
-    cursor: 'pointer',
-    textAlign: 'left'
-  };
-  const requestCardStyle = {
-    backgroundColor: '#e9ecef',
-    padding: '20px',
-    borderRadius: '10px',
-    marginBottom: '20px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)'
-  };
+// Styles
+const containerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center', // Centers items horizontally
+  justifyContent: 'center', // Centers items vertically
+  backgroundColor: '#f5d2d1', // Light pink background color
+  padding: '20px',
+  width: '100vw', // Full viewport width
+  height: '100vh', // Full viewport height
+  overflow: 'auto', // Allows scrolling if content overflows
+  boxSizing: 'border-box',
+};
 
+const requestCardStyle = {
+  backgroundColor: '#e9ecef',
+  padding: '20px',
+  borderRadius: '10px',
+  marginBottom: '20px',
+  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+  width: '300px', // Fixed width for consistent card size
+  textAlign: 'center', // Center text inside each card
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center', // Center content within each card
+};
 
-  export function handleAxiosError(error: any): string {
-    if (error.response) {
-        console.error('Response error:', error.response.data);
-        console.error('Response status:', error.response.status);
-        console.error('Response headers:', error.response.headers);
-        return `Server responded with status ${error.response.status}: ${error.response.data.message || 'An error occurred.'}`;
-    } else if (error.request) {
-        // The request was made, but no response was received
-        console.error('Request error:', error.request);
-        return 'No response received from the server. Please check your network connection.';
-    } else {
-        console.error('General error:', error.message);
-        return `Error: ${error.message}`;
-    }
+export function handleAxiosError(error: any): string {
+  if (error.response) {
+    console.error('Response error:', error.response.data);
+    console.error('Response status:', error.response.status);
+    console.error('Response headers:', error.response.headers);
+    return `Server responded with status ${error.response.status}: ${error.response.data.message || 'An error occurred.'}`;
+  } else if (error.request) {
+    console.error('Request error:', error.request);
+    return 'No response received from the server. Please check your network connection.';
+  } else {
+    console.error('General error:', error.message);
+    return `Error: ${error.message}`;
+  }
 }
 
 export default ServiceRequestList;

@@ -15,50 +15,57 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <div className="login-container" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', width: '300px', textAlign: 'center' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', minHeight: '100vh',  width: '100vw' }}>
+      <div className="login-container" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', height: '94%', width: '97%', textAlign: 'center', }}>
         <img
           src={logoo}
           alt="logo"
           style={{
             alignSelf: 'center',
-            width: '23pc',
-            height: '21pc',
-            marginBottom: '-80px',
-            marginInlineStart: '-56px',
-            marginTop: '-90px'
-          }}
-        />
-        <h2 style={{ marginTop: '15px', marginBottom: '20px' }}>LOGIN</h2>
+            width: '350px',
+            height: 'auto',
+            marginBottom: '-360px',
+            marginTop: '-20px',
+            marginInlineStart: '-25px',
+  }}
+/>
+
+        <h2 style={{ marginTop: '310px', marginBottom: '-5px', color: 'black', marginInlineStart: '-12px' }}>LOGIN</h2>
         <form onSubmit={onLogin} style={{ margin: '10px 0' }}>
-          <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-            <label style={{ fontSize: 14, display: 'block', marginBottom: '5px' }}>Username:</label>
+          <div style={{ textAlign: 'left', marginBottom: '7px' }}>
+            <label style={{ fontSize: 14, display: 'block', marginBottom: '1px', color:'black', marginInlineStart: '592px' }}>Username:</label>
             <input
               type="text"
               name="username"
               style={{
-                width: '100%',
+                width: '275px',
                 padding: '8px',
                 backgroundColor: '#F08080',
                 border: 'none',
                 borderRadius: '10px',
+                marginInlineStart: '590px',
               }}
+
+
               onChange={(e) => handleUsernameChange(e.target.value)}
             />
           </div>
-          <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-            <label style={{ fontSize: 14, display: 'block', marginBottom: '5px' }}>Password:</label>
+          <div style={{ textAlign: 'left', marginBottom: '30px', }}>
+            <label style={{ fontSize: 14, display: 'block', marginBottom: '1px', color: 'black', marginInlineStart: '592px' }}>Password:</label>
             <div style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 style={{
-                  width: '100%',
+                  width: '275px',
                   padding: '8px',
                   backgroundColor: '#F08080',
                   border: 'none',
                   borderRadius: '10px',
+                  marginInlineStart: '590px'
                 }}
+
+
                 onChange={(e) => handlePasswordChange(e.target.value)}
               />
               <span
@@ -71,23 +78,25 @@ export default function LoginPage() {
                   cursor: 'pointer',
                 }}
               >
-                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye}  style={{ color: 'black', marginInline: '600px' }} />
               </span>
             </div>
           </div>
 
-          {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
+          {error && <p style={{ color: 'red', marginBottom: '20px', marginTop: '-30px', fontSize: 13, marginInlineStart: '-14px' }}>{error}</p>}
 
           <button
             type="submit"
             style={{
-              width: '100%',
+              width: '290px',
               padding: '10px',
               backgroundColor: 'maroon',
               border: 'none',
               borderRadius: '10px',
               color: 'white',
               fontSize: 16,
+              marginBottom: '30px',
+              marginInlineStart: '-10px'
             }}
             onClick={onLogin}
           >
