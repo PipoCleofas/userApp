@@ -10,51 +10,55 @@ const useLocation = () => {
   const [longitude, setLongitude] = useState<number | null>(null);
   const [title, setTitle] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
-  const [arrivalTime, setArrivalTime] = useState<number | null | string>()
+  const [arrivalTime, setArrivalTime] = useState<number | string | null>(null);
+  
+
+  
+
 
  
-const handleArrivalTime = (distance: number) => {
-  console.log("handleArrivalTime called with distance:", distance); // Debug log for distance
-
-  switch (distance) {
-    case 14000:
-      setArrivalTime(20);
-      console.log('14 km');
-      break;
-    case 13000:
-      setArrivalTime(18);
-      console.log('13 km');
-      break;
-    case 12000:
-      setArrivalTime(16);
-      console.log('12 km');
-      break;
-    case 10000:
-      setArrivalTime(14);
-      console.log('10 km');
-      break;
-    case 8000:
-      setArrivalTime(12);
-      console.log('8 km');
-      break;
-    case 5000:
-      setArrivalTime(8);
-      console.log('5 km');
-      break;
-    case 3000:
-      setArrivalTime(5);
-      console.log('3 km');
-      break;
-    case 1000:
-      setArrivalTime(2);
-      console.log('1 km');
-      break;
-    default:
-      setArrivalTime('Calculating');
-      console.log('Calculating');
-      break;
+  function debounce(func: (...args: any[]) => void, delay: number) {
+    let timeoutId: NodeJS.Timeout | null;
+    return (...args: any[]) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
   }
-};
+
+  const handleArrivalTime = (distance: number) => {
+    console.log("Distance received in handleArrivalTime:", distance);
+    let newTime;
+    if (distance > 14000) {
+      newTime = "Go to the nearest station";
+    } else if (distance >= 13000) {
+      newTime = 30;
+    } else if (distance >= 12000) {
+      newTime = 20;
+    } else if (distance >= 10000) {
+      newTime = 18;
+    } else if (distance >= 8000) {
+      newTime = 16;
+    } else if (distance >= 5000) {
+      newTime = 14;
+    } else if (distance >= 3000) {
+      newTime = 10;
+    } else if (distance >= 1000) {
+      newTime = 7;
+    } else if (distance > 0) {
+      newTime = 1;
+    } else {
+      newTime = "Calculating";
+    }
+    console.log("New arrival time set to:", newTime);
+    setArrivalTime(newTime); // This should trigger a re-render
+  };
+  
+  
+
+  
+  
 
   const fetchLocation = async () => {
     setIsFetching(true);
@@ -79,16 +83,10 @@ const handleArrivalTime = (distance: number) => {
       setIsFetching(false);
     }
   };
-
   
   useEffect(() => {
     fetchLocation();
   }, []); 
-
-  // directions
-
-  
-
 
   return { 
     location, 
@@ -106,7 +104,6 @@ const handleArrivalTime = (distance: number) => {
     handleArrivalTime,
     arrivalTime,
     setArrivalTime,
-
   };
 };
 

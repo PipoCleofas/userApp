@@ -55,6 +55,25 @@ router.get('/getMarker/:marker', (req, res) => {
   });
 });
 
+router.get('/getStation/:marker', (req, res) => {
+  const marker = req.params.marker;
+
+  if (!marker) {
+    return res.status(400).send('Marker is required');
+  }
+
+  const query = `SELECT * FROM markerrr WHERE title = CONCAT(?, ' Station')`;
+
+  connection.query(query, [marker], (error, results) => {
+    if (error) {
+      console.error('Database error:', error.message);
+      return res.status(500).send('Database error');
+    }
+
+    return res.status(200).json(results);
+  });
+});
+
 router.put('/updateMarkerDesc/:id', (req, res) => {
   const id = req.params.id;  
   const { newDesc } = req.body;  

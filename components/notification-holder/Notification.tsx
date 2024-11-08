@@ -11,27 +11,35 @@ const Notification: React.FC<NotificationProps> = ({ message, trigger }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (trigger) {
-      setVisible(true);
-      // Fade in
-      console.log("Notification triggered with message:", message); // Debug log
+    console.log("Notification message updated:", message);
+  }, [message]);
 
+  
+  useEffect(() => {
+    if (trigger) {
+      console.log("Notification triggered with message:", message); // Debug log
+      setVisible(true);
+  
+      // Fade in
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 300,
         useNativeDriver: true,
       }).start();
-
+  
       // Fade out after 3 seconds
       setTimeout(() => {
         Animated.timing(fadeAnim, {
           toValue: 0,
           duration: 300,
           useNativeDriver: true,
-        }).start(() => setVisible(false)); // Hide notification after fade-out
+        }).start(() => {
+          setVisible(false); // Hide notification only after fade-out completes
+        });
       }, 3000);
     }
-  }, [trigger,message]);
+  }, [trigger, message]); // Include message in dependencies
+  
 
   return (
     visible && (

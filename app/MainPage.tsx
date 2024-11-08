@@ -22,27 +22,33 @@ const getMarkerImage = (title: string) => {
       return require('./pictures/ndrrmc.png');
     case 'PDRRMO':
       return require('./pictures/ndrrmc.png');
+    case 'PNP Station':
+      return require('./pictures/police.webp');
+    case 'BFP Station':
+      return require('./pictures/fire.png');
+    case 'Medical Station':
+      return require('./pictures/medic.png');
+    case 'PDRRMO Station':
+      return require('./pictures/ndrrmc.png');
 
   }
 };
 
-export default function Index() {
+export default function MainPage() {
 
  
-  const { location, errorMsg, isFetching, arrivalTime, handleArrivalTime } = useLocation();
+  const { location, errorMsg, isFetching, handleArrivalTime,arrivalTime } = useLocation();
   const { 
     EmergencyAssistanceRequest,
-    RouteAssistance,
     markerEmoji,
     markerImageSize,
     markers
   } = useHandleClicks();
 
+  
+
   const [triggerNotification, setTriggerNotification] = useState(false);
-
-
   const [emergencyAssistanceModalVisible, setEmergencyAssistanceModalVisible] = useState(false);
-  const [routeAssistanceModalVisible, setRouteAssistanceModalVisible] = useState(false);
 
   function serviceVisible() {
     setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
@@ -51,29 +57,19 @@ export default function Index() {
   async function emerAssReq(service: string, markerEmoji: any, imageWidth: number = 65, imageHeight: number = 60) {
     const serviceChosen = await AsyncStorage.setItem('serviceChosen', service)
 
-    
     EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'approved');
     setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
+    setTriggerNotification(true)
 
-    
+
+    setTimeout(() => setTriggerNotification(false), 2000); // Adjust timing as needed
+
   }
 
-  // for notification
-  useEffect(() => {
-    console.log("Arrival time updated:", arrivalTime); // Check if arrivalTime is updating
+ useEffect(() => {
+  console.log("Arrival Time Updated in MainPage:", arrivalTime);
+}, [arrivalTime]);
 
-    if (arrivalTime && arrivalTime !== 'Calculating') {
-      setTriggerNotification(true);
-
-      console.log("Trigger notification set to true"); // Debug log
-
-      
-      // Set a delay to allow the notification to display before resetting the trigger
-      const resetTrigger = setTimeout(() => setTriggerNotification(false), 3000); // 3 seconds delay
-      
-      return () => clearTimeout(resetTrigger);
-    }
-  }, [arrivalTime]);
 
   function cancelService() {
     EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'Cancelled Service');
@@ -88,17 +84,59 @@ export default function Index() {
   };
 
  
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const toRadians = (degrees: any) => degrees * (Math.PI / 180);
+
+  const R = 6371e3; 
+  const φ1 = toRadians(lat1);
+  const φ2 = toRadians(lat2);
+  const Δφ = toRadians(lat2 - lat1);
+  const Δλ = toRadians(lon2 - lon1);
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  const distance = R * c; 
+  return distance / 1000; 
+};
+
+useEffect(() => {
+  if (location) {
+    const distance = calculateDistance(
+      location.coords.latitude,
+      location.coords.longitude,
+      15.4690, // Target latitude
+      120.6045  // Target longitude
+    );
+    console.log("Calculated distance:", distance);
+    handleArrivalTime(distance);  // Use the immediate handler here
+  }
+}, [location?.coords.latitude, location?.coords.longitude]);
+
+
+
+
+
+
+
+
+
+
 
   return (
     <View style={styles.container}>
         
         <>
-      {console.log("Rendering Notification with trigger:", triggerNotification)}
-
+      {console.log("Arrival Time in Main Page:", arrivalTime)}
       <Notification
-        message={`Coming in ${arrivalTime} minute/s`}
+        message={'Authorities are alerted'}
         trigger={triggerNotification}
       />
+
+
        {/* MODAL 1*/}
       <Modal
         animationType="fade"
@@ -159,40 +197,6 @@ export default function Index() {
           </View>
         </View>
       </Modal>
-
-
-      {/* MODAL 2*/}
-
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={routeAssistanceModalVisible}
-        onRequestClose={() => {
-          setEmergencyAssistanceModalVisible(!routeAssistanceModalVisible);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={{marginBottom: 10}}> Are you sure? </Text>
-
-            <View style={styles.buttonModal}>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={RouteAssistance}>
-                <Text style={styles.textStyle}>Yes</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setRouteAssistanceModalVisible(!routeAssistanceModalVisible)}>
-                <Text style={styles.textStyle}>No</Text>
-              </Pressable>
-
-
-            </View>
-           
-          </View>
-        </View>
-        </Modal>
 
       {isFetching && <Text>Fetching location...</Text>}
       {errorMsg && <Text>{errorMsg}</Text>}

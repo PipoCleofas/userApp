@@ -96,15 +96,15 @@ const useHandleClicks = () => {
 
     const fetchMarkers = async (serviceChosen: string) => {
       try {
+        // Primary fetch: Get markers within a 14 km radius
         const response = await fetch(`http://192.168.100.127:3000/marker/getService/${serviceChosen}`);
         const data = await response.json();
     
         if (Array.isArray(data)) {
-          setMarkers(data);
+          let filteredMarkers: MarkerType[] = []; 
+          let closestDistance: number | null = null;
     
           if (location) {
-            let foundThreshold = null;
-    
             data.forEach((marker: MarkerType) => {
               const distance = haversineDistance(
                 location.coords.latitude,
@@ -113,45 +113,50 @@ const useHandleClicks = () => {
                 marker.longitude
               );
     
-              const distanceThresholds = [14000, 13000, 12000, 10000, 8000, 5000, 3000, 1000];
-              let calculated = false;
+              if (distance <= 14000) {
+                filteredMarkers.push(marker);
     
-              for (const threshold of distanceThresholds) {
-                if (distance >= threshold) {
-                  console.log(`Distance is ${distance}, calling handleArrivalTime with threshold ${threshold}`);
-                  foundThreshold = threshold; // Store the last threshold that matches
-                  calculated = true;
-                  break;
+                if (closestDistance === null || distance < closestDistance) {
+                  closestDistance = distance;
                 }
-              }
-    
-              if (!calculated) {
-                console.log('Not calculated');
+              } else {
+                console.log('Distance is greater than 14 km, skipping marker');
               }
             });
     
-            if (foundThreshold !== null) {
-              handleArrivalTime(foundThreshold); // Set arrival time based on the last threshold
+            // Check if there are any markers within 14 km
+            if (filteredMarkers.length > 0) {
+              setMarkers(filteredMarkers);
+              handleArrivalTime(closestDistance!);
             } else {
-              setArrivalTime('Calculating'); // Default if no threshold matched
+              // Fallback fetch: No markers within 14 km, so use the backend route to get a station
+              const fallbackResponse = await fetch(`http://192.168.100.127:3000/marker/getStation/${serviceChosen}`);
+              const fallbackData = await fallbackResponse.json();
+              console.log(fallbackData, "Fallback station data received");
+    
+              // Check if the backend returned any fallback stations
+              if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+                setMarkers(fallbackData);
+                setArrivalTime('Using fallback station data');
+              } else {
+                setArrivalTime('No nearby or fallback stations available');
+              }
             }
           }
         } else {
-          console.error('Error', 'Invalid data format from API');
+          console.error('Invalid data format from API');
         }
       } catch (error) {
         console.error('Error fetching markers:', error);
-        console.error('Error', 'Failed to load markers');
+        console.error('Failed to load markers');
       }
     };
     
-    // Use useEffect to monitor and log arrivalTime when it changes
-    useEffect(() => {
-      console.log(`Updated arrival time: ${arrivalTime}`);
-    }, [arrivalTime]);
-
-
-  
+    
+    
+    
+    
+    
     const updateStatusRequest = async (status: string, userId: number) => {
       try {
           const response = await axios.put(`http://192.168.100.127:3000/servicerequest/updateRequest/${status}`, {
@@ -245,50 +250,12 @@ const useHandleClicks = () => {
     
       
   
-    const RouteAssistance = async () => {
-        // Fetch the location
-        await fetchLocation();
     
-        try {
-      
-          const markerResponse = await axios.post('http://192.168.100.127:3000/marker/submit', {
-             
-              title: "Emergency Assistance Request",
-              description: "Emergency Assistance Request",
-          }, {
-              headers: {
-              'Content-Type': 'application/json',
-              },
-          });
-          console.log('Marker submission success:', markerResponse.data);
-        } catch (error: any) {
-        handleAxiosError(error);
-        }
-    
-      
-    };
       
   
     
 
-    const sendSMS = async (message: string) => {
-        if (!isAvailable) {
-        console.log("SMS is not available on this device.");
-        return;
-        }
-
-        try {
-        const { result } = await SMS.sendSMSAsync(
-            ['09937839142'],
-            message
-        );
-        setResult(result);
-        console.log("SMS sent result:", result);
-        } catch (error) {
-        console.error("Error sending SMS:", error);
-        }
-    };
-
+   
     const handleAxiosError = (error: any) => {
         if (error.response) {
         console.error('Response error:', error.response.data);
@@ -345,7 +312,6 @@ const useHandleClicks = () => {
         handleBackButtonInCitizenPhotoPress,
         handleLoginButtonInSignupAsCitizenPress,
         EmergencyAssistanceRequest,
-        RouteAssistance,
 
         onFileChange,
         onFileUpload,
