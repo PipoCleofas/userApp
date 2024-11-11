@@ -6,7 +6,6 @@ import useHandleClicks from '@/hooks/useHandleClicks';
 import { useNavigation } from 'expo-router';
 import Notification from '@/components/notification-holder/Notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDataInput } from '@/website/web-app/src/hooks/useDataInput';
 
 
 

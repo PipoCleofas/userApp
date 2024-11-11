@@ -97,7 +97,7 @@ const useHandleClicks = () => {
     const fetchMarkers = async (serviceChosen: string) => {
       try {
         // Primary fetch: Get markers within a 14 km radius
-        const response = await fetch(`http://192.168.100.127:3000/marker/getService/${serviceChosen}`);
+        const response = await fetch(`http://db-production-c620.up.railway.app/marker/getService/${serviceChosen}`);
         const data = await response.json();
     
         if (Array.isArray(data)) {
@@ -130,7 +130,7 @@ const useHandleClicks = () => {
               handleArrivalTime(closestDistance!);
             } else {
               // Fallback fetch: No markers within 14 km, so use the backend route to get a station
-              const fallbackResponse = await fetch(`http://192.168.100.127:3000/marker/getStation/${serviceChosen}`);
+              const fallbackResponse = await fetch(`http://db-production-c620.up.railway.app/marker/getStation/${serviceChosen}`);
               const fallbackData = await fallbackResponse.json();
               console.log(fallbackData, "Fallback station data received");
     
@@ -159,7 +159,7 @@ const useHandleClicks = () => {
     
     const updateStatusRequest = async (status: string, userId: number) => {
       try {
-          const response = await axios.put(`http://192.168.100.127:3000/servicerequest/updateRequest/${status}`, {
+          const response = await axios.put(`http://db-production-c620.up.railway.app/servicerequest/updateRequest/${status}`, {
               UserID: userId
           }, {
               headers: {
@@ -188,7 +188,7 @@ const useHandleClicks = () => {
           if (USERID !== null) {
             await updateStatusRequest(requestStatus ?? '', parseInt(USERID));
             
-            const markerUpdateResponse = await axios.put(`http://192.168.100.127:3000/marker/updateMarkerTitle/${USERID}`, {
+            const markerUpdateResponse = await axios.put(`http://db-production-c620.up.railway.app/marker/updateMarkerTitle/${USERID}`, {
               newTitle: 'Cancelled Service Assistance Request'
             }, {
               headers: {
@@ -200,7 +200,7 @@ const useHandleClicks = () => {
           }
         }
         
-        const markerResponse = await axios.post('http://192.168.100.127:3000/marker/submit', {
+        const markerResponse = await axios.post('http://db-production-c620.up.railway.app/marker/submit', {
           latitude,
           longitude,
           title: `${requestType} Assistance Request`,
@@ -216,7 +216,7 @@ const useHandleClicks = () => {
         let  username = await AsyncStorage.getItem('username')
         console.log(username)
 
-        const serviceRequestResponse = await axios.post('http://192.168.100.127:3000/servicerequest/submit', {
+        const serviceRequestResponse = await axios.post('http://db-production-c620.up.railway.app/servicerequest/submit', {
           UserID: USERID,
           Username: username,
           requesttype: requestType,  

@@ -8,7 +8,7 @@ export async function submitBarangay(
     dispatch: React.Dispatch<Action>) 
     {
         try{
-            const barangayResponse = await axios.post('http://192.168.100.127:3000/barangay/submit', {
+            const barangayResponse = await axios.post('http://db-production-c620.up.railway.app/barangay/submit', {
                 barangayname: state.BarangayName,
                 sitio: state.Sitio
               }, {
