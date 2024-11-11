@@ -19,7 +19,7 @@ export const markerSubmit = async (
   console.log('Submitting marker with lat:', state.latitude, 'lng:', state.longitude);
 
   try {
-    const markerResponse = await axios.post('http://db-production-c620.up.railway.app/marker/submit', {
+    const markerResponse = await axios.post('https://db-production-c620.up.railway.app/marker/submit', {
       latitude: state.location,
       longitude: state.longitude,
       title: state.title || "Emergency Assistance Request",
