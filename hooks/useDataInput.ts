@@ -364,7 +364,7 @@ const userSubmit = async (
 ) => {
   try {
     const userResponse = await axios.post(
-      'https://db-production-c620.up.railway.app/user/submit',
+      'https://fearless-growth-production.up.railway.app/user/submit',
       {
         lname: state.lastname,
         fname: state.firstname,

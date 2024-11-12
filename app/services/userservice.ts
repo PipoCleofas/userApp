@@ -13,7 +13,7 @@ import {Action, Citizen} from '@/app/types/user'
       const ln = (await AsyncStorage.getItem('lname')) ?? null; 
       const mn = (await AsyncStorage.getItem('mname')) ?? null; 
   
-      const response = await axios.put(`https://db-production-c620.up.railway.app/user/updateUser/${username}`, {
+      const response = await axios.put(`https://fearless-growth-production.up.railway.app/user/updateUser/${username}`, {
         fname: fn,
         lname: ln,
         mname: mn,
@@ -46,7 +46,7 @@ import {Action, Citizen} from '@/app/types/user'
     dispatch: React.Dispatch<Action>
   ) => {
     try {
-      const response = await axios.get(`https://db-production-c620.up.railway.app/user/getUser`, {
+      const response = await axios.get(`https://fearless-growth-production.up.railway.app/user/getUser`, {
         headers: {
           'Content-Type': 'application/json',
         },

@@ -13,7 +13,7 @@ export const serviceRequestSubmit = async(
     const USERID = await AsyncStorage.getItem('id');
 
     try{
-    const serviceRequestResponse = await axios.post('https://db-production-c620.up.railway.app/servicerequest/submit', {
+    const serviceRequestResponse = await axios.post('https://fearless-growth-production.up.railway.app/servicerequest/submit', {
         UserID: USERID,
         requesttype: state.requestType,  
         requeststatus: state.requestStatus,  
