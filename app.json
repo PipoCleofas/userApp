@@ -19,9 +19,7 @@
         "NSLocationWhenInUseUsageDescription": "We need your location to show it on the map",
         "NSLocationAlwaysUsageDescription": "We need your location to show it on the map",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location to show it on the map",
-        "UIBackgroundModes": [
-          "location"
-        ],
+        "UIBackgroundModes": ["location"],
         "NSCameraUsageDescription": "We need your permission to use the camera to capture photos.",
         "NSPhotoLibraryUsageDescription": "We need your permission to access your photo library to select photos."
       }
@@ -32,10 +30,13 @@
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "WRITE_EXTERNAL_STORAGE"
       ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA598JrOvVsYPrClcB9vEEnB5z6_a-70Po"
+        }
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -66,9 +67,8 @@
         "origin": false
       },
       "eas": {
-        "projectId": "41806137-02e1-43c5-85b0-9b1aa12a5caf"
-      },
-      "googleMapsApiKey": "AIzaSyA598JrOvVsYPrClcB9vEEnB5z6_a-70Po"
+        "projectId": "28e3f0d4-4c25-4d96-bab0-8b5fcac490f1"
+      }
     }
   }
 }

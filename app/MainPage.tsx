@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { StyleSheet, View, Text, Modal, Pressable, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import useLocation from '@/hooks/useLocation';
 import useHandleClicks from '@/hooks/useHandleClicks';
@@ -7,44 +7,21 @@ import { useNavigation } from 'expo-router';
 import Notification from '@/components/notification-holder/Notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
-const getMarkerImage = (title: string) => {
-  switch (title) {
-    case 'BFP':
-      return require('./pictures/fire.png');
-    case 'PNP':
-      return require('./pictures/police.webp');
-    case 'Medical':
-      return require('./pictures/medic.png');
-    case 'NDRRMC':
-      return require('./pictures/ndrrmc.png');
-    case 'PDRRMO':
-      return require('./pictures/ndrrmc.png');
-    case 'PNP Station':
-      return require('./pictures/police.webp');
-    case 'BFP Station':
-      return require('./pictures/fire.png');
-    case 'Medical Station':
-      return require('./pictures/medic.png');
-    case 'PDRRMO Station':
-      return require('./pictures/ndrrmc.png');
-
-  }
+const markerImages = { 
+  BFP: require('./pictures/fire.png'),
+  PNP: require('./pictures/police.webp'),
+  Medical: require('./pictures/medic.png'),
+  NDRRMC: require('./pictures/ndrrmc.png'),
+  PDRRMO: require('./pictures/ndrrmc.png'),
+  'PNP Station': require('./pictures/police.webp'),
+  'BFP Station': require('./pictures/fire.png'),
+  'Medical Station': require('./pictures/medic.png'),
+  'PDRRMO Station': require('./pictures/ndrrmc.png'),
 };
 
 export default function MainPage() {
-
- 
-  const { location, errorMsg, isFetching, handleArrivalTime,arrivalTime } = useLocation();
-  const { 
-    EmergencyAssistanceRequest,
-    markerEmoji,
-    markerImageSize,
-    markers
-  } = useHandleClicks();
-
-  
+  const { location, errorMsg, isFetching, handleArrivalTime, arrivalTime } = useLocation();
+  const { EmergencyAssistanceRequest, markerEmoji, markerImageSize, markers } = useHandleClicks();
 
   const [triggerNotification, setTriggerNotification] = useState(false);
   const [emergencyAssistanceModalVisible, setEmergencyAssistanceModalVisible] = useState(false);
@@ -54,21 +31,16 @@ export default function MainPage() {
   }
 
   async function emerAssReq(service: string, markerEmoji: any, imageWidth: number = 65, imageHeight: number = 60) {
-    const serviceChosen = await AsyncStorage.setItem('serviceChosen', service)
-
+    await AsyncStorage.setItem('serviceChosen', service);
     EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'approved');
     setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
-    setTriggerNotification(true)
-
-
-    setTimeout(() => setTriggerNotification(false), 2000); // Adjust timing as needed
-
+    setTriggerNotification(true);
+    setTimeout(() => setTriggerNotification(false), 2000);
   }
 
- useEffect(() => {
-  console.log("Arrival Time Updated in MainPage:", arrivalTime);
-}, [arrivalTime]);
-
+  useEffect(() => {
+    console.log("Arrival Time Updated in MainPage:", arrivalTime);
+  }, [arrivalTime]);
 
   function cancelService() {
     EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'Cancelled Service');
@@ -76,191 +48,142 @@ export default function MainPage() {
   }
 
   const defaultRegion = {
-    latitude: 15.4817, // Tarlac City latitude
-    longitude: 120.5979, // Tarlac City longitude
-    latitudeDelta: 0.05, // Adjust for desired zoom level
+    latitude: 15.4817,
+    longitude: 120.5979,
+    latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   };
 
- 
-const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const toRadians = (degrees: any) => degrees * (Math.PI / 180);
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const toRadians = (degrees: any) => degrees * (Math.PI / 180);
+    const R = 6371e3;
+    const φ1 = toRadians(lat1);
+    const φ2 = toRadians(lat2);
+    const Δφ = toRadians(lat2 - lat1);
+    const Δλ = toRadians(lon2 - lon1);
 
-  const R = 6371e3; 
-  const φ1 = toRadians(lat1);
-  const φ2 = toRadians(lat2);
-  const Δφ = toRadians(lat2 - lat1);
-  const Δλ = toRadians(lon2 - lon1);
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
 
-  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c / 1000;
+  };
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  const distance = R * c; 
-  return distance / 1000; 
-};
-
-useEffect(() => {
-  if (location) {
-    const distance = calculateDistance(
-      location.coords.latitude,
-      location.coords.longitude,
-      15.4690, // Target latitude
-      120.6045  // Target longitude
-    );
-    console.log("Calculated distance:", distance);
-    handleArrivalTime(distance);  // Use the immediate handler here
-  }
-}, [location?.coords.latitude, location?.coords.longitude]);
-
-
-
-
-
-
-
-
-
-
+  useEffect(() => {
+    if (location) {
+      const distance = calculateDistance(
+        location.coords.latitude,
+        location.coords.longitude,
+        15.4690,
+        120.6045
+      );
+      console.log("Calculated distance:", distance);
+      handleArrivalTime(distance);
+    }
+  }, [location?.coords.latitude, location?.coords.longitude]);
 
   return (
     <View style={styles.container}>
-        
-        <>
-      {console.log("Arrival Time in Main Page:", arrivalTime)}
-      <Notification
-        message={'Authorities are alerted'}
-        trigger={triggerNotification}
-      />
+      <>
+        {console.log("Arrival Time in Main Page:", arrivalTime)}
+        <Notification
+          message={'Authorities are alerted'}
+          trigger={triggerNotification}
+        />
 
-
-       {/* MODAL 1*/}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={emergencyAssistanceModalVisible}
-        onRequestClose={() => {
-          setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
-        }}>
-        <View style={modalStyles.centeredView}>
-          <View style={modalStyles.modalView}>
-            <Text style={{ marginBottom: 10 }}>Choose Service</Text>
-
-            <View style={modalStyles.buttonModal}>
-
-              <View style={modalStyles.servicesContainerStyle}>
-                <Pressable
-                  style={[modalStyles.serviceButton]}
-                  onPress={() => emerAssReq('BFP',require('./pictures/fire.png'))}>
-                  <Text style={modalStyles.textStyle}>BFP</Text>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={emergencyAssistanceModalVisible}
+          onRequestClose={() => setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible)}>
+          <View style={modalStyles.centeredView}>
+            <View style={modalStyles.modalView}>
+              <Text style={{ marginBottom: 10 }}>Choose Service</Text>
+              <View style={modalStyles.buttonModal}>
+                <View style={modalStyles.servicesContainerStyle}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('BFP', markerImages.BFP)}>
+                    <Text style={modalStyles.textStyle}>BFP</Text>
+                  </Pressable>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PNP', markerImages.PNP)}>
+                    <Text style={modalStyles.textStyle}>PNP</Text>
+                  </Pressable>
+                </View>
+                <View style={modalStyles.servicesContainerStyle}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('Medical', markerImages.Medical)}>
+                    <Text style={modalStyles.textStyle}>Medical</Text>
+                  </Pressable>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PDRRMO', markerImages.NDRRMC)}>
+                    <Text style={modalStyles.textStyle}>PDRRMO</Text>
+                  </Pressable>
+                </View>
+                <Pressable style={modalStyles.closeButton} onPress={cancelService}>
+                  <Text style={modalStyles.textStyle}>Cancel Service</Text>
                 </Pressable>
-
-                <Pressable
-                  style={[modalStyles.serviceButton]}
-                  onPress={() => emerAssReq('PNP',require('./pictures/police.webp'))}>
-                  <Text style={modalStyles.textStyle}>PNP</Text>
-                </Pressable>
-              </View>
-
-              <View style={modalStyles.servicesContainerStyle}>
-                <Pressable
-                  style={[modalStyles.serviceButton]}
-                  onPress={() => emerAssReq('Medical', require('./pictures/medic.png'))}>
-                  <Text style={modalStyles.textStyle}>Medical</Text>
-                </Pressable>
-
-                <Pressable
-                  style={[modalStyles.serviceButton]}
-                  onPress={() => emerAssReq('PDRRMO', require('./pictures/ndrrmc.png'))}>
-                  <Text style={modalStyles.textStyle}>PDRRMO</Text>
+                <Pressable style={modalStyles.closeButton} onPress={() => setEmergencyAssistanceModalVisible(false)}>
+                  <Text style={modalStyles.textStyle}>Close</Text>
                 </Pressable>
               </View>
+            </View>
+          </View>
+        </Modal>
 
-            
+        {isFetching && <Text>Fetching location...</Text>}
+        {errorMsg && <Text>{errorMsg}</Text>}
+        {!isFetching && location && (
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={styles.map}
+            initialRegion={defaultRegion}
+            region={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+            >
+              <Image
+                source={markerEmoji}
+                style={{ width: markerImageSize.width, height: markerImageSize.height }}
+              />
+            </Marker>
+            {markers.map((marker, index) => {
+              const markerImage = markerImages[marker.title as keyof typeof markerImages] || markerImages.BFP;
+              return (
+                <Marker
+                  key={index}
+                  coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+                  title={marker.title}
+                  description={`Latitude: ${marker.latitude}, Longitude: ${marker.longitude}`}
+                >
+                  <Image source={markerImage} style={{ width: 40, height: 40 }} />
+                </Marker>
+              );
+            })}
+          </MapView>
+        )}
 
-              <Pressable
-                style={[modalStyles.closeButton]}
-                onPress={() => cancelService()}>
-                <Text style={modalStyles.textStyle}>Cancel Service</Text>
-              </Pressable>
-
-              <Pressable
-                style={[modalStyles.closeButton]}
-                onPress={() => setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible)}>
-                <Text style={modalStyles.textStyle}>Close</Text>
-              </Pressable>
-
+        <View style={styles.tabBarContainer}>
+          <View style={styles.iconContainer}>
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity style={styles.button} onPress={serviceVisible}>
+                <Text style={styles.buttonText}>Emergency Assistance</Text>
+                <Text style={styles.buttonText}>Request</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
-      </Modal>
-
-      {isFetching && <Text>Fetching location...</Text>}
-      {errorMsg && <Text>{errorMsg}</Text>}
-      {!isFetching && location && (
-        <MapView
-          style={styles.map}
-          initialRegion={defaultRegion}
-          region={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          }}
-
-        >
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title=""
-            description=""
-          >
-          <Image
-            source={markerEmoji}
-            style={{ width: markerImageSize.width, height: markerImageSize.height }} 
-          />
-
-          </Marker>
-          {markers.map((marker, index) => (
-                <Marker
-                  key={index}
-                  coordinate={{
-                    latitude: marker.latitude,
-                    longitude: marker.longitude,
-                  }}
-                  title={marker.title} 
-                  description={`Latitude: ${marker.latitude}, Longitude: ${marker.longitude}`}
-                >
-                  <Image
-                    source={getMarkerImage(marker.title)} 
-                    style={{ width: 40, height: 40 }}  
-                  />
-                </Marker>
-              ))}
-        </MapView>
-      )}
-
-     
-      <View style={styles.tabBarContainer}>
-        <View style={styles.iconContainer}>
-          
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.button} onPress={serviceVisible}>
-              <Text style={styles.buttonText}>Emergency Assistance</Text>
-              <Text style={styles.buttonText}>Request</Text>
-            </TouchableOpacity>
-          </View>
-
-        </View>
-      </View>
       </>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
