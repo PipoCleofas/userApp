@@ -17,7 +17,7 @@ interface MarkerType {
 // request status = 'pending' | 'approved' | 'rejected'
   
 const useHandleClicks = () => {
-  const [markers, setMarkers] = useState<MarkerType[]>([]); // State to store markers
+  const [markers, setMarkers] = useState<MarkerType[] | null>([]); // State to store markers
 
     const {latitude, longitude, fetchLocation, handleArrivalTime, arrivalTime, location, setArrivalTime} = useLocation();
     const {isAvailable,setResult} = useSMS();
@@ -194,7 +194,9 @@ const useHandleClicks = () => {
               headers: {
                   'Content-Type': 'application/json',
               },
+              
             });
+            setMarkers(null)
           } else {
             console.error("USERID is null");
           }

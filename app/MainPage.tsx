@@ -153,7 +153,7 @@ export default function MainPage() {
                 style={{ width: markerImageSize.width, height: markerImageSize.height }}
               />
             </Marker>
-            {markers.map((marker, index) => {
+            {markers && markers.map((marker, index) => {
               const markerImage = markerImages[marker.title as keyof typeof markerImages] || markerImages.BFP;
               return (
                 <Marker
