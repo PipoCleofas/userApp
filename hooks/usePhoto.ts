@@ -2,119 +2,154 @@ import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import useHandleClicks from './useHandleClicks';
 import { useNavigation } from 'expo-router';
+import { Alert } from 'react-native';
+import axios from 'axios';
+import { CameraType, useCameraPermissions, Camera } from 'expo-camera';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const usePhotoPicker = () => {
+  const navigation = useNavigation();
+  const [imageUri1, setImageUri1] = useState<string | null>(null);
+  const [imageUri2, setImageUri2] = useState<string | null>(null);
+  const [imageUri3, setImageUri3] = useState<string | null>(null);
+  const [imageUri4, setImageUri4] = useState<string | null>(null);
+  const [imageError,setImageError] = useState<string | null>(null)
 
-  const { onFileChange, onFileUpload } = useHandleClicks();
+  const pickImage = async (setImageUri: React.Dispatch<React.SetStateAction<string | null>>) => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
 
-  // State to store image URIs and base64 data for each photo
-  const [photoUri1, setPhotoUri1] = useState<string | null>(null);
-  const [photoBase641, setPhotoBase641] = useState<string | null>(null);
-
-  const [photoUri2, setPhotoUri2] = useState<string | null>(null);
-  const [photoBase642, setPhotoBase642] = useState<string | null>(null);
-
-  const [photoUri3, setPhotoUri3] = useState<string | null>(null);
-  const [photoBase643, setPhotoBase643] = useState<string | null>(null);
-
-  const navigation = useNavigation()
-
-  // Reusable function to select or take a photo and trigger onFileChange
-  const handlePhotoSelection = async (
-    setUri: React.Dispatch<React.SetStateAction<string | null>>, 
-    setBase64: React.Dispatch<React.SetStateAction<string | null>>, 
-    source: 'camera' | 'library', 
-    photoKey: string
-  ) => {
-    try {
-      if (source === 'camera') {
-        const permission = await ImagePicker.requestCameraPermissionsAsync();
-        if (permission.status !== 'granted') {
-          alert('Camera access is required to take photos.');
-          return;
-        }
-      }
-
-      let result = source === 'camera'
-        ? await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            base64: true,
-          })
-        : await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            base64: true,
-          });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const selectedImage = result.assets[0];
-        setUri(selectedImage.uri || null);
-        setBase64(selectedImage.base64 || null);
-
-        // Simulate an event object to pass to onFileChange
-        const fileEvent = {
-          target: {
-            files: [{ uri: selectedImage.uri, base64: selectedImage.base64 }],
-          },
-        };
-
-        
-        onFileChange(fileEvent, photoKey);
-      }
-    } catch (error) {
-      console.error('Error handling photo:', error);
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
     }
   };
 
-  // Functions for specific photo inputs
-  const handleTakePhoto1 = () => handlePhotoSelection(setPhotoUri1, setPhotoBase641, 'camera', 'photo1');
-  const handleSelectPhoto1 = () => handlePhotoSelection(setPhotoUri1, setPhotoBase641, 'library', 'photo1');
+  // Function to capture an image using the camera
+  const captureImage = async (setImageUri: React.Dispatch<React.SetStateAction<string | null>>) => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    if (status === 'granted') {
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        quality: 1,
+      });
 
-  const handleTakePhoto2 = () => handlePhotoSelection(setPhotoUri2, setPhotoBase642, 'camera', 'photo2');
-  const handleSelectPhoto2 = () => handlePhotoSelection(setPhotoUri2, setPhotoBase642, 'library', 'photo2');
-
-  const handleTakePhoto3 = () => handlePhotoSelection(setPhotoUri3, setPhotoBase643, 'camera', 'photo3');
-  const handleSelectPhoto3 = () => handlePhotoSelection(setPhotoUri3, setPhotoBase643, 'library', 'photo3');
-
-
-  // Function to handle file uploads
-  const handleUploadPhotos = () => {
-    const photos = [
-      { uri: photoUri1, base64: photoBase641, key: 'photo1' },
-      { uri: photoUri2, base64: photoBase642, key: 'photo2' },
-      { uri: photoUri3, base64: photoBase643, key: 'photo3' },
-    ];
-
-    navigation.navigate('UsernamePhoto' as never)
-    // Trigger onFileUpload for each photo if available
-    photos.forEach(photo => {
-      if (photo.uri && photo.base64) {
-        onFileUpload(photo.uri, photo.key);  // Pass the photo URI and key (e.g., 'photo1')
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        setImageUri(uri);
       }
-    });
+    } else {
+      Alert.alert('Camera permission is required to use the camera');
+    }
   };
 
+  const uploadAllImages = async () => {
+    if(!imageUri1 || !imageUri2 || !imageUri3){
+      setImageError('Provide the required photos');
+      return;
+    }
+
+    const formData = new FormData();
+    const images = [
+      { uri: imageUri1, name: 'photo1' },
+      { uri: imageUri2, name: 'photo2' },
+      { uri: imageUri3, name: 'photo3' },
+    ];
+    console.log(images)
+    // Append each image to the formData if it has been selected
+    images.forEach(({ uri, name }) => {
+      if (uri) {
+        formData.append('photos', {
+          uri,
+          type: 'image/jpeg',
+          name: `${name}.jpg`,
+        } as any);
+      }
+    });
+  
+    try {
+      // Retrieve UserID from AsyncStorage
+      const userID = await AsyncStorage.getItem('firstId');
+      if (!userID) {
+        Alert.alert('Error', 'User ID not found.');
+        return;
+      }
+  
+      // Append UserID to formData
+      formData.append('userID', userID);
+      console.log(formData)
+  
+      // Make the POST request
+      await axios.post('https://express-production-ac91.up.railway.app/photo/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      
+      navigation.navigate('UsernamePhoto' as never)
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Upload Failed', 'Failed to upload images');
+    }
+  };
+
+  const uploadProfile = async () => {
+    if (!imageUri4) {
+      setImageError('Provide the required photos');
+      return 0;
+    }
+  
+    const formData = new FormData();
+    formData.append('photo4', {
+      uri: imageUri4,
+      type: 'image/jpeg',
+      name: 'photo4.jpg',
+    } as any);
+    console.log(formData)
+    try {
+      const userID = await AsyncStorage.getItem('firstId');
+      if (!userID) {
+        Alert.alert('Error', 'User ID not found.');
+        return;
+      }
+  
+      // Make the PUT request
+      const response  = await axios.put(
+        `https://express-production-ac91.up.railway.app/photo/photos/${userID}`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+      
+      if(response.status  === 200){
+        navigation.navigate('CitizenLogin' as never)
+      }
+  
+      Alert.alert('Success', 'Profile image uploaded successfully');
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      Alert.alert('Upload Failed', 'Failed to upload the profile image');
+    }
+  };
+  
+  
   return {
-    setPhotoUri3,
-    setPhotoBase643,
+    imageError,
+    imageUri1,
+    imageUri2,
+    imageUri3,
+    imageUri4,
+    uploadAllImages,
+    pickImage,
+    captureImage,
+    setImageUri1,
+    setImageUri2,
+    setImageUri3,
+    setImageUri4,
+    uploadProfile,
 
-    photoUri1,
-    photoBase641,
-    handleSelectPhoto1,
-    handleTakePhoto1,
-
-    photoUri2,
-    photoBase642,
-    handleSelectPhoto2,
-    handleTakePhoto2,
-
-    photoUri3,
-    photoBase643,
-    handleSelectPhoto3,
-    handleTakePhoto3,
-
-    handleUploadPhotos
   };
 };
 

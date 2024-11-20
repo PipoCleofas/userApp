@@ -12,8 +12,19 @@ export default function CitizenPhoto() {
   const [modal3Visible, setModal3Visible] = useState(false);
 
   const { handleLoginButtonPress,handleBackButtonInCitizenPhotoPress } = useHandleClicks();
-  const { handleUploadPhotos, photoUri1, photoUri2, photoUri3, handleSelectPhoto1 , handleSelectPhoto2, handleSelectPhoto3,handleTakePhoto1, handleTakePhoto2,handleTakePhoto3 } = usePhoto();
-  const {handleCitizenPhotoNext,state} = useDataInput();
+  const {
+    imageUri1,
+    imageUri2,
+    imageUri3,
+    uploadAllImages,
+    pickImage,
+    captureImage,
+    setImageUri1,
+    setImageUri2,
+    setImageUri3,
+    imageError
+    } = usePhoto();
+  const {state} = useDataInput();
 
   return (
 
@@ -34,10 +45,10 @@ export default function CitizenPhoto() {
 
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <TouchableOpacity onPress={handleSelectPhoto1} style={styles.modalButtons}>
+          <TouchableOpacity onPress={() => pickImage(setImageUri1)} style={styles.modalButtons}>
             <Text style={styles.modalText}>Select Photo</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleTakePhoto1} style={styles.modalButtons}>
+          <TouchableOpacity onPress={() => captureImage(setImageUri1)} style={styles.modalButtons}>
             <Text style={styles.modalText}>Open Camera</Text>
           </TouchableOpacity>
 
@@ -51,7 +62,7 @@ export default function CitizenPhoto() {
       </Modal>
 
       <Modal
-      animationType="fade"
+      animationType="fade"  
       transparent={true}
       visible={modal2Visible}
       onRequestClose={() => {
@@ -59,10 +70,10 @@ export default function CitizenPhoto() {
       }}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <TouchableOpacity onPress={handleSelectPhoto2} style={styles.modalButtons}>
+          <TouchableOpacity onPress={() => pickImage(setImageUri2)} style={styles.modalButtons}>
             <Text style={styles.modalText}>Select Photo</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleTakePhoto2} style={styles.modalButtons}>
+          <TouchableOpacity onPress={() => captureImage(setImageUri2)} style={styles.modalButtons}>
             <Text style={styles.modalText}>Open Camera</Text>
           </TouchableOpacity>         
           
@@ -84,10 +95,10 @@ export default function CitizenPhoto() {
       }}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <TouchableOpacity onPress={handleSelectPhoto3} style={styles.modalButtons}>
+          <TouchableOpacity onPress={() => pickImage(setImageUri3)} style={styles.modalButtons}>
             <Text style={styles.modalText}>Select Photo</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleTakePhoto3} style={styles.modalButtons}>
+          <TouchableOpacity onPress={() => captureImage(setImageUri3)} style={styles.modalButtons}>
             <Text style={styles.modalText}>Open Camera</Text>
           </TouchableOpacity>         
           <Pressable
@@ -136,36 +147,26 @@ export default function CitizenPhoto() {
       
       <View style={styles.photoUriList}>
 
-        {photoUri1 && (
-          <View style={styles.previewContainer}>
-            <Text>Valid ID:</Text>
-            <Image source={{ uri: photoUri1 }} style={styles.previewImage} />
-          </View>
-        )}
+      {imageUri1 && <Image source={{ uri: imageUri1 }} style={{ width: 100, height: 100, margin: 5 }} />}
 
-        {photoUri2 && (
-          <View style={styles.previewContainer}>
-            <Text>Front View:</Text>
-            <Image source={{ uri: photoUri2 }} style={styles.previewImage} />
-          </View>
-        )}
 
-        {photoUri3 && (
-          <View style={styles.previewContainer}>
-            <Text>Back View:</Text>
-            <Image source={{ uri: photoUri3 }} style={styles.previewImage} />
-          </View>
-        )}
+      {imageUri2 && <Image source={{ uri: imageUri2 }} style={{ width: 100, height: 100, margin: 5 }} />}
+
+
+      {imageUri3 && <Image source={{ uri: imageUri3 }} style={{ width: 100, height: 100, margin: 5 }} />}
+
       </View>
       
       {state.error && <Text style={styles.errorText}>{state.error}</Text>}
+      {imageError && <Text style={styles.errorText}>{imageError}</Text>}
+
       <View style={styles.columnButtons}>
         <TouchableOpacity style={styles.button1}>
           <SimpleLineIcons name="arrow-left" size={16} color="black" style={styles.icon} onPress={handleBackButtonInCitizenPhotoPress} />
           <Text style={styles.buttonText1}>BACK</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button2} onPress={handleUploadPhotos}>
+        <TouchableOpacity style={styles.button2} onPress={uploadAllImages}>
           <Text style={styles.buttonText2}>NEXT</Text>
           <SimpleLineIcons name="arrow-right" size={16} color="#FFFFFF" style={styles.icon} />
         </TouchableOpacity>

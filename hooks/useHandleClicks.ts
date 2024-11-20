@@ -96,10 +96,11 @@ const useHandleClicks = () => {
 
     const fetchMarkers = async (serviceChosen: string) => {
       try {
-        // Primary fetch: Get markers within a 14 km radius
-        const response = await fetch(`https://fearless-growth-production.up.railway.app/marker/getService/${serviceChosen}`);
+        const station = serviceChosen + " Station"
+        console.log("Station chosen: " + station)
+        const response = await fetch(`https://express-production-ac91.up.railway.app/marker/getService/${station}`);
         const data = await response.json();
-    
+        console.log("Data: " + data)
         if (Array.isArray(data)) {
           let filteredMarkers: MarkerType[] = []; 
           let closestDistance: number | null = null;

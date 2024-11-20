@@ -1,22 +1,22 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Pressable, Image } from "react-native";
 import useDataInput from "@/hooks/useDataInput";
-
+import usePhoto from "@/hooks/usePhoto"
 const UsernamePhoto = () => {
-  const {state,handleChangeState, handleConfirmUsernamePhoto, usernamePhotoError, handleSelectPhoto4, photoUri4} = useDataInput();
-
+  const {state,handleChangeState, usernamePhotoError,handleConfirmUsernamePhoto} = useDataInput();
+  const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError} = usePhoto();
 
  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your Profile</Text>
-      <Pressable onPress={handleSelectPhoto4}>
+      <Pressable onPress={() => pickImage(setImageUri4)}>
         <MaterialIcons name="image-search" size={50} color="#4A4A4A" style={styles.icon} />
       </Pressable>
 
-      {photoUri4 && (
+      {imageUri4 && (
         <View style={styles.previewContainer}>
-          <Image source={{ uri: photoUri4 }} style={styles.previewImage} />
+          <Image source={{ uri: imageUri4 }} style={styles.previewImage} />
         </View>
       )}
 
@@ -31,6 +31,9 @@ const UsernamePhoto = () => {
       </View>
 
       {state.error && <Text style={styles.errorText}>{state.error}</Text>}
+     
+
+
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.buttonConfirm} onPress={handleConfirmUsernamePhoto}>

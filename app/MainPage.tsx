@@ -8,15 +8,25 @@ import Notification from '@/components/notification-holder/Notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const markerImages = { 
-  BFP: require('./pictures/fire.png'),
-  PNP: require('./pictures/police.webp'),
-  Medical: require('./pictures/medic.png'),
-  NDRRMC: require('./pictures/ndrrmc.png'),
-  PDRRMO: require('./pictures/ndrrmc.png'),
   'PNP Station': require('./pictures/police.webp'),
   'BFP Station': require('./pictures/fire.png'),
   'Medical Station': require('./pictures/medic.png'),
   'PDRRMO Station': require('./pictures/ndrrmc.png'),
+
+  'PNP BRGY. MABINI': require('./pictures/police.webp'),
+  'PNP BRGY. SAN ISIDRO': require('./pictures/police.webp'),
+  'PNP HILARIO STREET': require('./pictures/police.webp'),
+
+
+  'BFP BRGY. SAN ISIDRO': require('./pictures/fire.png'),
+  'BFP BRGY. SAN SEBASTIAN': require('./pictures/fire.png'),
+  'BFP BRGY. SAN NICOLAS': require('./pictures/fire.png'),
+
+  'CENTRAL LUZON DOCTORS HOSPITAL': require('./pictures/medic.png'),
+  'TARLAC PROVINCIAL HOSPITAL': require('./pictures/medic.png'),
+  'TALON GENERAL HOSPITAL': require('./pictures/medic.png'),
+
+
 };
 
 export default function MainPage() {
@@ -102,18 +112,18 @@ export default function MainPage() {
               <Text style={{ marginBottom: 10 }}>Choose Service</Text>
               <View style={modalStyles.buttonModal}>
                 <View style={modalStyles.servicesContainerStyle}>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('BFP', markerImages.BFP)}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('BFP', markerImages['BFP Station'])}>
                     <Text style={modalStyles.textStyle}>BFP</Text>
                   </Pressable>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PNP', markerImages.PNP)}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PNP', markerImages['PNP Station'])}>
                     <Text style={modalStyles.textStyle}>PNP</Text>
                   </Pressable>
                 </View>
                 <View style={modalStyles.servicesContainerStyle}>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('Medical', markerImages.Medical)}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('Medical', markerImages['Medical Station'])}>
                     <Text style={modalStyles.textStyle}>Medical</Text>
                   </Pressable>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PDRRMO', markerImages.NDRRMC)}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PDRRMO', markerImages['PDRRMO Station'])}>
                     <Text style={modalStyles.textStyle}>PDRRMO</Text>
                   </Pressable>
                 </View>
@@ -154,7 +164,7 @@ export default function MainPage() {
               />
             </Marker>
             {markers && markers.map((marker, index) => {
-              const markerImage = markerImages[marker.title as keyof typeof markerImages] || markerImages.BFP;
+              const markerImage = markerImages[marker.title as keyof typeof markerImages] || markerImages['PDRRMO Station'];
               return (
                 <Marker
                   key={index}

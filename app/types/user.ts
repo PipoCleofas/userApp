@@ -136,6 +136,5 @@ export interface Action {
       return "Password cannot be empty.";
     }
 
-    // Remove the state.error check in the validation, as it may conflict with dispatch handling
-    return null; // No error, valid input
+    return null; 
 };

@@ -9,8 +9,11 @@ import {handleBirthdayChange} from '@/app/utils/validateUser'
 import {updateUser, getUser} from '@/app/services/userservice'
 import  {validateName,validateBirthday,validatePassword, validateBarangayAndSitio,validateUsernamePhoto, validatePhotos} from '@/app/utils/validateUser'
 import {Action, Citizen} from '@/app/types/user'
+import usePhoto from '@/hooks/usePhoto'
 
 const useCheckPassword = () => {
+  const {uploadProfile} = usePhoto();
+
   const navigation = useNavigation();
   const {onFileChange, onFileUpload} = useHandleClicks();
 
@@ -133,7 +136,11 @@ const useCheckPassword = () => {
   const handleConfirmUsernamePhoto = async () => {
     try {
       const usernamePhotoError = validateUsernamePhoto(state.username ?? '');
-  
+      
+     await uploadProfile();
+
+      
+
       if (usernamePhotoError) {
         dispatch({
           actionType: 'error',
