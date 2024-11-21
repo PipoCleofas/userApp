@@ -121,11 +121,11 @@ export const validateName = (fname: string | null, mname: string | null, lname: 
       return "Picture or username cannot be empty.";
     }
     
-    /*
+    
     if (!photo) {
       return "Photo cannot be empty or invalid.";
     }
-    */
+    
    
     return null; // No error
   };

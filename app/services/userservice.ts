@@ -6,9 +6,9 @@ import {Action, Citizen} from '@/app/types/user'
   
   export const updateUser = async (
     username: string,
-    dispatch: React.Dispatch<Action> 
   ) => {
     try {
+      console.log("updating username")
       const fn = (await AsyncStorage.getItem('fname')) ?? null; 
       const ln = (await AsyncStorage.getItem('lname')) ?? null; 
       const mn = (await AsyncStorage.getItem('mname')) ?? null; 
@@ -23,20 +23,12 @@ import {Action, Citizen} from '@/app/types/user'
         },
       });
   
-      dispatch({
-        actionType: 'put',
-        data: { username },
-      });
+      
   
-      console.log('User updated successfully:', response.data);
+      console.log('Username updated successfully');
     } catch (error) {
       handleAxiosError(error);
   
-      // Dispatch an error action
-      dispatch({
-        actionType: 'error',
-        data: { error: error instanceof Error ? error.message : 'Unknown error' },
-      });
     }
   };
   

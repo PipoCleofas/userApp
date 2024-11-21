@@ -6,6 +6,7 @@ import { Alert } from 'react-native';
 import axios from 'axios';
 import { CameraType, useCameraPermissions, Camera } from 'expo-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {updateUser} from '@/app/services/userservice'
 
 const usePhotoPicker = () => {
   const navigation = useNavigation();
@@ -14,6 +15,8 @@ const usePhotoPicker = () => {
   const [imageUri3, setImageUri3] = useState<string | null>(null);
   const [imageUri4, setImageUri4] = useState<string | null>(null);
   const [imageError,setImageError] = useState<string | null>(null)
+  const [usernamePhotoError, setUsernamePhotoError] = useState<string | null>(null)
+  const [username,setUsername] = useState<string | null>()
 
   const pickImage = async (setImageUri: React.Dispatch<React.SetStateAction<string | null>>) => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -94,12 +97,22 @@ const usePhotoPicker = () => {
     }
   };
 
+
+
+
+
+
   const uploadProfile = async () => {
-    if (!imageUri4) {
-      setImageError('Provide the required photos');
+    if (!imageUri4 || !username) {
+      setImageError('Picture or username cannot be empty');
       return 0;
     }
   
+    // username
+    await updateUser(username ?? 'Lebron James');
+  
+
+    // photo
     const formData = new FormData();
     formData.append('photo4', {
       uri: imageUri4,
@@ -110,7 +123,6 @@ const usePhotoPicker = () => {
     try {
       const userID = await AsyncStorage.getItem('firstId');
       if (!userID) {
-        Alert.alert('Error', 'User ID not found.');
         return;
       }
   
@@ -127,7 +139,6 @@ const usePhotoPicker = () => {
         navigation.navigate('CitizenLogin' as never)
       }
   
-      Alert.alert('Success', 'Profile image uploaded successfully');
     } catch (error) {
       console.error('Error uploading profile image:', error);
       Alert.alert('Upload Failed', 'Failed to upload the profile image');
@@ -149,6 +160,7 @@ const usePhotoPicker = () => {
     setImageUri3,
     setImageUri4,
     uploadProfile,
+    setUsername
 
   };
 };

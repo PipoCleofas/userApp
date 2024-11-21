@@ -2,9 +2,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Pressable, Image } from "react-native";
 import useDataInput from "@/hooks/useDataInput";
 import usePhoto from "@/hooks/usePhoto"
+
 const UsernamePhoto = () => {
   const {state,handleChangeState, usernamePhotoError,handleConfirmUsernamePhoto} = useDataInput();
-  const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError} = usePhoto();
+  const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError,setUsername} = usePhoto();
 
  
   return (
@@ -26,17 +27,16 @@ const UsernamePhoto = () => {
           maxLength={15}
           placeholder="Enter username"
           placeholderTextColor="#aaa"
-          onChangeText={(text) => handleChangeState('username', text)} 
+          onChangeText={(text) => setUsername(text)} 
         />
       </View>
 
-      {state.error && <Text style={styles.errorText}>{state.error}</Text>}
-     
+      {imageError && <Text style={styles.errorText}>{imageError}</Text>}
 
 
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.buttonConfirm} onPress={handleConfirmUsernamePhoto}>
+        <TouchableOpacity style={styles.buttonConfirm} onPress={uploadProfile}>
           <Text style={styles.buttonText}>Confirm</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.buttonDelete} >

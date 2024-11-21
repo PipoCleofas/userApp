@@ -158,7 +158,7 @@ const useCheckPassword = () => {
         },
       });
   
-      await updateUser(state.username ?? 'Lebron James', dispatch);
+      //await updateUser(state.username ?? 'Lebron James', dispatch);
   
       navigation.navigate('CitizenLogin' as never);
       
