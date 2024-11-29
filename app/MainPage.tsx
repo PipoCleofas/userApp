@@ -48,12 +48,11 @@ export default function MainPage() {
     setTimeout(() => setTriggerNotification(false), 2000);
   }
 
-  useEffect(() => {
-    console.log("Arrival Time Updated in MainPage:", arrivalTime);
-  }, [arrivalTime]);
 
-  function cancelService() {
-    EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'Cancelled Service');
+  async function cancelService() {
+    let serviceChosen = await AsyncStorage.getItem('serviceChosen');
+    console.log(serviceChosen)
+    EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'Cancelled Service', serviceChosen!);
     setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
   }
 
@@ -96,7 +95,6 @@ export default function MainPage() {
   return (
     <View style={styles.container}>
       <>
-        {console.log("Arrival Time in Main Page:", arrivalTime)}
         <Notification
           message={'Authorities are alerted'}
           trigger={triggerNotification}
@@ -127,7 +125,7 @@ export default function MainPage() {
                     <Text style={modalStyles.textStyle}>PDRRMO</Text>
                   </Pressable>
                 </View>
-                <Pressable style={modalStyles.closeButton} onPress={cancelService}>
+                <Pressable style={modalStyles.closeButton} onPress={() => cancelService()}>
                   <Text style={modalStyles.textStyle}>Cancel Service</Text>
                 </Pressable>
                 <Pressable style={modalStyles.closeButton} onPress={() => setEmergencyAssistanceModalVisible(false)}>

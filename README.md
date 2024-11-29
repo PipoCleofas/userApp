@@ -1,5 +1,3 @@
-# STILL ON DEVELOPMENT
-
 ## I collaborated with a team to create and furnish this one system which consists of 2 mobile applications and 2 web applications
 
 ## Prerequisites

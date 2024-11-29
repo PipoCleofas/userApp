@@ -1,10 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Pressable, Image } from "react-native";
-import useDataInput from "@/hooks/useDataInput";
 import usePhoto from "@/hooks/usePhoto"
 
 const UsernamePhoto = () => {
-  const {state,handleChangeState, usernamePhotoError,handleConfirmUsernamePhoto} = useDataInput();
   const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError,setUsername} = usePhoto();
 
  

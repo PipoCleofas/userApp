@@ -47,13 +47,6 @@ const useHandleClicks = () => {
         navigation.navigate('CitizenSignup' as never);
     }
 
-    const handleProviderLoginPress = () => {
-        navigation.navigate('ProviderLogin' as never);
-    }
-
-    const handleProviderSignUpPress = () => {
-        navigation.navigate('ProviderSignup' as never);
-    }
 
     const handleBackButtonPress = () => {
         navigation.navigate('Signup' as never);
@@ -63,10 +56,6 @@ const useHandleClicks = () => {
         navigation.navigate('(tabs)' as never);
     }
 
-  
-
-    
-    
     const handleBackButtonInCitizenPhotoPress = () => {
         navigation.navigate("CitizenSignup" as never)
     }
@@ -174,7 +163,7 @@ const useHandleClicks = () => {
       }
   };
 
-    const EmergencyAssistanceRequest = async (requestType: string, markeremoji: any, imageWidth: number = 65, imageHeight: number = 70, requestStatus: string | null) => {
+    const EmergencyAssistanceRequest = async (requestType: string, markeremoji: any, imageWidth: number = 65, imageHeight: number = 70, requestStatus: string | null, cancelParams?: string) => {
 
       setMarkerEmoji(markeremoji);
       setMarkerImageSize({ width: imageWidth, height: imageHeight });
@@ -189,7 +178,7 @@ const useHandleClicks = () => {
           if (USERID !== null) {
             await updateStatusRequest(requestStatus ?? '', parseInt(USERID));
             
-            const markerUpdateResponse = await axios.put(`https://fearless-growth-production.up.railway.app/marker/updateMarkerTitle/${USERID}`, {
+            const markerUpdateResponse = await axios.put(`https://express-production-ac91.up.railway.app/marker/updateMarkerTitle/${USERID}/${"all"}`, {
               newTitle: 'Cancelled Service Assistance Request'
             }, {
               headers: {
@@ -203,17 +192,90 @@ const useHandleClicks = () => {
           }
         }
         
-        const markerResponse = await axios.post('https://fearless-growth-production.up.railway.app/marker/submit', {
+        switch(cancelParams){
+          case "BFP":
+            const updateBFP = await axios.put(`https://express-production-ac91.up.railway.app/marker/updateMarkerTitle/${USERID}/${"BFP"}`, {
+              newTitle: 'Cancelled Service Assistance Request'
+            }, {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+            });
+            break;
+            case "PNP":
+              const updatePNP = await axios.put(`https://express-production-ac91.up.railway.app/marker/updateMarkerTitle/${USERID}/${"PNP"}`, {
+                newTitle: 'Cancelled Service Assistance Request'
+              }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                
+              });
+              break;
+              case "Medical":
+            const updateMedical = await axios.put(`https://express-production-ac91.up.railway.app/marker/updateMarkerTitle/${USERID}/${"Medical"}`, {
+              newTitle: 'Cancelled Service Assistance Request'
+            }, {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              
+            });
+            break;
+
+            case "PDRRMO":
+            const updatePDRRMO = await axios.put(`https://express-production-ac91.up.railway.app/marker/updateMarkerTitle/${USERID}/${"PDRRMO"}`, {
+              newTitle: 'Cancelled Service Assistance Request'
+            }, {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              
+            });
+            break;
+
+        }
+
+        // for marker submit
+        let station: string;
+
+        switch(requestType){
+          case "BFP":
+            station = "bfpsanisidromarker";
+            break;
+          case "PNP":
+            station = "pnpsanisidromarker";
+            break;
+          case "Medical":
+            station = "talonmarker";
+            break;
+          case "PDRRMO":
+            station = "pdrrrmomarker";
+            break;
+          case "Canceled Service":
+            station = "bfpsanisidromarker";
+            break;
+          default:
+            throw new Error(`Unhandled requestType: ${requestType}`);
+        }
+
+        console.log("Latest station: " + station)
+        const markerResponse = await axios.post('https://express-production-ac91.up.railway.app/marker/submit', {
           latitude,
           longitude,
           title: `${requestType} Assistance Request`,
           description: "Emergency Assistance Request",
-          UserID: USERID 
+          UserID: USERID,
+          Station: station
         }, {
           headers: {
             'Content-Type': 'application/json',
           },
         });
+
+
+
+        
         console.log('Marker submission success:', markerResponse.data);
         
         let  username = await AsyncStorage.getItem('username')
@@ -272,34 +334,7 @@ const useHandleClicks = () => {
         console.error('Error config:', error.config);
     };
 
-    const onFileChange = (event: any, photoKey: any) => {
-      setSelectedPhotos({
-        ...selectedPhotos,  // Keep other files unchanged
-        [photoKey]: event.target.files[0]  // Update only the selected file
-      });
-    };
-
-   
-    const uriToBlob = async (uri: string): Promise<Blob> => {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      return blob;
-    };
     
-    const onFileUpload = async (fileUri: string, photoKey: string) => {
-      
-        const formData = new FormData();
-    
-       
-        const blob = await uriToBlob(fileUri);
-    
-        
-        formData.append('image', blob, `${photoKey}.jpg`);
-    
-        console.log('Uploading file:', photoKey);
-    
-        
-    };
     
     
     
@@ -308,16 +343,12 @@ const useHandleClicks = () => {
     return {
         handleCitizenLoginPress,
         handleCitizenSignUpPress,
-        handleProviderLoginPress,
-        handleProviderSignUpPress,
+
         handleBackButtonPress,
         handleLoginButtonPress,
         handleBackButtonInCitizenPhotoPress,
         handleLoginButtonInSignupAsCitizenPress,
         EmergencyAssistanceRequest,
-
-        onFileChange,
-        onFileUpload,
 
         markerEmoji,
         markerImageSize,
