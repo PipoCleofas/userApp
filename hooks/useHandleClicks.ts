@@ -178,6 +178,7 @@ const useHandleClicks = () => {
           if (USERID !== null) {
             await updateStatusRequest(requestStatus ?? '', parseInt(USERID));
             
+            /*
             const markerUpdateResponse = await axios.put(`https://express-production-ac91.up.railway.app/marker/updateMarkerTitle/${USERID}/${"all"}`, {
               newTitle: 'Cancelled Service Assistance Request'
             }, {
@@ -186,10 +187,13 @@ const useHandleClicks = () => {
               },
               
             });
+            */
+           
             setMarkers(null)
           } else {
             console.error("USERID is null");
           }
+          
         }
         
         switch(cancelParams){
