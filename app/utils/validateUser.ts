@@ -52,57 +52,56 @@ export const validateName = (fname: string | null, mname: string | null, lname: 
 
   export const handleBirthdayChange = (text: string, birthday: string | null, dispatch: React.Dispatch<any>) => {
     let formattedText = text.replace(/[^0-9]/g, '');
-  
+
     const previousBirthday = birthday || '';
-  
+
+    // Handle backspace or removal of characters
     if (formattedText.length < previousBirthday.replace(/[^0-9]/g, '').length) {
-      dispatch({
-        actionType: 'input',
-        data: { birthdate: text }
-      });
-      return;
+        dispatch({
+            actionType: 'input',
+            data: { birthdate: text }
+        });
+        return;
     }
-  
+
     if (formattedText.length <= 2) {
-      let month = parseInt(formattedText, 10);
-      if (isNaN(month) || month === 0) {
-        month = 1;
-      } else if (month > 12) {
-        month = 12;
-      }
-      formattedText = month.toString().padStart(2, '0');
+        // Handle month input
+        let month = parseInt(formattedText, 10);
+        if (isNaN(month) || month === 0) {
+            month = 1;
+        } else if (month > 12) {
+            month = 12;
+        }
+        formattedText = month.toString(); // Keep as entered, no leading zero
     } else if (formattedText.length <= 4) {
-      let month = formattedText.slice(0, 2);
-      let day = parseInt(formattedText.slice(2), 10);
-      if (isNaN(day) || day === 0) {
-        day = 1;
-      } else if (day > 31) {
-        day = 31;
-      }
-      formattedText = `${month}/${day.toString().padStart(2, '0')}`;
+        // Handle month and day input
+        let month = formattedText.slice(0, 2);
+        let day = formattedText.slice(2); // Keep day as entered
+        if (parseInt(day, 10) > 31) {
+            day = '31'; // Constrain to valid days
+        }
+        formattedText = `${month}/${day}`;
     } else if (formattedText.length > 4) {
-      let month = formattedText.slice(0, 2);
-      let day = parseInt(formattedText.slice(2, 4), 10);
-      let year = parseInt(formattedText.slice(4, 8), 10);
-      if (isNaN(day) || day === 0) {
-        day = 1;
-      } else if (day > 31) {
-        day = 31;
-      }
-      if (isNaN(year) || year === 0) {
-        year = 1990;
-      } else if (year > new Date().getFullYear()) {
-        year = new Date().getFullYear();
-      }
-      formattedText = `${month}/${day.toString().padStart(2, '0')}/${year}`;
+        // Handle full date input with year
+        let month = formattedText.slice(0, 2);
+        let day = formattedText.slice(2, 4);
+        let year = formattedText.slice(4, 8);
+        if (parseInt(day, 10) > 31) {
+            day = '31';
+        }
+        if (parseInt(year, 10) > new Date().getFullYear()) {
+            year = new Date().getFullYear().toString();
+        }
+        formattedText = `${month}/${day}/${year}`;
     }
-  
-    // Dispatch the formatted birthdate to update the state
+
     dispatch({
-      actionType: 'input',
-      data: { birthdate: formattedText }
+        actionType: 'input',
+        data: { birthdate: formattedText }
     });
-  };
+};
+
+
   
   export const validateBarangayAndSitio = (barangay: string | null, sitio: string | null = null) => {
     if (!barangay) {

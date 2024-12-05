@@ -12,25 +12,19 @@ const markerImages = {
   'BFP Station': require('./pictures/fire.png'),
   'Medical Station': require('./pictures/medic.png'),
   'PDRRMO Station': require('./pictures/ndrrmc.png'),
-
   'PNP BRGY. MABINI': require('./pictures/police.webp'),
   'PNP BRGY. SAN ISIDRO': require('./pictures/police.webp'),
   'PNP HILARIO STREET': require('./pictures/police.webp'),
-
-
   'BFP BRGY. SAN ISIDRO': require('./pictures/fire.png'),
   'BFP BRGY. SAN SEBASTIAN': require('./pictures/fire.png'),
   'BFP BRGY. SAN NICOLAS': require('./pictures/fire.png'),
-
   'CENTRAL LUZON DOCTORS HOSPITAL': require('./pictures/medic.png'),
   'TARLAC PROVINCIAL HOSPITAL': require('./pictures/medic.png'),
   'TALON GENERAL HOSPITAL': require('./pictures/medic.png'),
-
-
 };
 
 export default function MainPage() {
-  const { location, errorMsg, isFetching, handleArrivalTime, arrivalTime } = useLocation();
+  const { location, errorMsg, isFetching } = useLocation();
   const { EmergencyAssistanceRequest, markerEmoji, markerImageSize, markers } = useHandleClicks();
 
   const [triggerNotification, setTriggerNotification] = useState(false);
@@ -49,13 +43,6 @@ export default function MainPage() {
   }
 
 
-  async function cancelService() {
-    let serviceChosen = await AsyncStorage.getItem('serviceChosen');
-    console.log(serviceChosen)
-    EmergencyAssistanceRequest('Canceled Service', null, markerImageSize.width, markerImageSize.height, 'Cancelled Service', serviceChosen!);
-    setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
-  }
-
   const defaultRegion = {
     latitude: 15.4817,
     longitude: 120.5979,
@@ -63,34 +50,6 @@ export default function MainPage() {
     longitudeDelta: 0.05,
   };
 
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const toRadians = (degrees: any) => degrees * (Math.PI / 180);
-    const R = 6371e3;
-    const φ1 = toRadians(lat1);
-    const φ2 = toRadians(lat2);
-    const Δφ = toRadians(lat2 - lat1);
-    const Δλ = toRadians(lon2 - lon1);
-
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c / 1000;
-  };
-
-  useEffect(() => {
-    if (location) {
-      const distance = calculateDistance(
-        location.coords.latitude,
-        location.coords.longitude,
-        15.4690,
-        120.6045
-      );
-      console.log("Calculated distance:", distance);
-      handleArrivalTime(distance);
-    }
-  }, [location?.coords.latitude, location?.coords.longitude]);
 
   return (
     <View style={styles.container}>
@@ -125,9 +84,6 @@ export default function MainPage() {
                     <Text style={modalStyles.textStyle}>PDRRMO</Text>
                   </Pressable>
                 </View>
-                <Pressable style={modalStyles.closeButton} onPress={() => cancelService()}>
-                  <Text style={modalStyles.textStyle}>Cancel Service</Text>
-                </Pressable>
                 <Pressable style={modalStyles.closeButton} onPress={() => setEmergencyAssistanceModalVisible(false)}>
                   <Text style={modalStyles.textStyle}>Close</Text>
                 </Pressable>

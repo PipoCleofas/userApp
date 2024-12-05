@@ -11,7 +11,8 @@ export default function CitizenPhoto() {
   const [modal2Visible, setModal2Visible] = useState(false);
   const [modal3Visible, setModal3Visible] = useState(false);
 
-  const { handleLoginButtonPress,handleBackButtonInCitizenPhotoPress } = useHandleClicks();
+  const { handleBackButtonInCitizenPhotoPress } = useHandleClicks();
+
   const {
     imageUri1,
     imageUri2,
@@ -24,6 +25,7 @@ export default function CitizenPhoto() {
     setImageUri3,
     imageError
     } = usePhoto();
+
   const {state} = useDataInput();
 
   return (

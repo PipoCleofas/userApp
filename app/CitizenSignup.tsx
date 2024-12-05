@@ -6,11 +6,22 @@ import useHandleClicks from '@/hooks/useHandleClicks';
 import Barangay from '@/components/Barangay';
 import Sitio from '@/components/Sitio';
 import useDataInput from '@/hooks/useDataInput';
+import DatePicker from 'react-native-date-picker';
 
 export default function CitizenSignup() {
+
   const { handleBackButtonPress} = useHandleClicks();
+  
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { onBirthdayChange, handleChangeState, barangay, sitio, handleNextPress, barangaySitioError, handleBarangayChange, handleSitioChange, state } = useDataInput();
+
+  const { onBirthdayChange, 
+          handleChangeState, 
+          barangay, 
+          sitio, 
+          handleNextPress, 
+          handleBarangayChange, 
+          handleSitioChange, 
+          state } = useDataInput();
 
 
   return (
