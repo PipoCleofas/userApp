@@ -74,37 +74,24 @@ const Barangay: React.FC<BarangayProps>  = ({value, onValueChange}) => {
 
   return (
     <View style={styles.container}>
-      <ComboBox data={barangaysInTarlacCity} onValueChange={onValueChange}  value={value}/>
+      <ComboBox data={barangaysInTarlacCity} onValueChange={onValueChange}  value={value} placeholder="Select..."/>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: 200,
-    height: 40,
-    backgroundColor: '#D3D3D3',
-    borderColor: '#714423',
+    width: '100%',
+    height: 41,
+    backgroundColor: '#FFF',
+    borderColor: '#CCC',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     justifyContent: 'center',
+    paddingHorizontal: 0,
   },
 });
 
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    color: '#000000',
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    color: '#000000',
-  },
-  placeholder: {
-    color: '#888888',
-  },
-});
+
 
 export default Barangay;

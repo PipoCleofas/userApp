@@ -4,8 +4,9 @@ import axios from 'axios';
 import {Action, Citizen} from '@/app/types/user'
 
   
-  export const updateUser = async (
+  export const updateUserProfile = async (
     username: string,
+    password: string
   ) => {
     try {
       console.log("updating username")
@@ -13,7 +14,7 @@ import {Action, Citizen} from '@/app/types/user'
       const ln = (await AsyncStorage.getItem('lname')) ?? null; 
       const mn = (await AsyncStorage.getItem('mname')) ?? null; 
   
-      const response = await axios.put(`https://fearless-growth-production.up.railway.app/user/updateUser/${username}`, {
+      const response = await axios.put(`https://express-production-ac91.up.railway.app/user/updateUser/${username}/${password}`, {
         fname: fn,
         lname: ln,
         mname: mn,
@@ -38,7 +39,7 @@ import {Action, Citizen} from '@/app/types/user'
     dispatch: React.Dispatch<Action>
   ) => {
     try {
-      const response = await axios.get(`https://fearless-growth-production.up.railway.app/user/getUser`, {
+      const response = await axios.get(`https://express-production-ac91.up.railway.app/user/getUser`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -51,7 +52,7 @@ import {Action, Citizen} from '@/app/types/user'
       const user = response.data;
   
       if (user) {
-        const { id, address, username: storedUsername } = user;
+        const { id, address, username: storedUsername, gender } = user;
   
         if (id) {
           await AsyncStorage.setItem('id', id.toString());
@@ -80,6 +81,11 @@ import {Action, Citizen} from '@/app/types/user'
             actionType: 'get',
             data: { username: storedUsername },
           });
+        }
+
+        if(gender){
+          await AsyncStorage.setItem('gender',gender)
+          console.log('GENDER SAVED!!!')
         }
       } else {
         dispatch({

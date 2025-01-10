@@ -1,8 +1,6 @@
 import axios from "axios";
 import { useNavigation } from "expo-router";
 import useLocation from "./useLocation";
-import useSMS from "./useSMS";
-import * as SMS from 'expo-sms';
 import {useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -19,8 +17,7 @@ interface MarkerType {
 const useHandleClicks = () => {
   const [markers, setMarkers] = useState<MarkerType[] | null>([]); // State to store markers
 
-    const {latitude, longitude, fetchLocation, handleArrivalTime, arrivalTime, location, setArrivalTime} = useLocation();
-    const {isAvailable,setResult} = useSMS();
+    const {latitude, longitude, fetchLocation, arrivalTime, location, setArrivalTime} = useLocation();
   
 
   
@@ -48,8 +45,8 @@ const useHandleClicks = () => {
     }
 
 
-    const handleBackButtonPress = () => {
-        navigation.navigate('Signup' as never);
+    const handleBackButtonOnSignupPress = () => {
+        navigation.navigate('index' as never);
     }
 
     const handleLoginButtonPress = () => {
@@ -57,7 +54,7 @@ const useHandleClicks = () => {
     }
 
     const handleBackButtonInCitizenPhotoPress = () => {
-        navigation.navigate("CitizenSignup" as never)
+        navigation.navigate("UsernamePhoto" as never)
     }
 
     const handleLoginButtonInSignupAsCitizenPress = () => {
@@ -116,11 +113,16 @@ const useHandleClicks = () => {
     
             // Check if there are any markers within 14 km
             if (filteredMarkers.length > 0) {
-              setMarkers(filteredMarkers);
-              handleArrivalTime(closestDistance!);
+              const responseRider = await fetch(`https://express-production-ac91.up.railway.app/marker/getRider/${station}`);
+              const dataRider = await responseRider.json();
+              console.log("DataRider: ", dataRider)
+              const res = [...filteredMarkers, ...dataRider];
+              setMarkers(res);
+              console.log('All station with rider fetched!!')
+
             } else {
               // Fallback fetch: No markers within 14 km, so use the backend route to get a station
-              const fallbackResponse = await fetch(`https://fearless-growth-production.up.railway.app/marker/getStation/${serviceChosen}`);
+              const fallbackResponse = await fetch(`https://express-production-ac91.up.railway.app/marker/getRider/${station}`);
               const fallbackData = await fallbackResponse.json();
               console.log(fallbackData, "Fallback station data received");
     
@@ -263,6 +265,8 @@ const useHandleClicks = () => {
             throw new Error(`Unhandled requestType: ${requestType}`);
         }
 
+        const gender = await AsyncStorage.getItem('gender')
+
         console.log("Latest station: " + station)
         const markerResponse = await axios.post('https://express-production-ac91.up.railway.app/marker/submit', {
           latitude,
@@ -270,6 +274,7 @@ const useHandleClicks = () => {
           title: `${requestType} Assistance Request`,
           description: "Emergency Assistance Request",
           UserID: USERID,
+          Gender: gender,
           Station: station
         }, {
           headers: {
@@ -277,8 +282,60 @@ const useHandleClicks = () => {
           },
         });
 
+        console.log(1)
+        let spUsername;
 
+        switch(requestType){
+          case "BFP":
+            spUsername = "BFP BRGY. SAN ISIDRO";
+            break;
+          case "PNP":
+            spUsername = "PNP BRGY. SAN ISIDRO";
+            break;
+          case "Medical":
+            spUsername = "TALON GENERAL HOSPITAL";
+            break;
+          case "PDRRMO":
+            spUsername = "PDRRMO Station";
+            break;
+          default:
+            throw new Error(`Unhandled requestType: ${requestType}`);
+        }
 
+        console.log("SP Username: ", spUsername)
+        // for getting the id of the SP
+        const spResponse = await axios.get(`https://express-production-ac91.up.railway.app/serviceprovider/getSP`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          params: {
+            username: spUsername,
+          },
+        });
+
+        console.log("Going SP ID")
+        const spId = await spResponse.data.userId.toString();
+
+        // spID undefined
+        console.log("SP ID: ", spId)
+        await AsyncStorage.setItem('spID', spId)
+
+        console.log("Done SP ID")
+
+        // convo submit
+        const convoResponse = await axios.post('https://express-production-ac91.up.railway.app/messaging/submitConvo', {
+              sender_id: USERID,
+              receiver_id: spId,
+              message: 'Need help'
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const conversation_id = await AsyncStorage.setItem('conversation_id', convoResponse.data.conversation_id)
+
+        
         
         console.log('Marker submission success:', markerResponse.data);
         
@@ -318,7 +375,9 @@ const useHandleClicks = () => {
     
     
       
-  
+  function handleBackButtonOnUsernamePhotoPress(){
+    navigation.navigate('CitizenSignup' as never)
+  }
     
       
   
@@ -348,7 +407,7 @@ const useHandleClicks = () => {
         handleCitizenLoginPress,
         handleCitizenSignUpPress,
 
-        handleBackButtonPress,
+        handleBackButtonOnSignupPress,
         handleLoginButtonPress,
         handleBackButtonInCitizenPhotoPress,
         handleLoginButtonInSignupAsCitizenPress,
@@ -356,8 +415,8 @@ const useHandleClicks = () => {
 
         markerEmoji,
         markerImageSize,
-        markers
-        
+        markers,
+        handleBackButtonOnUsernamePhotoPress,
     }
 
 

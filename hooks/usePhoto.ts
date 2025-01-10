@@ -6,7 +6,8 @@ import { Alert } from 'react-native';
 import axios from 'axios';
 import { CameraType, useCameraPermissions, Camera } from 'expo-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {updateUser} from '@/app/services/userservice'
+import {updateUserProfile} from '@/app/services/userservice'
+import {validatePassword} from '@/app/utils/validateUser'
 
 const usePhotoPicker = () => {
   const navigation = useNavigation();
@@ -17,7 +18,9 @@ const usePhotoPicker = () => {
   const [imageError,setImageError] = useState<string | null>(null)
   const [usernamePhotoError, setUsernamePhotoError] = useState<string | null>(null)
   const [username,setUsername] = useState<string | null>()
-
+  const [password,setPassword] = useState<string | null>(null)
+  const [repassword, setrepassword] = useState<string | null>(null)
+  
   const pickImage = async (setImageUri: React.Dispatch<React.SetStateAction<string | null>>) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -84,13 +87,12 @@ const usePhotoPicker = () => {
       // Append UserID to formData
       formData.append('userID', userID);
       console.log(formData)
-  
       // Make the POST request
       await axios.post('https://express-production-ac91.up.railway.app/photo/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       
-      navigation.navigate('UsernamePhoto' as never)
+      navigation.navigate('CitizenLogin' as never)
     } catch (error) {
       console.error(error);
       Alert.alert('Upload Failed', 'Failed to upload images');
@@ -103,14 +105,37 @@ const usePhotoPicker = () => {
 
 
   const uploadProfile = async () => {
-    if (!imageUri4 || !username) {
-      setImageError('Picture or username cannot be empty');
+    //navigation.navigate('CitizenPhoto' as never)
+    console.log(password! + repassword)
+
+    if (!password) {
+      setImageError('Fill in the required fields.');
       return 0;
     }
   
-    // username
-    await updateUser(username ?? 'Lebron James');
-  
+    const err = validatePassword(password)
+    if(err){
+      setImageError(err)
+      return;
+    }
+    
+    if (repassword !== null && password !== repassword) {
+      setImageError("Passwords do not match.")
+    }
+
+    if(repassword == null){
+      setImageError("Reenter your password")
+
+    }
+
+    const userID = await AsyncStorage.getItem('firstId');
+      if (!userID) {
+        Alert.alert('Error', 'User ID not found.');
+        return;
+      }
+    
+    await updateUserProfile(username ?? 'Lebron James', password ?? 'SamplePassword');
+    
 
     // photo
     const formData = new FormData();
@@ -119,16 +144,18 @@ const usePhotoPicker = () => {
       type: 'image/jpeg',
       name: 'photo4.jpg',
     } as any);
+    formData.append('userID', userID);
     console.log(formData)
+
     try {
-      const userID = await AsyncStorage.getItem('firstId');
-      if (!userID) {
+      const userIDa = await AsyncStorage.getItem('firstId');
+      if (!userIDa) {
         return;
       }
   
       // Make the PUT request
       const response  = await axios.put(
-        `https://express-production-ac91.up.railway.app/photo/photos/${userID}`,
+        `https://express-production-ac91.up.railway.app/photo/photos/${userIDa}`,
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -136,7 +163,7 @@ const usePhotoPicker = () => {
       );
       
       if(response.status  === 200){
-        navigation.navigate('CitizenLogin' as never)
+        navigation.navigate('CitizenPhoto' as never)
       }
   
     } catch (error) {
@@ -160,8 +187,11 @@ const usePhotoPicker = () => {
     setImageUri3,
     setImageUri4,
     uploadProfile,
-    setUsername
-
+    setPassword,
+    setrepassword,
+    setUsername,
+    password,
+    repassword
   };
 };
 

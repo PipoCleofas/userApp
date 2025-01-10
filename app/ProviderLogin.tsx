@@ -4,6 +4,7 @@ import { SimpleLineIcons } from "@expo/vector-icons";
 import { Feather } from '@expo/vector-icons'; // Import Feather icons
 import useHandleClicks from "@/hooks/useHandleClicks";
 import useDataInput from "@/hooks/useDataInput";
+import handleSPLogin from '@/hooks/handleSPLogin'
 
 export default function CitizenLogin() {
 
@@ -11,6 +12,7 @@ export default function CitizenLogin() {
     const { handleBackButtonOnSignupPress } = useHandleClicks();
 
     const [showPassword, setShowPassword] = useState(false);  // State for password visibility
+    const { onPasswordChange, onLoginPress, onUnameChange, loginError } = handleSPLogin();
 
     return (
         <View style={styles.container}>
@@ -22,7 +24,7 @@ export default function CitizenLogin() {
 
             <View style={styles.inputContainer}>
                 <Text style={styles.labelInput}>USERNAME:</Text>
-                <TextInput style={styles.textInput} maxLength={15} onChangeText={(text) => handleChangeState('username', text)} />
+                <TextInput style={styles.textInput} maxLength={50} onChangeText={(text) => onUnameChange(text)} />
             </View>
 
             <View style={[styles.inputContainer, { marginBottom: 35 }]}>
@@ -32,13 +34,13 @@ export default function CitizenLogin() {
                         style={styles.textInput}
                         maxLength={20}
                         secureTextEntry={!showPassword}  // Toggle visibility based on state
-                        onChangeText={(text) => handleChangeState('password', text)}
+                        onChangeText={(text) => onPasswordChange(text)}
                     />
                    
                 </View>
             </View>
 
-            {state.error && <Text style={styles.errorText}>{state.error}</Text>}
+            {loginError && <Text style={styles.errorText}>{loginError}</Text>}
 
             <View style={styles.columnButtons}>
                 <TouchableOpacity style={styles.button1} onPress={() => handleBackButtonOnSignupPress()}>
@@ -46,7 +48,7 @@ export default function CitizenLogin() {
                     <Text style={styles.buttonText}>BACK</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button2} onPress={handleCitizenLogin}>
+                <TouchableOpacity style={styles.button2} onPress={onLoginPress}>
                     <Text style={[styles.buttonText, { color: 'white' }]}>LOGIN</Text>
                     <SimpleLineIcons style={{ color: 'white' }} name="arrow-right" />
                 </TouchableOpacity>

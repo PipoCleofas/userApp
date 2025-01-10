@@ -1,15 +1,17 @@
-
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image, Modal, Alert, Pressable } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Pressable, Modal } from "react-native";
 import { SimpleLineIcons } from "@expo/vector-icons";
-import useHandleClicks from "@/hooks/useHandleClicks";
-import useDataInput from "@/hooks/useDataInput";
-import usePhoto from '@/hooks/usePhoto';
+import IDS from '@/components/ID';
+import usePhoto from '@/hooks/usePhoto'
+import useHandleClicks from '@/hooks/useHandleClicks'
+import useDataInput from '@/hooks/useDataInput'
 
-export default function CitizenPhoto() {
+const ImageUploadScreen = () => {
+
   const [modal1Visible, setModal1Visible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
   const [modal3Visible, setModal3Visible] = useState(false);
+  const [id, setID] = useState<any>();
 
   const { handleBackButtonInCitizenPhotoPress } = useHandleClicks();
 
@@ -29,19 +31,12 @@ export default function CitizenPhoto() {
   const {state} = useDataInput();
 
   return (
-
-    
     <View style={styles.container}>
-
-
-      {/* modals */}
-
       <Modal
       animationType="fade"
       transparent={true}
       visible={modal1Visible}
       onRequestClose={() => {
-        Alert.alert('Modal has been closed.');
         setModal1Visible(!modal1Visible);
       }}>
 
@@ -113,181 +108,155 @@ export default function CitizenPhoto() {
       </Modal>
 
 
+      <Text style={styles.headerText}>CITIZEN</Text>
+      <Text style={[styles.headerText, {marginBottom: 55}]}>ACCOUNT</Text>
+      <IDS value={id} onValueChange={setID}/>
 
+      <View style={styles.photoContainer}>
+        {/* Front Image Upload */}
+        <View style={styles.uploadSection}>
+          <TouchableOpacity
+            onPress={() => setModal1Visible(true)}
+            style={styles.uploadBox}
+          >
+            {imageUri1 ? (
+              <Image source={{ uri: imageUri1 }} style={styles.uploadImage} />
+            ) : (
+              <SimpleLineIcons name="picture" size={40} color="#944547" />
+            )}
+            <Text style={styles.uploadLabel}>FRONT IMAGE</Text>
+            <Text style={styles.uploadButton}>UPLOAD A PHOTO</Text>
+          </TouchableOpacity>
+        </View>
 
+        {/* Back Image Upload */}
+        <View style={styles.uploadSection}>
+          <TouchableOpacity
+            onPress={() => setModal2Visible(true)}
+            style={styles.uploadBox}
+          >
+            {imageUri2 ? (
+              <Image source={{ uri: imageUri2 }} style={styles.uploadImage} />
+            ) : (
+              <SimpleLineIcons name="picture" size={40} color="#944547" />
+            )}
+            <Text style={styles.uploadLabel}>BACK IMAGE</Text>
+            <Text style={styles.uploadButton}>UPLOAD A PHOTO</Text>
+          </TouchableOpacity>
+        </View>
 
-
-      {/* true view */}
-
-
-
-      <Text style={styles.title}>CITIZEN</Text>
-      <Text style={styles.subtitle}>ACCOUNT</Text>
-
-      <View style={styles.inputContainer}>
-        <Text> VALID ID: </Text>
-        <TouchableOpacity onPress={() => setModal1Visible(true)} style={styles.textInput}>
-          <Text style={styles.text}>Upload a photo</Text>
-        </TouchableOpacity>
+        {/* Selfie Image Upload */}
+        <View style={styles.uploadSection}>
+          <TouchableOpacity
+            onPress={() => setModal3Visible(true)}
+            style={styles.uploadBox}
+          >
+            {imageUri3 ? (
+              <Image source={{ uri: imageUri3 }} style={styles.uploadImage} />
+            ) : (
+              <SimpleLineIcons name="picture" size={40} color="#944547" />
+            )}
+            <Text style={styles.uploadLabel}>SELFIE IMAGE</Text>
+            <Text style={styles.uploadButton}>UPLOAD A PHOTO</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-     
-
-      <View style={styles.inputContainer}>
-        <Text>FRONT IMAGE: </Text>
-        <TouchableOpacity onPress={() => setModal2Visible(true)} style={styles.textInput}>
-          <Text style={styles.text}>Upload a photo</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Text>BACK IMAGE: </Text>
-        <TouchableOpacity onPress={() => setModal3Visible(true)} style={styles.textInput}>
-          <Text style={styles.text}>Upload a photo</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.photoUriList}>
-
-      {imageUri1 && <Image source={{ uri: imageUri1 }} style={{ width: 100, height: 100, margin: 5 }} />}
-
-
-      {imageUri2 && <Image source={{ uri: imageUri2 }} style={{ width: 100, height: 100, margin: 5 }} />}
-
-
-      {imageUri3 && <Image source={{ uri: imageUri3 }} style={{ width: 100, height: 100, margin: 5 }} />}
-
-      </View>
-      
-      {state.error && <Text style={styles.errorText}>{state.error}</Text>}
-      {imageError && <Text style={styles.errorText}>{imageError}</Text>}
-
-      <View style={styles.columnButtons}>
-        <TouchableOpacity style={styles.button1}>
-          <SimpleLineIcons name="arrow-left" size={16} color="black" style={styles.icon} onPress={handleBackButtonInCitizenPhotoPress} />
-          <Text style={styles.buttonText1}>BACK</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={[styles.button, styles.backButton]} onPress={handleBackButtonInCitizenPhotoPress}>
+          <SimpleLineIcons name="arrow-left" size={16} color="white" />
+          <Text style={styles.buttonText}>BACK</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button2} onPress={uploadAllImages}>
-          <Text style={styles.buttonText2}>NEXT</Text>
-          <SimpleLineIcons name="arrow-right" size={16} color="#FFFFFF" style={styles.icon} />
+        <TouchableOpacity style={[styles.button, styles.nextButton]} onPress={uploadAllImages}>
+          <Text style={styles.buttonText}>NEXT</Text>
+          <SimpleLineIcons name="arrow-right" size={16} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
-    alignItems: "center",
     flex: 1,
+    backgroundColor: "#F4DBD7",
+    paddingHorizontal: 20,
+    justifyContent: "center",
   },
-  title: {
+  headerText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "black",
     textAlign: "center",
+    marginVertical: 0, // Add spacing above and below
+    color: "#944547",
   },
-  subtitle: {
-    fontSize: 20,
-    color: "black",
-    textAlign: "center",
-    marginBottom: 40,
-  },
-  textInput: {
-    width: 200,
-    height: 40,
-    backgroundColor: "#944547",
-    fontSize: 16,
-    borderColor: "#714423",
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    color: "white",
-    justifyContent: "center",
-  },
-  inputContainer: {
+  photoContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
+    justifyContent: "space-evenly",
+    marginVertical: 20,
   },
-  columnButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 30,
-  },
-  modalButtons: {
-    backgroundColor: '#944547',
-    width: 100,
-    alignItems: 'center',
-    justifyContent: 'center', // Centers content vertically
-    borderRadius: 10,
-    marginVertical: 7,
-    height: 40, // You can adjust the height to fit your design
-  },
-  photoUriList: {
-    flexDirection: 'row',
-  },
-  button1: {
-    backgroundColor: "#FFFDD0",
-    width: 100,
-    height: 40,
-    borderColor: "#D3D3D3",
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 3.84,
-    elevation: 5,
-    marginHorizontal: 10,
-  },
-  buttonText1: {
-    color: "black",
-    fontSize: 16,
-  },
-  button2: {
-    backgroundColor: "#714423",
-    width: 100,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    borderColor: "#D3D3D3",
-    borderRadius: 20,
-    borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 3.84,
-    elevation: 5,
-    marginHorizontal: 10,
-  },
-  buttonText2: {
-    color: "#FFFFFF",
-    fontSize: 16,
-  },
-  icon: {
-    marginHorizontal: 5,
-  },
-  previewContainer: {
-    marginTop: 20,
-    marginHorizontal: 8,
+  uploadSection: {
     alignItems: "center",
   },
-  previewImage: {
+  uploadBox: {
     width: 100,
     height: 100,
+    backgroundColor: "#F5F5F5",
     borderRadius: 10,
-    marginTop: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
   },
-  text: {
-    color: "white",
-    textAlign: "center",
+  uploadImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
+  uploadLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 5,
+  },
+  uploadButton: {
+    fontSize: 10,
+    color: "#FFFFFF",
+    backgroundColor: "#944547",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "40%",
+    paddingVertical: 10,
+    borderRadius: 25,
+    marginHorizontal: 10,
+  },
+  backButton: {
+    backgroundColor: "#8C1F31",
+  },
+  nextButton: {
+    backgroundColor: "#8C1F31",
+  },
+  buttonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginHorizontal: 8,
   },
   centeredView: {
     flex: 1,
@@ -310,13 +279,20 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    
+    color: 'white',
   },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
+  modalButtons: {
+    backgroundColor: '#944547',
+    width: 100,
+    alignItems: 'center',
+    justifyContent: 'center', // Centers content vertically
+    borderRadius: 10,
+    marginVertical: 7,
+    height: 40, // You can adjust the height to fit your design
   },
   buttonClose: {
     marginTop: 5,
@@ -326,18 +302,6 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
   },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-    
-    color: 'white',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 14,
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  
-
 });
+
+export default ImageUploadScreen;

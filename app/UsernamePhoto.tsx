@@ -1,46 +1,89 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import { Text, TextInput, TouchableOpacity, View, StyleSheet, Pressable, Image } from "react-native";
-import usePhoto from "@/hooks/usePhoto"
+import React from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from 'react-native';
+import { FontAwesome, SimpleLineIcons, AntDesign } from '@expo/vector-icons';
+import usePhoto from '@/hooks/usePhoto'
+import useDataInput from '@/hooks/useDataInput'
+import useHandleClicks from '@/hooks/useHandleClicks';
 
 const UsernamePhoto = () => {
-  const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError,setUsername} = usePhoto();
+  const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError,setUsername,setPassword,setrepassword,password} = usePhoto();
+  const {onPasswordChange,passworderr} = useDataInput();
+  const { handleBackButtonOnUsernamePhotoPress } = useHandleClicks();
 
- 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Profile</Text>
-      <Pressable onPress={() => pickImage(setImageUri4)}>
-        <MaterialIcons name="image-search" size={50} color="#4A4A4A" style={styles.icon} />
-      </Pressable>
+      {/* Logo Section */}
+      <View style={styles.logoContainer}>
+        <Image style={styles.logo} source={require('../app/pictures/unscreen.gif')} />
+        <Text style={styles.title}>SET UP YOUR ACCOUNT</Text>
+      </View>
 
-      {imageUri4 && (
-        <View style={styles.previewContainer}>
-          <Image source={{ uri: imageUri4 }} style={styles.previewImage} />
-        </View>
-      )}
-
+      {/* Input Fields */}
       <View style={styles.inputContainer}>
         <TextInput
+          placeholder="Username"
           style={styles.input}
-          maxLength={15}
-          placeholder="Enter username"
-          placeholderTextColor="#aaa"
-          onChangeText={(text) => setUsername(text)} 
+          placeholderTextColor="#ccc"
+          onChangeText={(text) => setUsername(text)}
+        />
+
+        <View style={{flexDirection: 'row'}}>
+          <TextInput
+            placeholder="Password"
+            style={styles.input}
+            placeholderTextColor="#ccc"
+            secureTextEntry
+            onChangeText={(text) => setPassword(text)}
+          />
+
+        {password && !passworderr && <AntDesign name="checkcircleo" />}
+
+        </View>
+       
+
+        <TextInput
+          placeholder="Re-enter password"
+          style={styles.input}
+          placeholderTextColor="#ccc"
+          secureTextEntry
+          onChangeText={(text) => setrepassword(text)}
         />
       </View>
 
+      {/* Select Photo */}
+      <TouchableOpacity style={styles.photoButton} onPress={() => pickImage(setImageUri4)}>
+       <FontAwesome name='file-image-o'/>
+
+       {imageUri4 ? (
+          <Text>Select Another Photo</Text>
+
+       ) : (
+         <Text style={styles.photoText}>SELECT PHOTO</Text>   
+       )}
+
+      </TouchableOpacity>
+
       {imageError && <Text style={styles.errorText}>{imageError}</Text>}
 
+      {/* Navigation Buttons */}
+      <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+                <TouchableOpacity style={[styles.button, styles.backButton]} onPress={handleBackButtonOnUsernamePhotoPress}>
+                  <SimpleLineIcons name="arrow-left" size={16} color="white" />
+                  <Text style={styles.buttonText}>BACK</Text>
+                </TouchableOpacity>
 
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.buttonConfirm} onPress={uploadProfile}>
-          <Text style={styles.buttonText}>Confirm</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonDelete} >
-          <Text style={styles.buttonText}>Delete</Text>
-        </TouchableOpacity>
-      </View>
+                <TouchableOpacity style={[styles.button, styles.nextButton]} onPress={uploadProfile}>
+                  <Text style={styles.buttonText}>NEXT</Text>
+                  <SimpleLineIcons name="arrow-right" size={16} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
     </View>
   );
 };
@@ -48,98 +91,100 @@ const UsernamePhoto = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 30,
-    paddingTop: 40,
-    justifyContent: "center", 
-    backgroundColor: "#f5f5f5",
-    alignItems: "center",
+    backgroundColor: '#F4DBD7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 30,
-  },
-  icon: {
-    marginBottom: 20,
-    backgroundColor: "#FFFDD0",
-    padding: 10,
-    borderRadius: 50,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 10,
+    color: '#800020',
   },
   inputContainer: {
-    width: "100%", // Ensure the input takes full width
-    alignItems: "center", // Center input and buttons
-    marginBottom: 20,
+    width: '80%',
+    marginVertical: 20,
   },
   input: {
-    width: "80%",
-    height: 45,
-    backgroundColor: "#944547",
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    padding: 4,
+    marginBottom: 15,
     fontSize: 16,
-    borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    color: "white",
-    textAlign: "center", // Center text within the input
+    borderColor: '#ccc',
   },
-  buttonContainer: {
-    width: "100%",
-    alignItems: "center",
-    marginTop: 20,
+  photoButton: {
+    width: '80%',
+    height: 100,
+    backgroundColor: '#FAD4D1',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
-  buttonConfirm: {
-    width: "80%",
-    backgroundColor: "#4CAF50",
-    paddingVertical: 12,
-    marginVertical: 10, // Add vertical spacing between buttons
-    borderRadius: 25,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
-    alignItems: "center",
+  photoIcon: {
+    width: 40,
+    height: 40,
+    marginBottom: 5,
+    tintColor: '#800020',
   },
-  buttonDelete: {
-    width: "80%",
-    backgroundColor: "red",
-    paddingVertical: 12,
-    marginVertical: 10, // Add vertical spacing between buttons
+  photoText: {
+    fontSize: 14,
+    color: '#800020',
+  },
+  navButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  navButton: {
+    backgroundColor: '#800020',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  navButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '40%', // Make the buttons thinner
+    paddingVertical: 10, // Adjust padding for a slimmer appearance
     borderRadius: 25,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
-    alignItems: "center",
+    marginHorizontal: 10, // Add horizontal margin to create a gap
+  },
+  backButton: {
+    backgroundColor: '#8C1F31',
+  },
+  nextButton: {
+    backgroundColor: '#8C1F31',
   },
   buttonText: {
-    color: "#fff",
+    color: '#FFF',
     fontSize: 16,
-    fontWeight: "bold",
-  },
-  previewContainer: {
-    marginBottom: 20,
-    marginTop: 20, // Add margin around the photo preview
-  },
-  previewImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 10,
-    borderColor: "#ccc",
-    borderWidth: 2,
+    fontWeight: 'bold',
+    marginHorizontal: 8, // Spacing between the icon and text
   },
   errorText: {
     color: 'red',
     fontSize: 14,
-    marginBottom: 6,
+    marginBottom: 4,
     textAlign: 'center',
   },
 });

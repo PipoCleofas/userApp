@@ -1,5 +1,3 @@
-// PipoCleofas
-
 import React, { useState } from 'react';
 import { View, Modal, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
@@ -21,7 +19,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ data, onValueChange, value, placeho
   return (
     <TouchableOpacity onPress={() => setIsModalVisible(true)}>
       <View style={styles.container}>
-        <Text style={styles.selectorText}>
+        <Text style={[styles.selectorText, !value && styles.placeholderText]}>
           {value ? data.find(item => item.value === value)?.label : placeholder}
         </Text>
 
@@ -56,8 +54,8 @@ const ComboBox: React.FC<ComboBoxProps> = ({ data, onValueChange, value, placeho
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    borderWidth: 1,
+    padding: 8,
+    borderWidth: 0,
     borderColor: '#ddd',
     borderRadius: 5,
     height: 50, 
@@ -66,8 +64,11 @@ const styles = StyleSheet.create({
   },
   selectorText: {
     fontSize: 16,
-    color: 'black',
+    color: 'black', // Color for selected option
     textAlign: 'left', 
+  },
+  placeholderText: {
+    color: '#aaa', // Lighter color for placeholder
   },
   modalContainer: {
     flex: 1,

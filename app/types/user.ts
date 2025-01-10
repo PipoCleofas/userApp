@@ -19,6 +19,7 @@ export const InitialCitizen = {
     error: null,
     lastname: null,
     firstname: null,
+    gender: null,
     middlename:  null,
     birthdate:  null,
 }
@@ -27,6 +28,7 @@ export interface Citizen extends User {
     lastname?: string | null;
     firstname?: string | null;
     middlename?: string | null;
+    gender?: string | null;
     repassword?: string | null;
     birthdate?: any;
 
@@ -50,6 +52,8 @@ export interface Action {
       middlename?: string | null;
       birthdate?: number | null;
       password?: string | null;
+      gender?: string | null;
+
       repassword?: string | null
       error?: string | null;
     };
@@ -77,6 +81,7 @@ export interface Action {
           };
         }
 
+        /*
         const passwordError = validatePassword(
           password ?? null,
           repassword ?? null
@@ -87,21 +92,22 @@ export interface Action {
             error: nameError,
           };
         }
-
+        */
         return {
           ...state,
           lastname: action.data.lastname ?? state.lastname,
           firstname: action.data.firstname ?? state.firstname,
           middlename: action.data.middlename ?? state.middlename,
           birthdate: action.data.birthdate ?? state.birthdate,
-          password: action.data.password ?? state.password,
-          repassword: action.data.repassword ?? state.repassword,
+          gender: action.data.gender ?? state.gender,
           error: null,
         };
       case 'put':
         return {
           ...state,
           username: action.data.username ?? state.username,
+          password: action.data.password ?? state.password,
+          repassword: action.data.repassword ?? state.repassword,
           error: null,
         };
         case 'error':

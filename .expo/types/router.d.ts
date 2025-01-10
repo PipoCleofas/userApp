@@ -6,7 +6,7 @@ export * from 'expo-router';
 declare module 'expo-router' {
   export namespace ExpoRouter {
     export interface __routes<T extends string = string> extends Record<string, unknown> {
-      StaticRoutes: `/` | `/CitizenLogin` | `/CitizenPhoto` | `/CitizenSignup` | `/MainPage` | `/Signup` | `/UsernamePhoto` | `/_sitemap` | `/services/barangayservice` | `/services/markerservice` | `/services/servicerequest` | `/services/userservice` | `/types/assistancereport` | `/types/barangay` | `/types/marker` | `/types/servicerequest` | `/types/user` | `/utils/handleAxiosError` | `/utils/validateUser`;
+      StaticRoutes: `/` | `/CitizenLogin` | `/CitizenPhoto` | `/CitizenSignup` | `/MainPage` | `/ProviderLogin` | `/SPMainPage` | `/UsernamePhoto` | `/_sitemap` | `/services/barangayservice` | `/services/markerservice` | `/services/servicerequest` | `/services/userservice` | `/types/assistancereport` | `/types/barangay` | `/types/marker` | `/types/servicerequest` | `/types/user` | `/utils/handleAxiosError` | `/utils/validateUser`;
       DynamicRoutes: never;
       DynamicRouteTemplate: never;
     }

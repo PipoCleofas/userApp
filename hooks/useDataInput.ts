@@ -8,9 +8,10 @@ import {getUser} from '@/app/services/userservice'
 import  {validateName,validateBirthday,validatePassword, validateBarangayAndSitio,validateUsernamePhoto} from '@/app/utils/validateUser'
 import {Action, Citizen} from '@/app/types/user'
 import usePhoto from '@/hooks/usePhoto'
+import handleAxiosError from '@/app/utils/handleAxiosError'
 
 const useCheckPassword = () => {
-  const {uploadProfile} = usePhoto();
+  const {uploadProfile,setPassword,setrepassword} = usePhoto();
 
   const navigation = useNavigation();
 
@@ -20,7 +21,7 @@ const useCheckPassword = () => {
   const [providerName, setProviderName] = useState<string | null>()
   const [providerPassword, setProviderPassword] = useState<string | null>()
   const [providerLoginError,setProviderLoginError] = useState<string | null>()
-
+  const [passworderr,setpassworderr] = useState<string | null>()
 
 
   const [usernamePhotoError,setUsernamePhotoError] = useState<string | null>(null);
@@ -39,6 +40,23 @@ const useCheckPassword = () => {
     });
   };
  
+  const onPasswordChange = (password: string) => {
+    setPassword(password);
+    console.log(password)
+
+    const err = validatePassword(password);
+  
+  
+    if (err) {
+      setpassworderr(err)
+      console.log(`Error on password: ${err}`);
+      return false;
+    } else {
+      console.log("No errors on password");
+      return true;
+    }
+  };
+  
 
    // barangay and sitio
 
@@ -64,30 +82,29 @@ const useCheckPassword = () => {
   };
   
 
-  const handleNextPress = async () => {
+  const handleNextPressSignup = async () => {
     try {
       // Validate the user inputs
       const nameError = validateName(state.firstname ?? '', state.middlename ?? '', state.lastname ?? '');
-      const passwordError = validatePassword(state.password, state.repassword);
+      //const passwordError = validatePassword(state.password, state.repassword);
       const birthdayError = validateBirthday(state.birthdate ? state.birthdate.toString() : '');
       const barangaySitioError = validateBarangayAndSitio(barangay, sitio);
   
-      if (nameError || passwordError || birthdayError || barangaySitioError) {
+      if (nameError || birthdayError || barangaySitioError) {
         dispatch({
           actionType: 'error',
-          data: { error: nameError || passwordError || birthdayError || barangaySitioError },
+          data: { error: nameError || birthdayError || barangaySitioError },
         });
         return;
       }
   
       dispatch({ actionType: 'input', data: { error: null } });
   
-    
+      
       await userSubmit(state, dispatch);
   
       const id = await AsyncStorage.getItem('firstId');
-
-      console.log(barangay)
+      const gender = await AsyncStorage.setItem('gender',state.gender!)
 
       if (barangay) {
         await AsyncStorage.setItem('address', barangay);
@@ -109,7 +126,7 @@ const useCheckPassword = () => {
   
      
   
-      navigation.navigate('CitizenPhoto' as never);
+      navigation.navigate('UsernamePhoto' as never);
   
     } catch (error: any) {
       handleAxiosError(error);
@@ -203,35 +220,27 @@ const useCheckPassword = () => {
   }
 };
 
-  const handleAxiosError = (error: any) => {
-    if (error.response) {
-    console.error('Response error:', error.response.data);
-    console.error('Response status:', error.response.status);
-    console.error('Response headers:', error.response.headers);
-    } else if (error.request) {
-    console.error('Request error:', error.request);
-    } else {
-    console.error('General error:', error.message);
-    }
-    console.error('Error config:', error.config);
-};
+
 
 const userSubmit = async (
   state: Citizen,
   dispatch: React.Dispatch<Action>
 ) => {
   try {
+     const payload = {
+      lname: state.lastname,
+      fname: state.firstname,
+      mname: state.middlename,
+      gender: state.gender,
+      birthday: state.birthdate?.toString(),
+      address: barangay,
+    };
+
+    console.log('Payload being sent to backend:', payload);
+
     const userResponse = await axios.post(
-      'https://fearless-growth-production.up.railway.app/user/submit',
-      {
-        lname: state.lastname,
-        fname: state.firstname,
-        mname: state.middlename,
-        password: state.password,
-        repassword: state.repassword,
-        birthday: state.birthdate?.toString(),
-        address: barangay
-      },
+      'https://express-production-ac91.up.railway.app/user/submittt',
+      payload,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -261,8 +270,7 @@ const userSubmit = async (
         firstname: state.firstname,
         middlename: state.middlename,
         birthdate:  state.birthdate,
-        password: state.password,
-        repassword: state.repassword
+        gender: state.gender,
       },
     });
 
@@ -277,8 +285,9 @@ const userSubmit = async (
     });
   }
 };
+
   return {
-    handleNextPress,
+    handleNextPressSignup,
     sitio,
     barangay,
     handleBarangayChange, 
@@ -295,6 +304,8 @@ const userSubmit = async (
     setProviderName,
     setProviderPassword,
     providerLoginError,
+    onPasswordChange,
+    passworderr,
   };
 };
 

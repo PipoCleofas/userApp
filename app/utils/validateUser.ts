@@ -5,7 +5,7 @@ export const validateName = (fname: string | null, mname: string | null, lname: 
     return null;
   };
 
-  export const validatePassword = (password: string | null, reEnteredPassword: string | null = null) => {
+  export const validatePassword = (password: string | null) => {
     if (!password) {
       return "Password cannot be empty.";
     }
@@ -26,13 +26,7 @@ export const validateName = (fname: string | null, mname: string | null, lname: 
       return "Password must contain at least one number.";
     }
 
-    if (reEnteredPassword !== null && password !== reEnteredPassword) {
-      return "Passwords do not match.";
-    }
-
-    if(reEnteredPassword == null){
-      return "Reenter your password"
-    }
+    
 
     return null; // No error
   };
