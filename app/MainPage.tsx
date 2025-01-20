@@ -39,11 +39,23 @@ export default function MainPage() {
   
 
   useEffect(() => {
-    AsyncStorage.getItem('gender').then(setGender);
-    AsyncStorage.getItem('username').then(setUname);
+    const fetchData = async () => {
+      try {
+        const gender = await AsyncStorage.getItem('gender');
+        const username = await AsyncStorage.getItem('username');
+        console.log('Gender:', gender, 'Username:', username);
+        setGender(gender ?? null); // Default to null if no value
+        setUname(username ?? null);
+      } catch (error) {
+        console.error('Error fetching AsyncStorage data:', error);
+      }
+    };
+  
+    fetchData();
   }, []);
+  
 
-  const { sendMessageUser, messages } = useChat();
+  const { sendMessageUser, messages, setMessageInput, messageInput } = useChat();
   const { location, errorMsg, isFetching } = useLocation();
   const { EmergencyAssistanceRequest, markerEmoji, markerImageSize, markers } = useHandleClicks();
 
@@ -52,13 +64,14 @@ export default function MainPage() {
   const [emergencyAssistanceModalVisible, setEmergencyAssistanceModalVisible] = useState(false);
 
   function serviceVisible() {
-    setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
+    setEmergencyAssistanceModalVisible((prev) => !prev);
   }
 
   async function emerAssReq(service: string, markerEmoji: any, imageWidth: number = 65, imageHeight: number = 60) {
     await AsyncStorage.setItem('serviceChosen', service);
     EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'approved');
-    setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible);
+
+    setEmergencyAssistanceModalVisible(false);
     setTriggerNotification(true);
     setTimeout(() => setTriggerNotification(false), 2000);
   }
@@ -94,16 +107,18 @@ export default function MainPage() {
                 <Text style={modalStyles.header}>CHAT WITH US</Text>
               </View>
               <View style={modalStyles.messageContainer}>
-                <Text style={modalStyles.sender}>{uname}</Text>
+                <Text style={modalStyles.sender} >{uname}</Text>
 
                 {messages.map((v) => (
-                    <Text style={modalStyles.message}>{v.message}</Text>
+                    <Text style={modalStyles.message} key={v.id}>{v.message}</Text>
                 ))}
               </View>
               <View style={modalStyles.inputContainer}>
                 <TextInput
                   style={modalStyles.input}
                   placeholder="Write a message..."
+                  onChangeText={(text) => setMessageInput(text)}
+                  value={messageInput}
                 />
                 <Button
                   title="Send"
@@ -113,6 +128,7 @@ export default function MainPage() {
             </View>
           </View>
         </Modal>
+        
         <Modal
           animationType="fade"
           transparent={true}

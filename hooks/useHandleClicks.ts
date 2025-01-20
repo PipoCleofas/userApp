@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useNavigation } from "expo-router";
 import useLocation from "./useLocation";
-import {useEffect, useState } from "react";
+import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Define the type for the marker object
@@ -282,7 +282,6 @@ const useHandleClicks = () => {
           },
         });
 
-        console.log(1)
         let spUsername;
 
         switch(requestType){

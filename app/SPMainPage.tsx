@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator, Pressable, Modal, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator, Pressable, Modal, TextInput, Button } from 'react-native';
 import { useNavigation } from 'expo-router';
 import useHandleLogin from '@/hooks/handleSPLogin';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from '@/components/notification-holder/Notification';
+import useChat from '@/hooks/useChat';
+import { AntDesign, Feather } from '@expo/vector-icons';
 
 interface MarkerType {
   latitude: number;
@@ -42,6 +44,8 @@ export default function MainPage() {
   const [isPressed, setIsPressed] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState({ latitude: 0, longitude: 0 });
+  const [chatModalVisible, setChatModalVisible] = useState(false);
+  const [uname,setUname] = useState<string | null>();
 
   const [triggerNotification, setTriggerNotification] = useState(false);
 
@@ -51,7 +55,11 @@ export default function MainPage() {
   const [message, setMessage] = useState<string | null>('');
   const [messageError, setMessageError] = useState<string | null>();
 
+  const [conversationId, setConversationId] = useState<number | null>();
+  const [receiverId, setReceiverID] = useState<number | null>();
+
   const { markerUnameEmoji, markerImageSize, imageChanger } = useHandleLogin();
+  const { sendMessageSP, messages, setMessageInput, setMessages, messageInput } = useChat();
 
   const defaultRegion = {
     latitude: 15.4817,
@@ -60,18 +68,7 @@ export default function MainPage() {
     longitudeDelta: 0.05,
   };
 
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const toRad = (value: number) => (value * Math.PI) / 180;
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in kilometers
-  };
+  
   
   async function handleSendMessage() {
     try {
@@ -191,17 +188,135 @@ export default function MainPage() {
   
     
     
-  useEffect(() => {
-    const intervalId = setInterval(fetchAndUpdateMarker, 3000);
-    imageChanger()
-    return () => clearInterval(intervalId);
+    useEffect(() => {
+      const initialize = async () => {
+          const username = await AsyncStorage.getItem("usernameSP");
+          setUname(username);
+          imageChanger(); 
+      };
+  
+      initialize(); // Call the async function
+  
+      const intervalId = setInterval(fetchAndUpdateMarker, 3000);
+  
+      return () => clearInterval(intervalId);
   }, [markers]);
+  
+  useEffect(() => {
+    const initialize = async () => {
+        const username = await AsyncStorage.getItem("usernameSP");
+        setUname(username);
+        imageChanger(); 
+    };
+
+    initialize(); // Call the async function
+
+    const intervalId = setInterval(fetchAndUpdateMarker, 3000);
+
+    return () => clearInterval(intervalId);
+}, [markers]);
+  
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    const fetchLatestMessages = async () => {
+      try {
+        const userID = await AsyncStorage.getItem('userId');
+        if (!userID) {
+          console.error('User ID not found in AsyncStorage');
+          return;
+        }
+
+        const responseConvo = await axios.get('https://express-production-ac91.up.railway.app/messaging/getLatestConversation', {
+          params: { receiver_id: userID },
+        });
+
+        if (!responseConvo.data.success) {
+          console.error('Failed to fetch latest conversation:', responseConvo.data.message);
+          return;
+        }
+
+        const { sender_id, conversation_id } = responseConvo.data;
+        await AsyncStorage.setItem('senderID', sender_id.toString());
+
+        const getConvo = await axios.get('https://express-production-ac91.up.railway.app/messaging/getLatestConvo', {
+          params: { conversation_id },
+        });
+
+        if (!getConvo.data.success) {
+          console.error('Failed to fetch conversation details:', getConvo.data.message);
+          return;
+        }
+
+        const { message } = getConvo.data;
+
+        if (Array.isArray(message)) {
+          setMessages(message);
+          console.log('Messages updated:', message);
+        } else if (message) {
+          setMessages([message]); // Wrap a single message in an array
+          console.log('Single message received:', message);
+        } else {
+          console.error('No valid message data received:', message);
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
+
+    const initializeFetching = async () => {
+      await fetchLatestMessages(); // Initial fetch
+      interval = setInterval(fetchLatestMessages, 3000); // Fetch every 3 seconds
+    };
+
+    initializeFetching();
+
+    return () => clearInterval(interval);
+  }, []);
+
+
 
 
   
 
   return (
     <View style={styles.container}>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={chatModalVisible}
+          onRequestClose={() => setChatModalVisible(false)}
+        >
+          <View style={modalStyles.modalOverlay}>
+            <View style={modalStyles.modalContent}>
+              <Feather name='x-circle' size={20} onPress={() => setChatModalVisible(false)} style={{left: 110}}/>
+              <View>
+                <Text style={modalStyles.header}>CHAT WITH US</Text>
+              </View>
+              <View style={modalStyles.messageContainer}>
+                <Text style={modalStyles.sender} >{uname}</Text>
+
+                {messages.map((v) => (
+                    <Text style={modalStyles.message} key={v.id}>{v.message}</Text>
+                ))}
+              </View>
+              <View style={modalStyles.inputContainer}>
+                <TextInput
+                  style={modalStyles.input}
+                  placeholder="Write a message..."
+                  onChangeText={(text) => setMessageInput(text)}
+                  value={messageInput}
+                />
+                <Button
+                  title="Send"
+                  onPress={() => sendMessageSP()}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
       <Notification
           message={'Someone asked for help!'}
           trigger={triggerNotification}
@@ -264,7 +379,12 @@ export default function MainPage() {
               onPress={() => setModalVisible(true)}
             >
               <Text style={styles.buttonText}>Send Updates</Text>
+
+              <AntDesign name="message1" size={30} color="black" style={{left: 95}} onPress={() => setChatModalVisible(true)}/>
+
             </TouchableOpacity>
+
+
           </View>
         </View>
       </View>
@@ -470,5 +590,54 @@ const modalStyles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
+  },
+  messageContainer: {
+    marginBottom: 20,
+    width: '100%',
+  },
+  message: {
+    marginBottom: 10,
+    backgroundColor: '#eee',
+    padding: 10,
+    borderRadius: 5,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  sender: {
+    fontWeight: 'bold',
+    marginBottom: 25,
+    marginLeft: 5
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  header: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+    color: 'black',
+  },
+  headerStyle: {
+    color: 'red',
   },
 });

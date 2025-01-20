@@ -49,6 +49,9 @@ export default function useHandleLogin(){
               console.log(loginErr);
               return;
           }
+
+          await AsyncStorage.setItem('username', uname!)
+
   
           // First login request
           const response = await axios.get(
