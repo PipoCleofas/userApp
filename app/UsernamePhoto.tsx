@@ -13,8 +13,7 @@ import useDataInput from '@/hooks/useDataInput'
 import useHandleClicks from '@/hooks/useHandleClicks';
 
 const UsernamePhoto = () => {
-  const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError,setUsername,setPassword,setrepassword,password} = usePhoto();
-  const {onPasswordChange,passworderr} = useDataInput();
+  const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError,setUsername,setPassword,setrepassword,password,passworderr,onPasswordChange} = usePhoto();
   const { handleBackButtonOnUsernamePhotoPress } = useHandleClicks();
 
   return (
@@ -34,18 +33,15 @@ const UsernamePhoto = () => {
           onChangeText={(text) => setUsername(text)}
         />
 
-        <View style={{flexDirection: 'row'}}>
           <TextInput
             placeholder="Password"
-            style={styles.input}
+            style={[styles.input, { borderColor: passworderr ? 'red' : 'green', borderWidth: 1 }]}
             placeholderTextColor="#ccc"
             secureTextEntry
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={(text) => onPasswordChange(text)}
           />
 
-        {password && !passworderr && <AntDesign name="checkcircleo" />}
 
-        </View>
        
 
         <TextInput

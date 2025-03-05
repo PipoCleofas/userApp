@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator, Pressable, Modal, TextInput, Button } from 'react-native';
 import { useNavigation } from 'expo-router';
@@ -26,11 +26,11 @@ const markerImages: { [key: string]: any } = {
   "CENTRAL LUZON DOCTORS HOSPITAL": require('../app/pictures/medic.png'),
   "TALON GENERAL HOSPITAL": require('../app/pictures/medic.png'),
   "PDRRMO Station": require('../app/pictures/ndrrmc.png'),
-  "BFP Assistance Request": require('../app/pictures/person.jpg'),
-  "PNP Assistance Request": require('../app/pictures/person.jpg'),
-  "Medical Assistance Request": require('../app/pictures/person.jpg'),
-  "NDRRMC Assistance Request": require('../app/pictures/person.jpg'),
-  "PDRRMO Assistance Request": require('../app/pictures/person.jpg'),
+  "BFP Assistance Request": require('../app/pictures/finalPerson.png'),
+  "PNP Assistance Request": require('../app/pictures/finalPerson.png'),
+  "Medical Assistance Request": require('../app/pictures/finalPerson.png'),
+  "NDRRMC Assistance Request": require('../app/pictures/finalPerson.png'),
+  "PDRRMO Assistance Request": require('../app/pictures/finalPerson.png'),
   'Male': require('./pictures/male.jpg'),
   'Female': require('./pictures/female.jpg'),
 };
@@ -54,12 +54,14 @@ export default function MainPage() {
   const [nameInNeed, setNameInNeed] = useState<string | null>();
   const [message, setMessage] = useState<string | null>('');
   const [messageError, setMessageError] = useState<string | null>();
+ 
+  const [showTransferModal,setShowTransferModal] = useState<boolean>(false)
 
-  const [conversationId, setConversationId] = useState<number | null>();
-  const [receiverId, setReceiverID] = useState<number | null>();
+  const transferTo = useRef<string>()
 
-  const { markerUnameEmoji, markerImageSize, imageChanger } = useHandleLogin();
+  const { markerUnameEmoji, markerImageSize, imageChanger,transferItems, transferableItems, updateTransferItems } = useHandleLogin();
   const { sendMessageSP, messages, setMessageInput, setMessages, messageInput } = useChat();
+
 
   const defaultRegion = {
     latitude: 15.4817,
@@ -99,6 +101,9 @@ export default function MainPage() {
     typeof obj.title === 'string';
   
     
+    useEffect(() => {
+      console.log('transferItems updated:', transferItems);
+    }, [transferItems]);
 
     const fetchAndUpdateMarker = async () => {
       try {
@@ -202,19 +207,7 @@ export default function MainPage() {
       return () => clearInterval(intervalId);
   }, [markers]);
   
-  useEffect(() => {
-    const initialize = async () => {
-        const username = await AsyncStorage.getItem("usernameSP");
-        setUname(username);
-        imageChanger(); 
-    };
-
-    initialize(); // Call the async function
-
-    const intervalId = setInterval(fetchAndUpdateMarker, 3000);
-
-    return () => clearInterval(intervalId);
-}, [markers]);
+  
   
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -275,12 +268,158 @@ export default function MainPage() {
   }, []);
 
 
+  const handleTransferPress = async (transferTo: string) => {
+    try {
+      const uname = await AsyncStorage.getItem('username');
+      if (!uname) {
+        console.error("Username not found in AsyncStorage");
+        return;
+      }
+      
+      try {
+        await axios.post(
+          "https://express-production-ac91.up.railway.app/messaging/uploadLog",
+          {
+            message: `${uname} transferred to ${transferTo}`,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Message uploaded successfully.");
+      } catch (messageError) {
+        console.error("Message upload failed:", messageError);
+      }
+      // Modify transferTo before proceeding
+      let modifiedTransferTo = transferTo;
+      switch (transferTo) {
+        case 'PNP MABINI':
+          modifiedTransferTo = 'pnpmabinimarker';
+          break;
+        case 'PNP HILARIO':
+          modifiedTransferTo = 'pnphilariomarker';
+          break;
+        case 'PNP SAN ISIDRO':
+          modifiedTransferTo = 'pnpsanisidromarker';
+          break;
+        case 'CLDH':
+          modifiedTransferTo = 'centralmarker';
+          break;
+        case 'TPH':
+          modifiedTransferTo = 'provincialmarker';
+          break;
+        case 'TALON':
+          modifiedTransferTo = 'talonmarker';
+          break;
+        case 'BFP SAN NICOLAS':
+          modifiedTransferTo = 'bfpsannicolasmarker';
+          break;
+        case 'BFP SAN SEBASTIAN':
+          modifiedTransferTo = 'bfpsansebastianmarker';
+          break;
+        case 'BFP SAN ISIDRO':
+          modifiedTransferTo = 'bfpsanisidromarker';
+          break;
+      }
+  
+      let curTable: string;
+      switch (uname) {
+        case 'BFP BRGY. SAN ISIDRO': curTable = 'bfpsanisidromarker'; break;
+        case 'BFP BRGY. SAN NICOLAS': curTable = 'bfpsannicolasmarker'; break;
+        case 'BFP BRGY. SAN SEBASTIAN': curTable = 'bfpsansebastianmarker'; break;
+        case 'PNP BRGY. SAN ISIDRO': curTable = 'pnpsanisidromarker'; break;
+        case 'PNP BRGY. MABINI': curTable = 'pnpmabinimarker'; break;
+        case 'PNP BRGY. HILARIO': curTable = 'pnphilariomarker'; break;
+        case 'TALON GENERAL HOSPITAL': curTable = 'talonmarker'; break;
+        case 'CENTRAL LUZON DOCTORS HOSPITAL': curTable = 'centralmarker'; break;
+        case 'TARLAC PROVINCIAL HOSPITAL': curTable = 'provincialmarker'; break;
+        case 'PDRRMO Station': curTable = 'pdrrmomarker'; break;
+        default: curTable = 'bfpsanisidromarker';
+      }
+  
+      console.log("Current table:", curTable);
+      console.log("Modified Transfer To:", modifiedTransferTo);
+  
+      if (!modifiedTransferTo) {
+        console.error("Transfer target table is missing");
+        return;
+      }
+  
+      await axios.post(
+        `https://express-production-ac91.up.railway.app/marker/transferMarker?table=${modifiedTransferTo}&currentTable=${curTable}`,
+        {}, // No body needed
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      setShowTransferModal(false); // Close modal after successful transfer
+    } catch (err) {
+      console.error("Transfer failed:", err);
+    }
+  };
+  
 
+  useEffect(() => {
+    if (showTransferModal && uname) {
+      updateTransferItems(uname); // ✅ Ensure state updates when modal opens
+    }
+  }, [showTransferModal, uname]);
+
+  const handleShowTransferModalPress = () => {
+    setShowTransferModal(true)
+  }
+
+  const handleBackPress = () => {
+    setShowTransferModal(false)
+  }
 
   
 
   return (
     <View style={styles.container}>
+
+    <Modal visible={showTransferModal} transparent animationType="fade">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              {/* Header without dropdown */}
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Transfer Request</Text>
+                <TouchableOpacity onPress={() => handleBackPress()} style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>✖</Text>
+                </TouchableOpacity>
+              </View>
+
+              
+
+              {/* List of transfer requests */}
+              <View style={styles.listContainer}>
+                {transferItems.length === 0 ? (
+                  <Text>No transfer items available</Text>
+                ) : (
+                  transferItems.map((item, index) => (
+                    <View key={item.id} style={styles.requestRow}>
+                      <View style={styles.labelBox}>
+                        <Text style={styles.labelText}>{item.label}</Text>
+                      </View>
+                      <TouchableOpacity style={styles.selectButton} onPress={() => handleTransferPress(item.label)}>
+                        <Text style={styles.buttonText}>SELECT</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.cancelButton} onPress={handleBackPress}>
+                        <Text style={styles.buttonText}>CANCEL</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))
+                )}
+              </View>
+
+            </View>
+          </View>
+    </Modal>
 
         <Modal
           animationType="fade"
@@ -302,17 +441,16 @@ export default function MainPage() {
                 ))}
               </View>
               <View style={modalStyles.inputContainer}>
-                <TextInput
-                  style={modalStyles.input}
-                  placeholder="Write a message..."
-                  onChangeText={(text) => setMessageInput(text)}
-                  value={messageInput}
-                />
-                <Button
-                  title="Send"
-                  onPress={() => sendMessageSP()}
-                />
-              </View>
+              <TextInput
+                style={modalStyles.input}
+                placeholder="Write a message..."
+                onChangeText={(text) => setMessageInput(text)}
+                value={messageInput}
+              />
+              <TouchableOpacity style={modalStyles.sendButton} onPress={sendMessageSP}>
+                <Text style={modalStyles.sendButtonText}>SEND</Text>
+              </TouchableOpacity>
+            </View>
             </View>
           </View>
         </Modal>
@@ -373,19 +511,25 @@ export default function MainPage() {
 
       <View style={styles.tabBarContainer}>
         <View style={styles.iconContainer}>
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={[styles.button, isPressed ? styles.buttonPressed : null]}
-              onPress={() => setModalVisible(true)}
-            >
-              <Text style={styles.buttonText}>Send Updates</Text>
+        <View style={styles.buttonsContainer}>
+          {/* Message Icon on the Left */}
+          <TouchableOpacity onPress={() => setChatModalVisible(true)} style={styles.iconButton}>
+            <AntDesign name="message1" size={30} color="black" />
+          </TouchableOpacity>
 
-              <AntDesign name="message1" size={30} color="black" style={{left: 95}} onPress={() => setChatModalVisible(true)}/>
+          {/* Send Updates in the Center */}
+          <TouchableOpacity
+            style={[styles.button, isPressed ? styles.buttonPressed : null]}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.buttonText}>Send Updates</Text>
+          </TouchableOpacity>
 
-            </TouchableOpacity>
-
-
-          </View>
+          {/* Transfer Button on the Right */}
+          <TouchableOpacity onPress={() => handleShowTransferModalPress()} style={styles.iconButton}>
+            <Image source={require('./pictures/transferButton.png')} style={styles.transferImage} />
+          </TouchableOpacity>
+        </View>
         </View>
       </View>
     </View>
@@ -401,10 +545,49 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  
+  header: {
+    backgroundColor: "#870D29",
+    padding: 12,
+    flexDirection: "row",  // Align items in a row
+    alignItems: "center",
+    justifyContent: "space-between", // Push X to the right
+  },
+  
+  closeButton: {
+    padding: 10,
+    position: "absolute",
+    right: 10,  // Align to the right
+    top: 5,
+
+  },
+  
+  closeButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  
   map: {
     width: '100%',
     height: '80%', 
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20, // Ensures even spacing
+    marginTop: 8,
+  },
+  
+  iconButton: {
+    padding: 10, // Adds spacing for touch area
+  },
+  
+  transferImage: {
+    width: 50, 
+    height: 50, 
+  },  
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -450,11 +633,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 8,
   },
   button: {
     backgroundColor: '#AD5765',
@@ -528,6 +706,53 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     textAlign: 'center',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+ 
+  headerText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  listContainer: {
+    padding: 10,
+  },
+  requestRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  labelBox: {
+    backgroundColor: "#d3d3d3",
+    padding: 8,
+    flex: 1,
+    marginRight: 5,
+  },
+  labelText: {
+    fontWeight: "bold",
+  },
+  selectButton: {
+    backgroundColor: "green",
+    padding: 8,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: "darkred",
+    padding: 8,
+    borderRadius: 5,
+  },
+  
   
 });
 
@@ -538,6 +763,38 @@ const modalStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#F0F0F0",
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  
+  input: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: "white",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginRight: 10,
+  },
+  
+  sendButton: {
+    backgroundColor: "#007AFF", // iOS blue send button style
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  
+  sendButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  
   modalView: {
     width: '80%',
     backgroundColor: 'white',
@@ -555,16 +812,7 @@ const modalStyles = StyleSheet.create({
     marginBottom: 5,
     color: '#333',
   },
-  input: {
-    width: '100%',
-    padding: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: 15,
-    fontSize: 16,
-    color: '#333',
-  },
+  
   textArea: {
     height: 80,
     textAlignVertical: 'top', // For multiline input
@@ -607,12 +855,7 @@ const modalStyles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
+  
   sender: {
     fontWeight: 'bold',
     marginBottom: 25,

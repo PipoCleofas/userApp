@@ -11,7 +11,6 @@ const ImageUploadScreen = () => {
   const [modal1Visible, setModal1Visible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
   const [modal3Visible, setModal3Visible] = useState(false);
-  const [id, setID] = useState<any>();
 
   const { handleBackButtonInCitizenPhotoPress } = useHandleClicks();
 
@@ -25,7 +24,9 @@ const ImageUploadScreen = () => {
     setImageUri1,
     setImageUri2,
     setImageUri3,
-    imageError
+    imageError,
+    setID,
+    id
     } = usePhoto();
 
   const {state} = useDataInput();
@@ -162,6 +163,8 @@ const ImageUploadScreen = () => {
         </View>
       </View>
 
+      {imageError && <Text style={styles.errorText}>{imageError}</Text>}
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={[styles.button, styles.backButton]} onPress={handleBackButtonInCitizenPhotoPress}>
           <SimpleLineIcons name="arrow-left" size={16} color="white" />
@@ -183,6 +186,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4DBD7",
     paddingHorizontal: 20,
     justifyContent: "center",
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 4,
+    textAlign: 'center',
   },
   headerText: {
     fontSize: 24,

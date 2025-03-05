@@ -151,7 +151,7 @@ const useHandleClicks = () => {
     
     const updateStatusRequest = async (status: string, userId: number) => {
       try {
-          const response = await axios.put(`https://fearless-growth-production.up.railway.app/servicerequest/updateRequest/${status}`, {
+          const response = await axios.put(`https://express-production-ac91.up.railway.app/servicerequest/updateRequest/${status}`, {
               UserID: userId
           }, {
               headers: {
@@ -341,7 +341,7 @@ const useHandleClicks = () => {
         let  username = await AsyncStorage.getItem('username')
         console.log(username)
 
-        const serviceRequestResponse = await axios.post('https://fearless-growth-production.up.railway.app/servicerequest/submit', {
+        const serviceRequestResponse = await axios.post('https://express-production-ac91.up.railway.app/servicerequest/submit', {
           UserID: USERID,
           Username: username,
           requesttype: requestType,  

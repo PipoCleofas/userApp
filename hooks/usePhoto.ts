@@ -20,6 +20,9 @@ const usePhotoPicker = () => {
   const [username,setUsername] = useState<string | null>()
   const [password,setPassword] = useState<string | null>(null)
   const [repassword, setrepassword] = useState<string | null>(null)
+  const [passworderr, setPasswordErr] = useState<string | null>(null)
+  const [id, setID] = useState<any>();
+
   
   const pickImage = async (setImageUri: React.Dispatch<React.SetStateAction<string | null>>) => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -53,29 +56,16 @@ const usePhotoPicker = () => {
   };
 
   const uploadAllImages = async () => {
-    if(!imageUri1 || !imageUri2 || !imageUri3){
+    if (!imageUri1 || !imageUri2 || !imageUri3) {
       setImageError('Provide the required photos');
       return;
     }
-
-    const formData = new FormData();
-    const images = [
-      { uri: imageUri1, name: 'photo1' },
-      { uri: imageUri2, name: 'photo2' },
-      { uri: imageUri3, name: 'photo3' },
-    ];
-    console.log(images)
-    // Append each image to the formData if it has been selected
-    images.forEach(({ uri, name }) => {
-      if (uri) {
-        formData.append('photos', {
-          uri,
-          type: 'image/jpeg',
-          name: `${name}.jpg`,
-        } as any);
-      }
-    });
   
+    if (!id) {
+      setImageError('Provide ID type');
+      return;
+    }
+
     try {
       // Retrieve UserID from AsyncStorage
       const userID = await AsyncStorage.getItem('firstId');
@@ -84,20 +74,49 @@ const usePhotoPicker = () => {
         return;
       }
   
-      // Append UserID to formData
-      formData.append('userID', userID);
-      console.log(formData)
-      // Make the POST request
-      await axios.post('https://express-production-ac91.up.railway.app/photo/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // Upload images to Cloudinary one by one
+      const uploadToCloudinary = async (uri: string) => {
+        const data = new FormData();
+        data.append('file', { uri, type: 'image/jpeg', name: 'photo.jpg' } as any);
+        data.append('upload_preset', 'tsuCapstone'); 
+        data.append('cloud_name', 'dsh9cyznf');
       
-      navigation.navigate('CitizenLogin' as never)
+        try {
+          const response = await fetch('https://api.cloudinary.com/v1_1/dsh9cyznf/image/upload', {
+            method: 'POST',
+            body: data,
+          });
+      
+          const result = await response.json();
+          console.log('Cloudinary Upload Result:', result); // Debugging
+          return result.secure_url; // Return Cloudinary URL
+        } catch (error) {
+          console.error('Cloudinary Upload Error:', error);
+          throw new Error('Failed to upload to Cloudinary');
+        }
+      };
+      
+  
+      // Upload all images and get their URLs
+      const photo1_url = await uploadToCloudinary(imageUri1);
+      const photo2_url = await uploadToCloudinary(imageUri2);
+      const photo3_url = await uploadToCloudinary(imageUri3);
+  
+      // Prepare data for API request
+      const requestBody = { userID, photos: [photo1_url, photo2_url, photo3_url] };
+  
+      // Send URLs to Express backend
+      await axios.post('https://express-production-ac91.up.railway.app/photo/upload', requestBody, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      navigation.navigate('CitizenLogin' as never);
     } catch (error) {
-      console.error(error);
+      console.error('Upload error:', error);
       Alert.alert('Upload Failed', 'Failed to upload images');
     }
   };
+  
 
 
 
@@ -105,39 +124,44 @@ const usePhotoPicker = () => {
 
 
   const uploadProfile = async () => {
-    //navigation.navigate('CitizenPhoto' as never)
-    console.log(password! + repassword)
-
+    console.log(password! + repassword);
+  
     if (!password) {
       setImageError('Fill in the required fields.');
-      return 0;
-    }
-  
-    const err = validatePassword(password)
-    if(err){
-      setImageError(err)
       return;
     }
-    
+  
+    const err = validatePassword(password);
+    if (err) {
+      setImageError(err);
+      return;
+    }
+  
     if (repassword !== null && password !== repassword) {
-      setImageError("Passwords do not match.")
+      setImageError('Passwords do not match.');
+      return;
     }
-
-    if(repassword == null){
-      setImageError("Reenter your password")
-
+  
+    if (repassword == null) {
+      setImageError('Reenter your password');
+      return;
     }
-
+  
     const userID = await AsyncStorage.getItem('firstId');
-      if (!userID) {
-        Alert.alert('Error', 'User ID not found.');
-        return;
-      }
-    
+    if (!userID) {
+      Alert.alert('Error', 'User ID not found.');
+      return;
+    }
+  
     await updateUserProfile(username ?? 'Lebron James', password ?? 'SamplePassword');
-    
-
-    // photo
+  
+    // Ensure image is selected
+    if (!imageUri4) {
+      Alert.alert('Error', 'Please select an image.');
+      return;
+    }
+  
+    // Prepare FormData for Cloudinary upload
     const formData = new FormData();
     formData.append('photo4', {
       uri: imageUri4,
@@ -145,34 +169,47 @@ const usePhotoPicker = () => {
       name: 'photo4.jpg',
     } as any);
     formData.append('userID', userID);
-    console.log(formData)
-
-    try {
-      const userIDa = await AsyncStorage.getItem('firstId');
-      if (!userIDa) {
-        return;
-      }
   
-      // Make the PUT request
-      const response  = await axios.put(
-        `https://express-production-ac91.up.railway.app/photo/photos/${userIDa}`,
+    console.log('Uploading image:', formData);
+  
+    try {
+      // Make the POST request to the `/upload-single` route
+      const response = await axios.post(
+        `https://express-production-ac91.up.railway.app/photo/upload-single`, 
         formData,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
         }
       );
-      
-      if(response.status  === 200){
-        navigation.navigate('CitizenPhoto' as never)
-      }
   
+      if (response.status === 200) {
+        console.log('Image uploaded successfully:', response.data.imageUrl);
+        navigation.navigate('CitizenPhoto' as never);
+      }
     } catch (error) {
       console.error('Error uploading profile image:', error);
-      Alert.alert('Upload Failed', 'Failed to upload the profile image');
+      Alert.alert('Upload Failed', 'Failed to upload the profile image.');
     }
   };
   
   
+    const onPasswordChange = (password: string) => {
+      setPassword(password);
+      console.log(password);
+  
+      const err = validatePassword(password);
+  
+      if (err) {
+          setPasswordErr(err);
+          console.log(`Error on password: ${err}`);
+          return false;
+      } else {
+         setPasswordErr(null); // Clear the error if no issues
+          console.log("No errors on password");
+          return true;
+      }
+  };
+
   return {
     imageError,
     imageUri1,
@@ -191,7 +228,11 @@ const usePhotoPicker = () => {
     setrepassword,
     setUsername,
     password,
-    repassword
+    onPasswordChange,
+    repassword,
+    passworderr,
+    setID,
+    id
   };
 };
 

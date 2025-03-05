@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
@@ -11,7 +11,10 @@ export default function useHandleLogin(){
     const [markerUnameEmoji, setMarkerUnameEmoji] = useState<any>();
 
     const [markerImageSize, setMarkerImageSize] =useState<{width: any, height: any}> ({ width: 60, height: 60 });
+    const [transferItems, setTransferItems] = useState<{ id: number; label: string }[]>([]);
 
+    const transferableItems = useRef<{ id: number; label: string }[]>([]);
+    
     const navigation = useNavigation();
 
     const onUnameChange = (text: string) => {
@@ -37,61 +40,100 @@ export default function useHandleLogin(){
       return words[0];
   }
   
-  
-    const onLoginPress = async () => {
-      try {
-          const loginErr = validateLogin(uname, password);
-          setLoginError(loginErr);
-          console.log('Received username:', uname);
-          console.log('Received password:', password);
-          
-          if (loginErr) {
-              console.log(loginErr);
-              return;
-          }
+  const updateTransferItems = (username: string) => {
+    let items: string[] = [];
 
-          await AsyncStorage.setItem('username', uname!)
+    switch (username) {
+      case "PNP BRGY. SAN ISIDRO":
+        items = ["PNP MABINI", "PNP HILARIO"];
+        break;
+      case "PNP BRGY. MABINI":
+        items = ["PNP SAN ISIDRO", "PNP HILARIO"];
+        break;
+      case "PNP HILARIO STREET":
+        items = ["PNP MABINI", "PNP SAN ISIDRO"];
+        break;
+      case "TALON GENERAL HOSPITAL":
+        items = ["CLDH", "TPH"];
+        break;
+      case "CENTRAL LUZON DOCTORS HOSPITAL":
+        items = ["TALON", "TPH"];
+        break;
+      case "TARLAC PROVINCIAL HOSPITAL":
+        items = ["TALON", "CLDH"];
+        break;
+      case "BFP BRGY. SAN ISIDRO":
+        items = ["BFP SAN NICOLAS", "BFP SAN SEBASTIAN"];
+        break;
+      case "BFP BRGY. SAN NICOLAS":
+        items = ["BFP SAN ISIDRO", "BFP SAN SEBASTIAN"];
+        break;
+      case "BFP BRGY. SAN SEBASTIAN":
+        items = ["BFP SAN ISIDRO", "BFP SAN NICOLAS"];
+        break;
 
-  
-          // First login request
-          const response = await axios.get(
-              'https://express-production-ac91.up.railway.app/serviceprovider/getServiceProvider',
-              {
-                  params: {
-                      username: uname,
-                      password: password,
-                  },
-              }
-          );
-  
-          if (response.data.success) {
-              console.log('Login successful');
-              const userId = response.data.userId;
-  
-              if (userId) {
-                  const servicetype = getFirstString(uname as string)
-                  const service = AsyncStorage.setItem('service',servicetype); // Extract servicetype (e.g., "PNP")
+      default:
+        items = [];
+    }
 
-                  
+    const mappedItems = items.map((name, index) => ({ id: index, label: name }));
+    setTransferItems(mappedItems);
+  };
 
-                  await AsyncStorage.setItem('usernameSP', uname as string);
-                  await AsyncStorage.setItem('userId', userId.toString());
-                  console.log('Username and User ID stored in AsyncStorage:', uname, userId);
-  
-                  await imageChanger();
-  
-                  navigation.navigate('SPMainPage' as never);
-              } else {
-                  console.error('User ID not found in response');
-                  setLoginError('User ID not found in response');
-              }
-          } else {
-              console.log('Login failed:', response.data.message);
-              setLoginError(response.data.message);
-          }
-      } catch (err) {
-          handleAxiosError(err);
+  const onLoginPress = async () => {
+    try {
+      if (!uname) {
+        console.error('Username is null or undefined');
+        return;
       }
+
+      const loginErr = validateLogin(uname, password);
+      setLoginError(loginErr);
+
+      if (loginErr) {
+        return;
+      }
+
+      await AsyncStorage.setItem('username', uname);
+
+      // ✅ Ensure transferItems is updated before navigation
+      updateTransferItems(uname);
+      
+      console.log("Updated transferItems:", transferItems); // Debugging
+
+      // First login request
+      const response = await axios.get(
+        'https://express-production-ac91.up.railway.app/serviceprovider/getServiceProvider',
+        { params: { username: uname, password: password } }
+      );
+
+      if (response.data.success) {
+        console.log('Login successful');
+        const userId = response.data.userId;
+
+        if (userId) {
+          const servicetype = getFirstString(uname);
+          await AsyncStorage.setItem('service', servicetype);
+          await AsyncStorage.setItem('usernameSP', uname);
+          await AsyncStorage.setItem('userId', userId.toString());
+
+          await imageChanger();
+
+          // ✅ Ensure state is updated before navigating
+          setTimeout(() => {
+            navigation.navigate('SPMainPage' as never);
+          }, 200);
+        } else {
+          console.error('User ID not found in response');
+          setLoginError('User ID not found in response');
+        }
+      } else {
+        console.log('Login failed:', response.data.message);
+        setLoginError(response.data.message);
+      }
+    } catch (err) {
+      handleAxiosError(err);
+    }
   };
   
 
@@ -179,5 +221,8 @@ export default function useHandleLogin(){
         imageChanger,
         uname,
         onProviderLoginPress,
+        transferItems,
+        transferableItems,
+        updateTransferItems,
     }
 }

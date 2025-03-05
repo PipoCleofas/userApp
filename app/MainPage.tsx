@@ -5,8 +5,9 @@ import useLocation from '@/hooks/useLocation';
 import useHandleClicks from '@/hooks/useHandleClicks';
 import Notification from '@/components/notification-holder/Notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AntDesign,Feather } from '@expo/vector-icons';
+import { AntDesign,Feather, FontAwesome5 } from '@expo/vector-icons';
 import useChat from '@/hooks/useChat';
+import useEvidence from '@/hooks/useEvidence'
 
 const markerImages = { 
   'PNP Station': require('./pictures/police.webp'),
@@ -22,12 +23,12 @@ const markerImages = {
   'CENTRAL LUZON DOCTORS HOSPITAL': require('./pictures/medic.png'),
   'TARLAC PROVINCIAL HOSPITAL': require('./pictures/medic.png'),
   'TALON GENERAL HOSPITAL': require('./pictures/medic.png'),
-  'PNP RIDER': require('./pictures/copCar.jpg'),
-  'Rider': require('./pictures/rescueCar.jpg'),
-  'FIRE TRUCK': require('./pictures/fireTruck.jpg'),
-  'Ambulance': require('./pictures/ambulance.jpg'),
-  'Male': require('./pictures/person.jpg'),
-  'Female': require('./pictures/person.jpg'),
+  'PNP RIDER': require('./pictures/finalCop.png'),
+  'Rider': require('./pictures/finalRescue.png'),
+  'FIRE TRUCK': require('./pictures/finalFireTruck.png'),
+  'Ambulance': require('./pictures/finalMedic.png'),
+  'Male': require('./pictures/finalPerson.png'),
+  'Female': require('./pictures/finalPerson.png'),
 };
 
 export default function MainPage() {
@@ -36,7 +37,23 @@ export default function MainPage() {
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [uname,setUname] = useState<string | null>();
 
-  
+  const [isVisible, setIsVisible] = useState(false);
+
+  const {
+    pickImage,
+    captureImage,
+    pickVideo,
+    recordVideo,
+    startRecordingAudio,
+    stopRecordingAudio,
+    mediaUri,
+    mediaType,
+    isRecording,
+    handleSubmit
+  } = useEvidence();
+
+  const openEvidenceModal = () => setIsVisible(true);
+  const closeEvidenceModal = () => setIsVisible(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,8 +81,12 @@ export default function MainPage() {
   const [emergencyAssistanceModalVisible, setEmergencyAssistanceModalVisible] = useState(false);
 
   function serviceVisible() {
-    setEmergencyAssistanceModalVisible((prev) => !prev);
+    if (!mediaUri) {
+      setEmergencyAssistanceModalVisible((prev) => !prev);
+    }
   }
+  
+
 
   async function emerAssReq(service: string, markerEmoji: any, imageWidth: number = 65, imageHeight: number = 60) {
     await AsyncStorage.setItem('serviceChosen', service);
@@ -84,6 +105,14 @@ export default function MainPage() {
     longitudeDelta: 0.05,
   };
 
+  const handleNextPartEAR = () => {
+    handleSubmit()
+    console.log("Submit done")
+    setIsVisible(false)
+    setEmergencyAssistanceModalVisible(true)
+    console.log("Visible done")
+
+  }
 
   return (
     <View style={styles.container}>
@@ -92,6 +121,63 @@ export default function MainPage() {
           message={'Authorities are alerted'}
           trigger={triggerNotification}
         />
+
+      <Modal  style={styles.modal} visible={isVisible}>
+        <View style={styles.containerEvidence}>
+          {/* Header */}
+          <TouchableOpacity onPress={closeEvidenceModal} style={styles.header}>
+            <Text style={styles.headerText}>Upload Evidence</Text>
+            <FontAwesome5 name="chevron-down" size={16} color="white" />
+          </TouchableOpacity>
+
+          <Text style={styles.label}>Select your file type</Text>
+
+          {/* Upload Options */}
+          <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
+            <FontAwesome5 name="cloud-upload-alt" size={30} color="#999" />
+            <Text style={styles.uploadText}>Pick an Image</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.uploadBox} onPress={captureImage}>
+            <FontAwesome5 name="camera" size={30} color="#999" />
+            <Text style={styles.uploadText}>Capture an Image</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.uploadBox} onPress={pickVideo}>
+            <FontAwesome5 name="video" size={30} color="#999" />
+            <Text style={styles.uploadText}>Pick a Video</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.uploadBox} onPress={recordVideo}>
+            <FontAwesome5 name="video" size={30} color="#999" />
+            <Text style={styles.uploadText}>Record a Video</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.uploadBox} onPress={startRecordingAudio}>
+            <FontAwesome5 name="microphone" size={30} color={isRecording ? "red" : "#999"} />
+            <Text style={styles.uploadText}>Start Audio Recording</Text>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity style={styles.uploadBox} onPress={stopRecordingAudio}>
+            <FontAwesome5 name="stop-circle" size={30} color="#999" />
+            <Text style={styles.uploadText}>Stop Audio Recording</Text>
+          </TouchableOpacity>
+
+          {/* Display selected file */}
+          {mediaUri && (
+            <Text style={styles.uploadText}>
+              Selected {mediaType}: {mediaUri}
+            </Text>
+          )}
+
+          {/* Submit Button */}
+          <TouchableOpacity style={styles.submitButton} onPress={handleNextPartEAR}>
+            <Text style={styles.submitText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
 
         {/* Modal */}
         <Modal
@@ -212,7 +298,7 @@ export default function MainPage() {
         <View style={styles.tabBarContainer}>
           <View style={styles.iconContainer}>
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.button} onPress={serviceVisible}>
+              <TouchableOpacity style={styles.button} onPress={openEvidenceModal}>
                 <Text style={styles.buttonText}>Emergency Request</Text>
               </TouchableOpacity>
 
@@ -248,6 +334,68 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3, // Softer shadow
     shadowRadius: 6,
   },
+  modal: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dimmed background
+  },
+  containerEvidence: {
+    width: '75%', 
+    maxHeight: '100%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 15,
+    alignSelf: 'center',
+    elevation: 5, // Adds a subtle shadow
+  },
+  header: {
+    backgroundColor: '#870D26',
+    padding: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  label: {
+    marginTop: 10,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  uploadBox: {
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadText: {
+    textAlign: 'center',
+    fontSize: 11,
+    color: '#666',
+    marginTop: 4,
+  },
+  submitButton: {
+    marginTop: 8,
+    backgroundColor: '#870D26',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  
   messageIconPressed: {
     backgroundColor: '#3A70C2', // Slightly darker shade on press
   },
@@ -375,7 +523,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
+  
+  dropdown: {
+    marginTop: 8,
+    backgroundColor: '#F9F9F9',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
   
 });
 

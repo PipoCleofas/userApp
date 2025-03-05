@@ -41,6 +41,10 @@ export const validateName = (fname: string | null, mname: string | null, lname: 
       return "Birthday cannot be empty.";
     }
     
+    if(birthday.length != 10){
+      return "Invalid birthday";
+    }
+
     return null; // No error
   }
 

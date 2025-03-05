@@ -40,22 +40,7 @@ const useCheckPassword = () => {
     });
   };
  
-  const onPasswordChange = (password: string) => {
-    setPassword(password);
-    console.log(password)
 
-    const err = validatePassword(password);
-  
-  
-    if (err) {
-      setpassworderr(err)
-      console.log(`Error on password: ${err}`);
-      return false;
-    } else {
-      console.log("No errors on password");
-      return true;
-    }
-  };
   
 
    // barangay and sitio
@@ -86,7 +71,6 @@ const useCheckPassword = () => {
     try {
       // Validate the user inputs
       const nameError = validateName(state.firstname ?? '', state.middlename ?? '', state.lastname ?? '');
-      //const passwordError = validatePassword(state.password, state.repassword);
       const birthdayError = validateBirthday(state.birthdate ? state.birthdate.toString() : '');
       const barangaySitioError = validateBarangayAndSitio(barangay, sitio);
   
@@ -174,6 +158,7 @@ const useCheckPassword = () => {
   try {
       const validationError = validateLogin(state.username!, state.password!, state);
 
+      console.log(state.username, state.password)
       if (validationError) {
           dispatch({
               actionType: 'error',
@@ -304,7 +289,6 @@ const userSubmit = async (
     setProviderName,
     setProviderPassword,
     providerLoginError,
-    onPasswordChange,
     passworderr,
   };
 };
