@@ -21,6 +21,8 @@ const useChat = () => {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [spId, setSpId] = useState<string | null>(null);
+  const [hasFetchedOnce, setHasFetchedOnce] = useState(false);
+
 
   // Fetch AsyncStorage values on mount
   /*
@@ -37,8 +39,7 @@ const useChat = () => {
     fetchAsyncStorageValues();
   }, []);
   */
-
-  /*
+  
   // Initialize socket connection
   useEffect(() => {
     if (!conversationId) {
@@ -84,69 +85,59 @@ const useChat = () => {
       clearTimeout(timeoutId); 
     };
   }, [conversationId]);
-  */
+  
   
   // Send message from User
   const sendMessageUser = async () => {
     try {
-      setMessageInput('')
-
+      setMessageInput('');
+  
       if (!messageInput?.trim()) {
-        console.log("Message Input is null")
+        console.log("Message Input is null");
         return;
       }
-
+  
       const userID = await AsyncStorage.getItem('id');
       const serviceProviderID = await AsyncStorage.getItem('spID');
-
-      // Define the payload
+  
       const payload = {
         sender_id: userID,
         receiver_id: serviceProviderID,
         message: messageInput,
       };
+  
       const response = await axios.post(`${SOCKET_SERVER_URL}/submitConvo`, payload);
       
-
-
-
-
-      console.log("Now fetching the conversation")
-
-      const { conversation_id } = response.data;
-
-      const responseConvo = await fetch(`${SOCKET_SERVER_URL}/conversations/${conversation_id}`);
-      const text = await responseConvo.text(); 
-      console.log("Success fetching the conversation")
-      const data = JSON.parse(text); 
-      console.log("Data: " + data)
-      setMessages(data);
-
-
-      // Handle the response
-      console.log('Message sent successfully:', response.data);
+      console.log("Now fetching the conversation");
   
-      return {
-        success: true,
-        data: response.data,
-      };
+      const { conversation_id } = response.data;
+  
+      await AsyncStorage.setItem('conversation_id', conversation_id);
+  
+      const responseConvo = await fetch(`${SOCKET_SERVER_URL}/conversations/${conversation_id}`);
+      const text = await responseConvo.text();
+      console.log("Success fetching the conversation");
+      const data = JSON.parse(text);
+      console.log("Data:", data);
+      setMessages(data);
+  
+
+  
+      console.log('Message sent successfully:', response.data);
+    
+      return { success: true, data: response.data };
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         console.error('Error sending message:', err.message);
-        return {
-          success: false,
-          error: err.response?.data || 'An error occurred',
-        };
+        return { success: false, error: err.response?.data || 'An error occurred' };
       }
   
-      // Fallback for non-Axios errors
       console.error('Unexpected error:', err);
-      return {
-        success: false,
-        error: 'An unexpected error occurred',
-      };
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
+  
+  
 
   const sendMessageSP = async () => {
     const userID = AsyncStorage.getItem('userId')
@@ -198,7 +189,8 @@ const useChat = () => {
     setMessageInput,
     sendMessageUser,
     sendMessageSP,
-    setMessages
+    setMessages,
+    hasFetchedOnce
   };
 };
 

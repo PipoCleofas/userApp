@@ -187,6 +187,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: "center",
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adds a transparent background effect
+  },
+  modalView: {
+    width: '80%', // Adjust modal width
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalButtons: {
+    backgroundColor: '#944547',
+    width: 120,
+    height: 45,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    marginVertical: 7,
+  },
+  buttonClose: {
+    backgroundColor: '#944547', // Match the other buttons for consistency
+  },
+  textStyle: {
+    color: 'white', // Ensures text contrast
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   errorText: {
     color: 'red',
     fontSize: 14,
@@ -266,50 +309,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginHorizontal: 8,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-   modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-    
-    color: 'white',
-  },
-  modalButtons: {
-    backgroundColor: '#944547',
-    width: 100,
-    alignItems: 'center',
-    justifyContent: 'center', // Centers content vertically
-    borderRadius: 10,
-    marginVertical: 7,
-    height: 40, // You can adjust the height to fit your design
-  },
-  buttonClose: {
-    marginTop: 5,
-    backgroundColor: '#FFFDD0',
-  },
-  textStyle: {
-    color: 'black',
-    textAlign: 'center',
   },
 });
 

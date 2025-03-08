@@ -7,7 +7,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from '@/components/notification-holder/Notification';
 import useChat from '@/hooks/useChat';
-import { AntDesign, Feather } from '@expo/vector-icons';
+import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
+import { Linking } from "react-native";
 
 interface MarkerType {
   latitude: number;
@@ -48,6 +49,7 @@ export default function MainPage() {
   const [uname,setUname] = useState<string | null>();
 
   const [triggerNotification, setTriggerNotification] = useState(false);
+  const [checkEvidenceVisible,setCheckEvidenceVisible] = useState(false);
 
 
   const [serviceProvided, setServiceProvided] = useState<string | null>();
@@ -56,11 +58,12 @@ export default function MainPage() {
   const [messageError, setMessageError] = useState<string | null>();
  
   const [showTransferModal,setShowTransferModal] = useState<boolean>(false)
-
-  const transferTo = useRef<string>()
+  const [pendingRequests, setPendingRequests] = useState<any>()
 
   const { markerUnameEmoji, markerImageSize, imageChanger,transferItems, transferableItems, updateTransferItems } = useHandleLogin();
   const { sendMessageSP, messages, setMessageInput, setMessages, messageInput } = useChat();
+
+
 
 
   const defaultRegion = {
@@ -71,7 +74,31 @@ export default function MainPage() {
   };
 
   
-  
+  useEffect(() => {
+    let interval: NodeJS.Timeout; // Store interval ID
+
+    const fetchPendingRequests = async () => {
+      try {
+        const username = await AsyncStorage.getItem("username");
+        if (!username) return;
+
+        const response = await axios.get(`https://express-production-ac91.up.railway.app/marker/getPending`, {
+          params: { Station: username },
+        });
+        console.log(response.data)
+        setPendingRequests(response.data);
+      } catch (err) {
+        console.error("Error fetching pending requests:", err);
+      }
+    };
+
+    // Run immediately, then every 5 seconds
+    fetchPendingRequests();
+    interval = setInterval(fetchPendingRequests, 5000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
   async function handleSendMessage() {
     try {
       if (!serviceProvided || !nameInNeed || !message) {
@@ -101,9 +128,29 @@ export default function MainPage() {
     typeof obj.title === 'string';
   
     
-    useEffect(() => {
-      console.log('transferItems updated:', transferItems);
-    }, [transferItems]);
+    async function handleCheckEvidence(UserID: number) {
+      if (!UserID) {
+        console.error("❌ UserID is required.");
+        return;
+      }
+    
+      try {
+        const response = await axios.get(
+          `https://express-production-ac91.up.railway.app/photo/getMedia/${UserID}`
+        );
+    
+        if (response.data.success && response.data.media.length > 0) {
+          const mediaUrl = response.data.media[0].cloudinary_url; // Get the first media URL
+    
+          console.log("✅ Opening media:", mediaUrl);
+          Linking.openURL(mediaUrl); // Open in the default web browser
+        } else {
+          console.log("⚠️ No media found:", response.data.message);
+        }
+      } catch (error:any) {
+        console.error("❌ Error fetching media:", error.response?.data || error.message);
+      }
+    }
 
     const fetchAndUpdateMarker = async () => {
       try {
@@ -120,42 +167,34 @@ export default function MainPage() {
           throw new Error('Service type not found in AsyncStorage');
         }
     
-        // Determine which endpoint to call based on username
+        console.log('SERVICE TYPE: ', servicetype);
+    
         let markerResponseData = [];
-        const specialUsernames = [
-          'TALON GENERAL HOSPITAL',
-          'BFP BRGY. SAN ISIDRO',
-          'PNP BRGY. SAN ISIDRO',
-          'PDRRMO STATION',
-        ];
     
-        if (specialUsernames.includes(username || '')) {
-          // Fetch male and female requests concurrently
-          const [maleResponse, femaleResponse] = await Promise.all([
-            axios.get(
-              `https://express-production-ac91.up.railway.app/marker/stationRequestsMale/${servicetype}`
-            ),
-            axios.get(
-              `https://express-production-ac91.up.railway.app/marker/stationRequestsFemale/${servicetype}`
-            ),
-          ]);
+        // Fetch male and female requests concurrently
+        const [maleResponse, femaleResponse] = await Promise.all([
+          axios.get(
+            `https://express-production-ac91.up.railway.app/marker/stationRequestsMale/${servicetype}`
+          ),
+          axios.get(
+            `https://express-production-ac91.up.railway.app/marker/stationRequestsFemale/${servicetype}`
+          ),
+        ]);
     
-          // Combine the data from both responses
-          markerResponseData = [...maleResponse.data, ...femaleResponse.data];
-        } else {
-          // Call getMarker endpoint
-          const singleResponse = await axios.get(
-            `https://express-production-ac91.up.railway.app/marker/getMarker/${encodeURIComponent(servicetype)}`
-          );
+        // Combine the data from both responses
+        markerResponseData = [...maleResponse.data, ...femaleResponse.data];
     
-          markerResponseData = singleResponse.data;
-        }
+        // Call getMarker endpoint
+        const singleResponse = await axios.get(
+          `https://express-production-ac91.up.railway.app/marker/getMarker/${encodeURIComponent(servicetype)}`
+        );
+    
+        markerResponseData = [...markerResponseData, ...singleResponse.data];
     
         console.log('Got the markers from: ' + servicetype);
     
         if (Array.isArray(data)) {
           const updatedMarkers = [...data, ...markerResponseData];
-          console.log('Updated markers: ', updatedMarkers);
           setMarkers(updatedMarkers);
     
           // SP marker
@@ -182,6 +221,7 @@ export default function MainPage() {
         console.error('Unexpected error in fetchAndUpdateMarker:', error.message);
       }
     };
+    
     
     
   
@@ -211,7 +251,7 @@ export default function MainPage() {
   
   useEffect(() => {
     let interval: NodeJS.Timeout;
-
+  
     const fetchLatestMessages = async () => {
       try {
         const userID = await AsyncStorage.getItem('userId');
@@ -219,54 +259,89 @@ export default function MainPage() {
           console.error('User ID not found in AsyncStorage');
           return;
         }
-
+  
         const responseConvo = await axios.get('https://express-production-ac91.up.railway.app/messaging/getLatestConversation', {
           params: { receiver_id: userID },
         });
-
+  
         if (!responseConvo.data.success) {
           console.error('Failed to fetch latest conversation:', responseConvo.data.message);
           return;
         }
-
+  
         const { sender_id, conversation_id } = responseConvo.data;
-        await AsyncStorage.setItem('senderID', sender_id.toString());
-
+  
+        if (sender_id) {
+          await AsyncStorage.setItem('senderID', sender_id.toString());
+        } else {
+          console.log('sender_id is null or undefined');
+        }
+  
+        if (!conversation_id) {
+          console.log('conversation_id is null or undefined');
+          return;
+        }
+  
         const getConvo = await axios.get('https://express-production-ac91.up.railway.app/messaging/getLatestConvo', {
           params: { conversation_id },
         });
-
+  
         if (!getConvo.data.success) {
           console.error('Failed to fetch conversation details:', getConvo.data.message);
           return;
         }
-
-        const { message } = getConvo.data;
-
-        if (Array.isArray(message)) {
-          setMessages(message);
-          console.log('Messages updated:', message);
-        } else if (message) {
-          setMessages([message]); // Wrap a single message in an array
-          console.log('Single message received:', message);
+  
+        const { messages } = getConvo.data; // Ensure we use `messages`, not `message`
+  
+        if (Array.isArray(messages)) {
+          setMessages(messages);
         } else {
-          console.error('No valid message data received:', message);
+          console.error('No valid message data received:', messages);
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
       }
     };
-
+  
     const initializeFetching = async () => {
       await fetchLatestMessages(); // Initial fetch
       interval = setInterval(fetchLatestMessages, 3000); // Fetch every 3 seconds
     };
-
+  
     initializeFetching();
-
+  
     return () => clearInterval(interval);
   }, []);
+  
+  async function handleApprove(UserID: number) {
+    const Status = "Approved"; // Set the new status
+    
+    const Station = await AsyncStorage.getItem('station')
+    console.log("Station: sfaf ",Station)
+    axios
+      .put("https://express-production-ac91.up.railway.app/marker/updateStatusRequest", { Status, UserID, Station })
+      .then((response) => {
+        console.log("✅ Status updated:", response.data);
+      })
+      .catch((error) => {
+        console.error("❌ Error updating status:", error.response?.data || error.message);
+      });
+  }
 
+  async function handleReject(UserID: number) {
+    const Status = "Approved"; // Set the new status
+  
+    const Station = AsyncStorage.getItem('station')
+
+    axios
+      .put("http://express-production-ac91.up.railway.app/marker/updateStatusRequest", { Status, UserID, Station })
+      .then((response) => {
+        console.log("✅ Status updated:", response.data);
+      })
+      .catch((error) => {
+        console.error("❌ Error updating status:", error.response?.data || error.message);
+      });
+  }
 
   const handleTransferPress = async (transferTo: string) => {
     try {
@@ -277,7 +352,7 @@ export default function MainPage() {
       }
       
       try {
-        await axios.post(
+        await axios.put(
           "https://express-production-ac91.up.railway.app/messaging/uploadLog",
           {
             message: `${uname} transferred to ${transferTo}`,
@@ -339,14 +414,52 @@ export default function MainPage() {
         default: curTable = 'bfpsanisidromarker';
       }
   
-      console.log("Current table:", curTable);
-      console.log("Modified Transfer To:", modifiedTransferTo);
-  
       if (!modifiedTransferTo) {
         console.error("Transfer target table is missing");
         return;
       }
-  
+      
+      let providerID;
+
+      switch (transferTo) {
+        case 'PNP MABINI':
+          providerID = '10151';
+          break;
+        case 'PNP HILARIO':
+          providerID = '10153';
+          break;
+        case 'PNP SAN ISIDRO':
+          providerID = '10152';
+          break;
+        case 'CLDH':
+          providerID = '10198';
+          break;
+        case 'TPH':
+          providerID = '10187';
+          break;
+        case 'TALON':
+          providerID = '10199';
+          break;
+        case 'BFP SAN NICOLAS':
+          providerID = '10165';
+          break;
+        case 'BFP SAN SEBASTIAN':
+          providerID = '10176';
+          break;
+        case 'BFP SAN ISIDRO':
+          providerID = '10154';
+          break;
+      }
+
+      await axios.put(
+        `https://express-production-ac91.up.railway.app/messaging/updateReceiver/${providerID}`,
+        {}, // No body needed
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
       await axios.post(
         `https://express-production-ac91.up.railway.app/marker/transferMarker?table=${modifiedTransferTo}&currentTable=${curTable}`,
         {}, // No body needed
@@ -421,6 +534,60 @@ export default function MainPage() {
           </View>
     </Modal>
 
+    <Modal visible={checkEvidenceVisible} transparent animationType="fade">
+  <View style={styles.modalWrapper}>
+    <View style={styles.modalBox}>
+      {/* Header */}
+      <View style={styles.modalHeader}>
+        <Text style={styles.modalTitle}>View Request</Text>
+        <TouchableOpacity onPress={() => setCheckEvidenceVisible(false)}>
+          <Text style={styles.dropdownArrow}>▼</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        {/* Loop through pendingRequests */}
+        {pendingRequests?.length > 0 ? (
+          pendingRequests.map((request: any, index: any) => (
+            <View key={index} style={styles.userRow}>
+              {/* Name */}
+              <Text style={styles.nameText}>
+                {request.Firstname} {request.Lastname}
+              </Text>
+
+              {/* Icons */}
+              <View style={styles.actionIconsContainer}>
+              <TouchableOpacity onPress={() => handleApprove(request.UserID)}>
+                <Text style={styles.modalIcon}>✅</Text>
+              </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => handleReject(request.UserID)}>
+                  <Text style={styles.modalIcon}>❌</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => handleCheckEvidence(request.UserID)}>
+                  <Text style={styles.modalIcon}>🖼️</Text>
+                </TouchableOpacity>
+
+    
+
+              </View>
+            </View>
+          ))
+        ) : (
+          <Text>No pending requests</Text>
+        )}
+      </View>
+    </View>
+  </View>
+</Modal>
+
+
+
+
+
+
         <Modal
           animationType="fade"
           transparent={true}
@@ -466,26 +633,38 @@ export default function MainPage() {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={modalStyles.modalBackground}>
+        <View style={modalStyles.modalOverlay}>
           <View style={modalStyles.modalView}>
+            <Text style={modalStyles.header}>Enter Details</Text>
+
             <Text style={modalStyles.label}>Name of the person in need</Text>
             <TextInput style={modalStyles.input} onChangeText={setNameInNeed} maxLength={30} />
+
             <Text style={modalStyles.label}>Service Provided</Text>
             <TextInput style={modalStyles.input} onChangeText={setServiceProvided} maxLength={10} />
+
             <Text style={modalStyles.label}>Message</Text>
-            <TextInput style={[modalStyles.input, modalStyles.textArea]} onChangeText={setMessage} multiline={true} maxLength={100} />
+            <TextInput 
+              style={[modalStyles.input, modalStyles.textArea]} 
+              onChangeText={setMessage} 
+              multiline={true} 
+              maxLength={100} 
+            />
+
             {messageError && <Text style={modalStyles.errorText}>{messageError}</Text>}
+
             <View style={modalStyles.buttonContainer}>
-              <Pressable style={modalStyles.button} onPress={handleSendMessage}>
+              <Pressable style={[modalStyles.button, modalStyles.sendButton]} onPress={handleSendMessage}>
                 <Text style={modalStyles.buttonText}>Send</Text>
               </Pressable>
-              <Pressable style={modalStyles.button} onPress={() => setModalVisible(false)}>
+              <Pressable style={[modalStyles.button, modalStyles.closeButton]} onPress={() => setModalVisible(false)}>
                 <Text style={modalStyles.buttonText}>Close</Text>
               </Pressable>
             </View>
           </View>
         </View>
       </Modal>
+
 
       
         <MapView
@@ -509,29 +688,37 @@ export default function MainPage() {
           ))}
         </MapView>
 
-      <View style={styles.tabBarContainer}>
-        <View style={styles.iconContainer}>
-        <View style={styles.buttonsContainer}>
-          {/* Message Icon on the Left */}
-          <TouchableOpacity onPress={() => setChatModalVisible(true)} style={styles.iconButton}>
-            <AntDesign name="message1" size={30} color="black" />
-          </TouchableOpacity>
+        <View style={styles.tabBarContainer}>
+    <View style={styles.iconContainer}>
+      <View style={styles.buttonsContainer}>
+        {/* Message Icon on the Left */}
+        <TouchableOpacity onPress={() => setChatModalVisible(true)} style={styles.iconButton}>
+          <AntDesign name="message1" size={30} color="black" />
+        </TouchableOpacity>
 
-          {/* Send Updates in the Center */}
-          <TouchableOpacity
-            style={[styles.button, isPressed ? styles.buttonPressed : null]}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.buttonText}>Send Updates</Text>
-          </TouchableOpacity>
-
-          {/* Transfer Button on the Right */}
-          <TouchableOpacity onPress={() => handleShowTransferModalPress()} style={styles.iconButton}>
-            <Image source={require('./pictures/transferButton.png')} style={styles.transferImage} />
+        {/* Notification Icon Above Send Updates */}
+        <View style={styles.notificationContainer}>
+          <TouchableOpacity onPress={() => setCheckEvidenceVisible(true)}>
+            <Ionicons name="notifications" size={24} color="red" />
           </TouchableOpacity>
         </View>
-        </View>
+
+        {/* Send Updates in the Center */}
+        <TouchableOpacity
+          style={[styles.button, isPressed ? styles.buttonPressed : null]}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.buttonText}>Send Updates</Text>
+        </TouchableOpacity>
+
+        {/* Transfer Button on the Right */}
+        <TouchableOpacity onPress={() => handleShowTransferModalPress()} style={styles.iconButton}>
+          <Image source={require('./pictures/transferButton.png')} style={styles.transferImage} />
+        </TouchableOpacity>
       </View>
+    </View>
+</View>
+
     </View>
   );
 }
@@ -544,6 +731,62 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
+  },
+  modalWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalBox: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+  notificationContainer: {
+    position: 'absolute',
+    top: -30, // Moves the notification icon above the Send Updates button
+    alignSelf: 'center', // Centers it above the button
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+    backgroundColor: "red", // Red background for the header
+    padding: 10,
+    borderRadius: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white", // White text for contrast
+  },
+  dropdownArrow: {
+    fontSize: 20,
+    color: "white", // White dropdown arrow for contrast
+  },
+  content: {
+    width: "100%",
+  },
+  userRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  nameText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  actionIconsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  modalIcon: {
+    fontSize: 20,
   },
   
   header: {
@@ -562,6 +805,7 @@ const styles = StyleSheet.create({
 
   },
   
+
   closeButtonText: {
     color: "white",
     fontSize: 18,
@@ -763,6 +1007,78 @@ const modalStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
+  },
+  modalView: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  header: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#333',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#444',
+  },
+  input: {
+    width: '100%',
+    padding: 12,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top', // Ensures text starts at the top for multiline input
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    marginHorizontal: 5,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  sendButton: {
+    backgroundColor: '#007AFF', // iOS-style blue send button
+  },
+  closeButton: {
+    backgroundColor: '#FF3B30', // iOS-style red close button
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -772,22 +1088,7 @@ const modalStyles = StyleSheet.create({
     marginTop: 10,
   },
   
-  input: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: "white",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginRight: 10,
-  },
   
-  sendButton: {
-    backgroundColor: "#007AFF", // iOS blue send button style
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
   
   sendButtonText: {
     color: "white",
@@ -795,56 +1096,7 @@ const modalStyles = StyleSheet.create({
     textAlign: "center",
   },
   
-  modalView: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
-  },
   
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top', // For multiline input
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  button: {
-    flex: 1,
-    backgroundColor: '#2196F3',
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
-  },
   messageContainer: {
     marginBottom: 20,
     width: '100%',
@@ -873,13 +1125,7 @@ const modalStyles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
-  header: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-    color: 'black',
-  },
+  
   headerStyle: {
     color: 'red',
   },

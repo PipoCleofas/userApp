@@ -9,6 +9,7 @@ export default function useHandleLogin(){
     let [password,setPassword] = useState<null | string>(null);
     const [markerEmoji, setMarkerEmoji] = useState<any>();
     const [markerUnameEmoji, setMarkerUnameEmoji] = useState<any>();
+    const [serviceRequests, setServiceRequests] = useState<any>();
 
     const [markerImageSize, setMarkerImageSize] =useState<{width: any, height: any}> ({ width: 60, height: 60 });
     const [transferItems, setTransferItems] = useState<{ id: number; label: string }[]>([]);
@@ -95,6 +96,8 @@ export default function useHandleLogin(){
       }
 
       await AsyncStorage.setItem('username', uname);
+      await AsyncStorage.setItem('station', uname);
+
 
       // ✅ Ensure transferItems is updated before navigation
       updateTransferItems(uname);
@@ -112,8 +115,7 @@ export default function useHandleLogin(){
         const userId = response.data.userId;
 
         if (userId) {
-          const servicetype = getFirstString(uname);
-          await AsyncStorage.setItem('service', servicetype);
+          await AsyncStorage.setItem('service', uname);
           await AsyncStorage.setItem('usernameSP', uname);
           await AsyncStorage.setItem('userId', userId.toString());
 
@@ -224,5 +226,6 @@ export default function useHandleLogin(){
         transferItems,
         transferableItems,
         updateTransferItems,
+        serviceRequests
     }
 }

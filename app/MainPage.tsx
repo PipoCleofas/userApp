@@ -72,7 +72,7 @@ export default function MainPage() {
   }, []);
   
 
-  const { sendMessageUser, messages, setMessageInput, messageInput } = useChat();
+  const { sendMessageUser, messages, setMessageInput, messageInput, setMessages } = useChat();
   const { location, errorMsg, isFetching } = useLocation();
   const { EmergencyAssistanceRequest, markerEmoji, markerImageSize, markers } = useHandleClicks();
 
@@ -87,6 +87,8 @@ export default function MainPage() {
   }
   
 
+
+  
 
   async function emerAssReq(service: string, markerEmoji: any, imageWidth: number = 65, imageHeight: number = 60) {
     await AsyncStorage.setItem('serviceChosen', service);
