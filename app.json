@@ -31,10 +31,14 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
+        "RECORD_AUDIO",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_AUDIO"
       ],
       "config": {
         "googleMaps": {
@@ -61,7 +65,8 @@
           "microphonePermission": "Allow RescueLink to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
@@ -71,7 +76,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "b21fe9d8-4e53-4dd0-be03-9810acdc9dae"
+        "projectId": "5fdf013b-d70b-426f-912d-7dc108f160d2"
       }
     }
   }

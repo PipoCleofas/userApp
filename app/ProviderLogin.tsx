@@ -33,10 +33,12 @@ export default function CitizenLogin() {
                     <TextInput
                         style={styles.textInput}
                         maxLength={20}
-                        secureTextEntry={!showPassword}  // Toggle visibility based on state
-                        onChangeText={(text) => onPasswordChange(text)}
+                        secureTextEntry={!showPassword}
+                        onChangeText={onPasswordChange}
                     />
-                   
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                        <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="black" style={{marginLeft: 10}}/>
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -103,7 +105,7 @@ const styles = StyleSheet.create({
       priorityText: {
         marginBottom: 70
       },
-    textInput: {
+      textInput: {
         color: 'white', // Maroon color
         flex: 1, // Flex to fill the remaining space
         backgroundColor: '#944547',

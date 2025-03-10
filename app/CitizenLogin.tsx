@@ -34,9 +34,12 @@ export default function CitizenLogin() {
                         secureTextEntry={!showPassword}  // Toggle visibility based on state
                         onChangeText={(text) => handleChangeState('password', text)}
                     />
-                   
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.iconWrapper}>
+                        <Feather name={showPassword ? "eye" : "eye-off"} size={20} color="black" />
+                    </TouchableOpacity>
                 </View>
             </View>
+
 
             {state.error && <Text style={styles.errorText}>{state.error}</Text>}
 
@@ -62,6 +65,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         textAlign: 'center',
     },
+    
     container: {
         justifyContent: 'center',
         alignItems: 'center',

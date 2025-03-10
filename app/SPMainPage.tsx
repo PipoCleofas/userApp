@@ -51,7 +51,6 @@ export default function MainPage() {
   const [triggerNotification, setTriggerNotification] = useState(false);
   const [checkEvidenceVisible,setCheckEvidenceVisible] = useState(false);
 
-
   const [serviceProvided, setServiceProvided] = useState<string | null>();
   const [nameInNeed, setNameInNeed] = useState<string | null>();
   const [message, setMessage] = useState<string | null>('');
@@ -570,7 +569,9 @@ export default function MainPage() {
                   <Text style={styles.modalIcon}>🖼️</Text>
                 </TouchableOpacity>
 
-    
+                <TouchableOpacity onPress={() => handleShowTransferModalPress()}>
+                  <Ionicons name="share-social-outline" size={24} color="black" />
+                </TouchableOpacity>
 
               </View>
             </View>
@@ -689,35 +690,29 @@ export default function MainPage() {
         </MapView>
 
         <View style={styles.tabBarContainer}>
-    <View style={styles.iconContainer}>
-      <View style={styles.buttonsContainer}>
-        {/* Message Icon on the Left */}
-        <TouchableOpacity onPress={() => setChatModalVisible(true)} style={styles.iconButton}>
-          <AntDesign name="message1" size={30} color="black" />
-        </TouchableOpacity>
+  <View style={styles.iconContainer}>
+    <View style={styles.buttonsContainer}>
+      {/* Message Icon on the Left */}
+      <TouchableOpacity onPress={() => setChatModalVisible(true)} style={styles.iconButton}>
+        <AntDesign name="message1" size={30} color="black" />
+      </TouchableOpacity>
 
-        {/* Notification Icon Above Send Updates */}
-        <View style={styles.notificationContainer}>
-          <TouchableOpacity onPress={() => setCheckEvidenceVisible(true)}>
-            <Ionicons name="notifications" size={24} color="red" />
-          </TouchableOpacity>
-        </View>
+      {/* Send Updates in the Center */}
+      <TouchableOpacity
+        style={[styles.button, isPressed ? styles.buttonPressed : null]}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.buttonText}>Send Updates</Text>
+      </TouchableOpacity>
 
-        {/* Send Updates in the Center */}
-        <TouchableOpacity
-          style={[styles.button, isPressed ? styles.buttonPressed : null]}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.buttonText}>Send Updates</Text>
-        </TouchableOpacity>
-
-        {/* Transfer Button on the Right */}
-        <TouchableOpacity onPress={() => handleShowTransferModalPress()} style={styles.iconButton}>
-          <Image source={require('./pictures/transferButton.png')} style={styles.transferImage} />
-        </TouchableOpacity>
-      </View>
+      {/* Notification Icon on the Right */}
+      <TouchableOpacity onPress={() => setCheckEvidenceVisible(true)} style={styles.notificationButton}>
+        <Ionicons name="notifications" size={24} color="red" />
+      </TouchableOpacity>
     </View>
+  </View>
 </View>
+
 
     </View>
   );
@@ -732,6 +727,20 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20, // Ensures even spacing
+    marginTop: 8,
+    width: '100%', // Takes full width to distribute items
+  },
+  
+  notificationButton: {
+    marginLeft: 10, // Creates spacing from "Send Updates"
+    padding: 10, // Ensures tapability
+  },
+  
   modalWrapper: {
     flex: 1,
     justifyContent: "center",
@@ -816,13 +825,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '80%', 
   },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20, // Ensures even spacing
-    marginTop: 8,
-  },
+ 
   
   iconButton: {
     padding: 10, // Adds spacing for touch area
