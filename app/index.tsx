@@ -4,13 +4,22 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import useHandleClicks from '@/hooks/useHandleClicks';
 import handleSPLogin from '@/hooks/handleSPLogin'
+import { useFonts, ReadexPro_400Regular } from "@expo-google-fonts/readex-pro";
+import { Montserrat_700Bold } from "@expo-google-fonts/montserrat";
 
 export default function Welcome() {
   const navigation = useNavigation();
-
+  const [fontsLoaded] = useFonts({
+    ReadexPro: ReadexPro_400Regular,
+    MontserratBold: Montserrat_700Bold,
+  });
   const {handleCitizenLoginPress,handleCitizenSignUpPress} = useHandleClicks();
   const {onProviderLoginPress} = handleSPLogin();
 
+  if (!fontsLoaded) {
+    return null; // or return a loading indicator
+  }
+  
   return (
       <View style={styles.container}>
         {/* Logo */}
@@ -57,6 +66,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#000', // Black text
     marginBottom: 0,
+    fontFamily: "MontserratBold"
   },
   priorityText: {
     marginBottom: 140
@@ -81,15 +91,20 @@ const styles = StyleSheet.create({
     color: '#FFF', // White text
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: "ReadexPro",
   },
   signInText: {
     color: '#000', // Black text
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: "MontserratBold"
+
   },
   signInLink: {
     color: '#8C1F31', // Maroon text for the link
     fontWeight: 'bold',
-    alignSelf: 'center'
+    alignSelf: 'center',
+    fontFamily: "ReadexPro",
+
   },
 });

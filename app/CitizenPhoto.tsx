@@ -11,9 +11,9 @@ const ImageUploadScreen = () => {
   const [modal1Visible, setModal1Visible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
   const [modal3Visible, setModal3Visible] = useState(false);
-
+  
   const { handleBackButtonInCitizenPhotoPress } = useHandleClicks();
-
+  
   const {
     imageUri1,
     imageUri2,
@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: "ReadexPro",
   },
   modalButtons: {
     backgroundColor: '#944547',
@@ -229,12 +230,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: "ReadexPro",
   },
   errorText: {
     color: 'red',
     fontSize: 14,
     marginBottom: 4,
     textAlign: 'center',
+    fontFamily: "ReadexPro",
   },
   headerText: {
     fontSize: 24,
@@ -242,6 +245,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 0, // Add spacing above and below
     color: "#944547",
+    fontFamily: "ReadexPro",
   },
   photoContainer: {
     flexDirection: "row",
@@ -275,6 +279,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginBottom: 5,
+    fontFamily: "ReadexPro",
   },
   uploadButton: {
     fontSize: 10,
@@ -282,6 +287,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#944547",
     paddingVertical: 5,
     paddingHorizontal: 10,
+    fontFamily: "ReadexPro",
     borderRadius: 10,
   },
   buttonContainer: {

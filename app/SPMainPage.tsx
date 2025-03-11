@@ -41,6 +41,7 @@ const getMarkerImage = (title: string) => {
 };
 
 export default function MainPage() {
+  
   const [markers, setMarkers] = useState<MarkerType[]>([]);
   const [isPressed, setIsPressed] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -342,6 +343,8 @@ export default function MainPage() {
       });
   }
 
+
+  
   const handleTransferPress = async (transferTo: string) => {
     try {
       const uname = await AsyncStorage.getItem('username');
@@ -364,7 +367,7 @@ export default function MainPage() {
         );
         console.log("Message uploaded successfully.");
       } catch (messageError) {
-        console.error("Message upload failed:", messageError);
+        console.log("Message upload failed:", messageError);
       }
       // Modify transferTo before proceeding
       let modifiedTransferTo = transferTo;
@@ -511,7 +514,7 @@ export default function MainPage() {
               {/* List of transfer requests */}
               <View style={styles.listContainer}>
                 {transferItems.length === 0 ? (
-                  <Text>No transfer items available</Text>
+                  <Text style={{    fontFamily: "ReadexPro"}}>No transfer items available</Text>
                 ) : (
                   transferItems.map((item, index) => (
                     <View key={item.id} style={styles.requestRow}>
@@ -577,7 +580,7 @@ export default function MainPage() {
             </View>
           ))
         ) : (
-          <Text>No pending requests</Text>
+          <Text style={{fontFamily: "ReadexPro"}}>No pending requests</Text>
         )}
       </View>
     </View>
@@ -766,11 +769,15 @@ const styles = StyleSheet.create({
     backgroundColor: "red", // Red background for the header
     padding: 10,
     borderRadius: 5,
+    fontFamily: "ReadexPro",
+
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "white", // White text for contrast
+    fontFamily: "ReadexPro",
+
   },
   dropdownArrow: {
     fontSize: 20,
@@ -788,6 +795,8 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: 18,
     fontWeight: "bold",
+    fontFamily: "ReadexPro",
+
   },
   actionIconsContainer: {
     flexDirection: "row",
@@ -804,6 +813,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",  // Align items in a row
     alignItems: "center",
     justifyContent: "space-between", // Push X to the right
+    fontFamily: "ReadexPro",
+
   },
   
   closeButton: {
@@ -819,6 +830,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+    fontFamily: "ReadexPro",
+
   },
   
   map: {
@@ -895,6 +908,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: "ReadexPro",
+
   },
   centeredView: {
     flex: 1,
@@ -970,6 +985,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: "ReadexPro",
+
   },
   listContainer: {
     padding: 10,
@@ -987,6 +1004,8 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontWeight: "bold",
+    fontFamily: "ReadexPro",
+
   },
   selectButton: {
     backgroundColor: "green",
@@ -1033,6 +1052,8 @@ const modalStyles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
     color: '#333',
+    fontFamily: "ReadexPro",
+
   },
   label: {
     fontSize: 16,
@@ -1081,6 +1102,7 @@ const modalStyles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: "ReadexPro",
   },
   inputContainer: {
     flexDirection: "row",
@@ -1097,6 +1119,7 @@ const modalStyles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+    fontFamily: "ReadexPro",
   },
   
   
@@ -1114,7 +1137,9 @@ const modalStyles = StyleSheet.create({
   sender: {
     fontWeight: 'bold',
     marginBottom: 25,
-    marginLeft: 5
+    marginLeft: 5,
+    fontFamily: "ReadexPro",
+
   },
   modalContent: {
     width: '80%',

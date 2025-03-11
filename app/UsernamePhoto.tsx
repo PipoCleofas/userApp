@@ -11,10 +11,18 @@ import { FontAwesome, SimpleLineIcons, AntDesign } from '@expo/vector-icons';
 import usePhoto from '@/hooks/usePhoto'
 import useDataInput from '@/hooks/useDataInput'
 import useHandleClicks from '@/hooks/useHandleClicks';
+import { useFonts, ReadexPro_400Regular } from "@expo-google-fonts/readex-pro";
 
 const UsernamePhoto = () => {
   const {imageUri4,setImageUri4,pickImage,uploadProfile,imageError,setUsername,setPassword,setrepassword,password,passworderr,onPasswordChange} = usePhoto();
   const { handleBackButtonOnUsernamePhotoPress } = useHandleClicks();
+  const [fontsLoaded] = useFonts({
+    ReadexPro: ReadexPro_400Regular,
+  });
+  
+  if (!fontsLoaded) {
+    return null; // or return a loading indicator
+  }
 
   return (
     <View style={styles.container}>
@@ -58,7 +66,7 @@ const UsernamePhoto = () => {
        <FontAwesome name='file-image-o'/>
 
        {imageUri4 ? (
-          <Text>Select Another Photo</Text>
+          <Text style={{fontFamily: "ReadexPro"}}>Select Another Photo</Text>
 
        ) : (
          <Text style={styles.photoText}>SELECT PHOTO</Text>   
@@ -105,6 +113,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
     color: '#800020',
+    fontFamily: "ReadexPro",
+
   },
   inputContainer: {
     width: '80%',
@@ -139,6 +149,7 @@ const styles = StyleSheet.create({
   photoText: {
     fontSize: 14,
     color: '#800020',
+    fontFamily: "ReadexPro",
   },
   navButtons: {
     flexDirection: 'row',
@@ -176,11 +187,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginHorizontal: 8, // Spacing between the icon and text
+    fontFamily: "ReadexPro",
   },
   errorText: {
     color: 'red',
     fontSize: 14,
     marginBottom: 4,
+    fontFamily: "ReadexPro",
     textAlign: 'center',
   },
 });

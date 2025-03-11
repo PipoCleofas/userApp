@@ -5,15 +5,22 @@ import { Feather } from '@expo/vector-icons'; // Import Feather icons
 import useHandleClicks from "@/hooks/useHandleClicks";
 import useDataInput from "@/hooks/useDataInput";
 import handleSPLogin from '@/hooks/handleSPLogin'
+import { useFonts, ReadexPro_400Regular } from "@expo-google-fonts/readex-pro";
 
 export default function CitizenLogin() {
-
+const [fontsLoaded] = useFonts({
+    ReadexPro: ReadexPro_400Regular,
+  });
     const { handleChangeState, handleCitizenLogin, state } = useDataInput();
     const { handleBackButtonOnSignupPress } = useHandleClicks();
 
     const [showPassword, setShowPassword] = useState(false);  // State for password visibility
     const { onPasswordChange, onLoginPress, onUnameChange, loginError } = handleSPLogin();
 
+    if (!fontsLoaded) {
+        return null; // or return a loading indicator
+      }
+      
     return (
         <View style={styles.container}>
             <Image style={styles.logo} source={require('../app/pictures/unscreen.gif')} />
@@ -82,6 +89,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         textAlign: 'right',
         marginRight: 10,
+        fontFamily: "ReadexPro",
     },
     inputContainer: {
         flexDirection: 'row',
@@ -101,6 +109,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#000', // Black text
         marginBottom: 0,
+        fontFamily: "ReadexPro",
       },
       priorityText: {
         marginBottom: 70
@@ -170,5 +179,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         marginHorizontal: 5, // Add some space between icon and text
+        fontFamily: "ReadexPro",
     },
 });

@@ -32,7 +32,7 @@ const markerImages = {
 };
 
 export default function MainPage() {
-
+ 
   const [gender, setGender] = useState<string | null>(null);
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [uname,setUname] = useState<string | null>();
@@ -51,6 +51,8 @@ export default function MainPage() {
     isRecording,
     handleSubmit
   } = useEvidence();
+
+  
 
   const openEvidenceModal = () => setIsVisible(true);
   const closeEvidenceModal = () => setIsVisible(false);
@@ -71,8 +73,9 @@ export default function MainPage() {
     fetchData();
   }, []);
   
+  
 
-  const { sendMessageUser, messages, setMessageInput, messageInput, setMessages } = useChat();
+  const { sendMessageUser, messages, setMessageInput, messageInput } = useChat();
   const { location, errorMsg, isFetching } = useLocation();
   const { EmergencyAssistanceRequest, markerEmoji, markerImageSize, markers } = useHandleClicks();
 
@@ -90,10 +93,9 @@ export default function MainPage() {
 
   
 
-  async function emerAssReq(service: string, markerEmoji: any, imageWidth: number = 65, imageHeight: number = 60) {
+  async function emerAssReq(service: string, markerEmoji: any, item: string, imageWidth: number = 65, imageHeight: number = 60) {
     await AsyncStorage.setItem('serviceChosen', service);
     EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'approved');
-
     setEmergencyAssistanceModalVisible(false);
     setTriggerNotification(true);
     setTimeout(() => setTriggerNotification(false), 2000);
@@ -124,61 +126,42 @@ export default function MainPage() {
           trigger={triggerNotification}
         />
 
-      <Modal  style={styles.modal} visible={isVisible}>
-        <View style={styles.containerEvidence}>
-          {/* Header */}
-          <TouchableOpacity onPress={closeEvidenceModal} style={styles.header}>
-            <Text style={styles.headerText}>Upload Evidence</Text>
-            <FontAwesome5 name="chevron-down" size={16} color="white" />
-          </TouchableOpacity>
+<Modal style={styles.modal} visible={isVisible}>
+  <View style={styles.containerEvidence}>
+    {/* Header */}
+    <TouchableOpacity onPress={closeEvidenceModal} style={styles.header}>
+      <Text style={styles.headerText}>Upload Evidence</Text>
+      <FontAwesome5 name="chevron-down" size={16} color="white" />
+    </TouchableOpacity>
 
-          <Text style={styles.label}>Select your file type</Text>
+    {/* Upload Options */}
+    <View>
+      {[
+        { icon: "cloud-upload-alt", text: "Image", action: pickImage },
+        { icon: "camera", text: "Capture", action: captureImage },
+        { icon: "video", text: "Pick Video", action: pickVideo },
+        { icon: "video", text: "Record", action: recordVideo },
+        { icon: "microphone", text: "Audio", action: startRecordingAudio, color: isRecording ? "red" : "#999" },
+        { icon: "stop-circle", text: "Stop", action: stopRecordingAudio }
+      ].map(({ icon, text, action, color = "#999" }, index) => (
+        <TouchableOpacity key={index} style={styles.uploadBox} onPress={action}>
+          <FontAwesome5 name={icon} size={24} color={color} />
+          <Text style={styles.uploadText}>{text}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
 
-          {/* Upload Options */}
-          <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
-            <FontAwesome5 name="cloud-upload-alt" size={30} color="#999" />
-            <Text style={styles.uploadText}>Pick an Image</Text>
-          </TouchableOpacity>
+    {/* Display selected file */}
+    {mediaUri && <Text style={styles.uploadText}>Selected: {mediaType}</Text>}
 
-          <TouchableOpacity style={styles.uploadBox} onPress={captureImage}>
-            <FontAwesome5 name="camera" size={30} color="#999" />
-            <Text style={styles.uploadText}>Capture an Image</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.uploadBox} onPress={pickVideo}>
-            <FontAwesome5 name="video" size={30} color="#999" />
-            <Text style={styles.uploadText}>Pick a Video</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.uploadBox} onPress={recordVideo}>
-            <FontAwesome5 name="video" size={30} color="#999" />
-            <Text style={styles.uploadText}>Record a Video</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.uploadBox} onPress={startRecordingAudio}>
-            <FontAwesome5 name="microphone" size={30} color={isRecording ? "red" : "#999"} />
-            <Text style={styles.uploadText}>Start Audio Recording</Text>
-          </TouchableOpacity>
+    {/* Submit Button */}
+    <TouchableOpacity style={styles.submitButton} onPress={handleNextPartEAR}>
+      <Text style={styles.submitText}>Submit</Text>
+    </TouchableOpacity>
+  </View>
+</Modal>
 
 
-          <TouchableOpacity style={styles.uploadBox} onPress={stopRecordingAudio}>
-            <FontAwesome5 name="stop-circle" size={30} color="#999" />
-            <Text style={styles.uploadText}>Stop Audio Recording</Text>
-          </TouchableOpacity>
-
-          {/* Display selected file */}
-          {mediaUri && (
-            <Text style={styles.uploadText}>
-              Selected {mediaType}: {mediaUri}
-            </Text>
-          )}
-
-          {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton} onPress={handleNextPartEAR}>
-            <Text style={styles.submitText}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
 
 
         {/* Modal */}
@@ -224,21 +207,21 @@ export default function MainPage() {
           onRequestClose={() => setEmergencyAssistanceModalVisible(!emergencyAssistanceModalVisible)}>
           <View style={modalStyles.centeredView}>
             <View style={modalStyles.modalView}>
-              <Text style={{ marginBottom: 10 }}>Choose Service</Text>
+              <Text style={{ marginBottom: 10,     fontFamily: "ReadexPro" }}>Choose Service</Text>
               <View style={modalStyles.buttonModal}>
                 <View style={modalStyles.servicesContainerStyle}>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('BFP', markerImages['Male'])}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('BFP', markerImages['Male'], 'BFP')}>
                     <Text style={modalStyles.textStyle}>BFP</Text>
                   </Pressable>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PNP', markerImages['Male'])}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PNP', markerImages['Male'], 'PNP')}>
                     <Text style={modalStyles.textStyle}>PNP</Text>
                   </Pressable>
                 </View>
                 <View style={modalStyles.servicesContainerStyle}>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('Medical', markerImages['Male'])}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('Medical', markerImages['Male'], 'Medical')}>
                     <Text style={modalStyles.textStyle}>Medical</Text>
                   </Pressable>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PDRRMO', markerImages['Male'])}>
+                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PDRRMO', markerImages['Male'], 'PDRRMO')}>
                     <Text style={modalStyles.textStyle}>PDRRMO</Text>
                   </Pressable>
                 </View>
@@ -320,6 +303,7 @@ export default function MainPage() {
 
 
 const styles = StyleSheet.create({
+  
   messageIcon: {
     position: 'absolute',
     bottom: 70, // Distance from the bottom
@@ -364,11 +348,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     fontWeight: 'bold',
+    fontFamily: "ReadexPro",
   },
   label: {
     marginTop: 10,
     fontSize: 12,
     fontWeight: 'bold',
+    fontFamily: "ReadexPro",
   },
   uploadBox: {
     marginTop: 10,
@@ -384,6 +370,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#666',
     marginTop: 4,
+    fontFamily: "ReadexPro",
   },
   submitButton: {
     marginTop: 8,
@@ -396,6 +383,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 14,
+    fontFamily: "ReadexPro",
+
   },
   
   messageIconPressed: {
@@ -475,6 +464,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: "ReadexPro",
+
   },
   centeredView: {
     flex: 1,
@@ -589,6 +580,7 @@ const modalStyles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: "ReadexPro",
   },
   iconButton: {
     backgroundColor: '#FFF',
@@ -625,6 +617,8 @@ const modalStyles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
     color: 'black',
+    fontFamily: "ReadexPro",
+
   },
   headerStyle: {
     color: 'red',

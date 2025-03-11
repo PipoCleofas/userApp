@@ -11,7 +11,9 @@ export default function CitizenSignup() {
 
   const { handleBackButtonOnSignupPress} = useHandleClicks();
   
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
+ 
 
   const { onBirthdayChange, 
           handleChangeState,
@@ -113,6 +115,8 @@ export default function CitizenSignup() {
             color: '#333',
             marginBottom: 2,
             marginLeft: 10, // Add this line to move the label slightly to the right
+            fontFamily: "ReadexPro",
+
           },
           
           container: {
@@ -133,6 +137,7 @@ export default function CitizenSignup() {
             color: '#000',
             marginBottom: 20,
             textAlign: 'center',
+            fontFamily: "ReadexPro",
           },
           input: {
             width: '85%',
@@ -165,6 +170,8 @@ export default function CitizenSignup() {
             fontSize: 16,
             fontWeight: 'bold',
             marginHorizontal: 8, // Spacing between the icon and text
+            fontFamily: "ReadexPro",
+
           },
           icon: {
             marginHorizontal: 4, // Adjust icon spacing if needed
