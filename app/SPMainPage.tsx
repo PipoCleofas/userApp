@@ -329,17 +329,30 @@ export default function MainPage() {
   }
 
   async function handleReject(UserID: number) {
-    const Status = "Approved"; // Set the new status
+    const Status = "Rejected";
+    const RequestStatus = "rejected";
   
-    const Station = AsyncStorage.getItem('station')
-
+    const Station = await AsyncStorage.getItem('station');
+  
     axios
-      .put("http://express-production-ac91.up.railway.app/marker/updateStatusRequest", { Status, UserID, Station })
-      .then((response) => {
-        console.log("✅ Status updated:", response.data);
+      .put("http://express-production-ac91.up.railway.app/marker/updateStatusRequest", {
+        Status,
+        UserID,
+        Station
+      })
+      .then((response1) => {
+        console.log("✅ Marker status updated:", response1.data);
+  
+        return axios.put("http://express-production-ac91.up.railway.app/updateRequestStatus", {
+          UserID,
+          RequestStatus,
+        });
+      })
+      .then((response2) => {
+        console.log("✅ Service request status updated:", response2.data);
       })
       .catch((error) => {
-        console.error("❌ Error updating status:", error.response?.data || error.message);
+        console.error("❌ Error during rejection process:", error.response?.data || error.message);
       });
   }
 
