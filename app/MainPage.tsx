@@ -111,6 +111,7 @@ export default function MainPage() {
 
   const handleNextPartEAR = () => {
     handleSubmit()
+    if(!mediaUri) return;
     console.log("Submit done")
     setIsVisible(false)
     setEmergencyAssistanceModalVisible(true)

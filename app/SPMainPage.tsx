@@ -109,7 +109,7 @@ export default function MainPage() {
       const d = new Date();
       console.log("Date: " + d)
       const finalMessage = `The Service Provided is ${serviceProvided}. The name of the person in need is ${nameInNeed}. ${d + ". " + message}`;
-      await axios.post("https://fearless-growth-production.up.railway.app/messaging/submit", {
+      await axios.post("https://express-production-ac91.up.railway.app/messaging/submit", {
         message: finalMessage
       }, {
         headers: { 'Content-Type': 'application/json' }
@@ -354,7 +354,7 @@ export default function MainPage() {
       }
       
       try {
-        await axios.put(
+        await axios.post(
           "https://express-production-ac91.up.railway.app/messaging/uploadLog",
           {
             message: `${uname} transferred to ${transferTo}`,
@@ -365,9 +365,10 @@ export default function MainPage() {
             },
           }
         );
+        
         console.log("Message uploaded successfully.");
       } catch (messageError) {
-        console.log("Message upload failed:", messageError);
+        console.error("Message upload failed:", messageError);
       }
       // Modify transferTo before proceeding
       let modifiedTransferTo = transferTo;

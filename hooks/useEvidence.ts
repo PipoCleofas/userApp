@@ -293,7 +293,7 @@ const useMediaRecorder = (): MediaRecorderHook => {
     playRecordingAudio,
     clearMedia,
     isRecording,
-    handleSubmit
+    handleSubmit,
   };
 };
 
