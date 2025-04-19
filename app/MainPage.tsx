@@ -95,7 +95,7 @@ export default function MainPage() {
 
   async function emerAssReq(service: string, markerEmoji: any, item: string, imageWidth: number = 65, imageHeight: number = 60) {
     await AsyncStorage.setItem('serviceChosen', service);
-    EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'approved');
+    EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'pending');
     setEmergencyAssistanceModalVisible(false);
     setTriggerNotification(true);
     setTimeout(() => setTriggerNotification(false), 2000);
