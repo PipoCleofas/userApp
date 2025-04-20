@@ -36,6 +36,7 @@ export default function MainPage() {
   const [gender, setGender] = useState<string | null>(null);
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [uname,setUname] = useState<string | null>();
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -53,6 +54,16 @@ export default function MainPage() {
   } = useEvidence();
 
   
+  const handleServicePress = (service: string): void => {
+    setSelectedServices((prev: string[]) => {
+      if (prev.includes(service)) {
+        return prev; // Don't add duplicate
+      }
+      return [...prev, service];
+    });
+  };
+
+  const isSelected = (service: string): boolean => selectedServices.includes(service);
 
   const openEvidenceModal = () => setIsVisible(true);
   const closeEvidenceModal = () => setIsVisible(false);
@@ -93,13 +104,22 @@ export default function MainPage() {
 
   
 
-  async function emerAssReq(service: string, markerEmoji: any, item: string, imageWidth: number = 65, imageHeight: number = 60) {
-    await AsyncStorage.setItem('serviceChosen', service);
-    EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'pending');
+  async function emerAssReq(
+    selectedServices: string[],
+    markerEmoji: any,
+    imageWidth: number = 65,
+    imageHeight: number = 60
+  ): Promise<void> {
+    for (const service of selectedServices) {
+      await AsyncStorage.setItem('serviceChosen', service);
+      EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'pending');
+    }
+  
     setEmergencyAssistanceModalVisible(false);
     setTriggerNotification(true);
     setTimeout(() => setTriggerNotification(false), 2000);
   }
+  
 
 
   const defaultRegion = {
@@ -211,21 +231,51 @@ export default function MainPage() {
               <Text style={{ marginBottom: 10,     fontFamily: "ReadexPro" }}>Choose Service</Text>
               <View style={modalStyles.buttonModal}>
                 <View style={modalStyles.servicesContainerStyle}>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('BFP', markerImages['Male'], 'BFP')}>
-                    <Text style={modalStyles.textStyle}>BFP</Text>
-                  </Pressable>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PNP', markerImages['Male'], 'PNP')}>
-                    <Text style={modalStyles.textStyle}>PNP</Text>
-                  </Pressable>
+                <Pressable
+                  style={[
+                    modalStyles.serviceButton,
+                    isSelected('BFP') && { backgroundColor: 'lightgreen' },
+                  ]}
+                  onPress={() => handleServicePress('BFP')}
+                >
+                  <Text style={modalStyles.textStyle}>BFP</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[
+                    modalStyles.serviceButton,
+                    isSelected('PNP') && { backgroundColor: 'lightgreen' },
+                  ]}
+                  onPress={() => handleServicePress('PNP')}
+                >
+                  <Text style={modalStyles.textStyle}>PNP</Text>
+                </Pressable>
+              </View>
+
+              <View style={modalStyles.servicesContainerStyle}>
+                <Pressable
+                  style={[
+                    modalStyles.serviceButton,
+                    isSelected('Medical') && { backgroundColor: 'lightgreen' },
+                  ]}
+                  onPress={() => handleServicePress('Medical')}
+                >
+                  <Text style={modalStyles.textStyle}>Medical</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[
+                    modalStyles.serviceButton,
+                    isSelected('PDRRMO') && { backgroundColor: 'lightgreen' },
+                  ]}
+                  onPress={() => handleServicePress('PDRRMO')}
+                >
+                  <Text style={modalStyles.textStyle}>PDRRMO</Text>
+                </Pressable>
                 </View>
-                <View style={modalStyles.servicesContainerStyle}>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('Medical', markerImages['Male'], 'Medical')}>
-                    <Text style={modalStyles.textStyle}>Medical</Text>
-                  </Pressable>
-                  <Pressable style={modalStyles.serviceButton} onPress={() => emerAssReq('PDRRMO', markerImages['Male'], 'PDRRMO')}>
-                    <Text style={modalStyles.textStyle}>PDRRMO</Text>
-                  </Pressable>
-                </View>
+                <Pressable style={modalStyles.closeButton} onPress={() => emerAssReq(selectedServices, markerEmoji)}>
+                  <Text style={modalStyles.textStyle}>Submit Request</Text>
+                </Pressable>
                 <Pressable style={modalStyles.closeButton} onPress={() => setEmergencyAssistanceModalVisible(false)}>
                   <Text style={modalStyles.textStyle}>Close</Text>
                 </Pressable>
