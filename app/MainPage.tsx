@@ -114,7 +114,7 @@ export default function MainPage() {
       await AsyncStorage.setItem('serviceChosen', service);
       EmergencyAssistanceRequest(service, markerEmoji, imageWidth, imageHeight, 'pending');
     }
-  
+    setSelectedServices([])
     setEmergencyAssistanceModalVisible(false);
     setTriggerNotification(true);
     setTimeout(() => setTriggerNotification(false), 2000);
