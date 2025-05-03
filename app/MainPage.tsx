@@ -202,8 +202,18 @@ export default function MainPage() {
                 <Text style={modalStyles.sender} >{uname}</Text>
 
                 {messages.map((v) => (
-                    <Text style={modalStyles.message} key={v.id}>{v.message}</Text>
+                  <Text
+                    key={v.id}
+                    style={
+                      v.sender === 'user'
+                        ? modalStyles.spMessage
+                        : modalStyles.userMessage
+                    }
+                  >
+                    {v.message}
+                  </Text>
                 ))}
+
               </View>
               <View style={modalStyles.inputContainer}>
                 <TextInput
@@ -688,6 +698,24 @@ const modalStyles = StyleSheet.create({
     backgroundColor: '#eee',
     padding: 10,
     borderRadius: 5,
+  },
+  userMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#f1f0f0',
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 5,
+    maxWidth: '80%',
+  },
+  
+  spMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#870D29',
+    color: 'white',
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 5,
+    maxWidth: '80%',
   },
   reply: {
     backgroundColor: '#ddd',

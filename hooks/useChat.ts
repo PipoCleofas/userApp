@@ -12,6 +12,7 @@ interface Message {
   message: string;
   timestamp: string;
   conversationId?: string;
+  sender: string;
 }
 
 const useChat = () => {
