@@ -57,11 +57,14 @@ export default function MainPage() {
   const handleServicePress = (service: string): void => {
     setSelectedServices((prev: string[]) => {
       if (prev.includes(service)) {
-        return prev; // Don't add duplicate
+        // Remove the service if it's already selected
+        return prev.filter(s => s !== service);
       }
+      // Add the service if it's not already selected
       return [...prev, service];
     });
   };
+  
 
   const isSelected = (service: string): boolean => selectedServices.includes(service);
 
