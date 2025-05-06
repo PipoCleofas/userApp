@@ -71,7 +71,6 @@ export default function MainPage() {
   const fetchDirections = async (
     assistanceMarkers: MarkerType[],
     currentLocation: { latitude: number; longitude: number },
-    setRouteCoordinates: React.Dispatch<React.SetStateAction<LatLng[][]>>
   ): Promise<void> => {
     const apiKey = 'AIzaSyA598JrOvVsYPrClcB9vEEnB5z6_a-70Po'; // Restrict in production
     const allCoordinates: LatLng[][] = [];
