@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const useLocation = () => {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -35,6 +37,33 @@ const useLocation = () => {
       setIsFetching(false);
     }
   };
+  
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const id = await AsyncStorage.getItem('id');
+        const station = await AsyncStorage.getItem('serviceChosen'); // can be null
+        if (!id || latitude === null || longitude === null) return;
+  
+        await axios.post('https://express-production-ac91.up.railway.app/marker/updatePosition', {
+          Stations: station ? JSON.parse(station) : null, // Parse array from string
+          latitude,
+          longitude,
+          UserID: id,
+        });
+        
+      } catch (err: any) {
+        console.error('Failed to update coordinates:', err.message);
+      }
+    }, 3000);
+  
+    return () => clearInterval(interval);
+  }, [latitude, longitude]);
+  
+  useEffect(() => {
+    fetchLocation();
+  }, []);
+  
   
   useEffect(() => {
     fetchLocation();
