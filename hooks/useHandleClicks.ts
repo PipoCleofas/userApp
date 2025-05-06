@@ -355,7 +355,7 @@ const useHandleClicks = () => {
           Username: username,
           requesttype: requestType,  
           requeststatus: requestStatus,  
-          address: address                  
+          address: 'San Isidro'                  
         }, {
           headers: {
             'Content-Type': 'application/json',
