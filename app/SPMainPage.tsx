@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator, Pressable, Modal, TextInput, Button, ScrollView } from 'react-native';
 import { useNavigation } from 'expo-router';
 import useHandleLogin from '@/hooks/handleSPLogin';
@@ -711,13 +711,12 @@ export default function MainPage() {
 
 
       
-        <MapView
+      <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
           initialRegion={defaultRegion}
-          
         >
-          
+          {/* Render all markers */}
           {markers.map((marker, index) => (
             marker.latitude && marker.longitude ? (
               <Marker
@@ -730,7 +729,23 @@ export default function MainPage() {
               </Marker>
             ) : null
           ))}
+
+          {/* Render polylines from current location to 'Assistance Request' markers */}
+          {currentLocation && markers
+            .filter(marker => marker.title?.includes('Assistance Request'))
+            .map((marker, index) => (
+              <Polyline
+                key={`line-${index}`}
+                coordinates={[
+                  { latitude: currentLocation.latitude, longitude: currentLocation.longitude },
+                  { latitude: marker.latitude, longitude: marker.longitude }
+                ]}
+                strokeColor="#FF0000" // red
+                strokeWidth={3}
+              />
+            ))}
         </MapView>
+
 
         <View style={styles.tabBarContainer}>
   <View style={styles.iconContainer}>
