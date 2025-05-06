@@ -9,6 +9,8 @@ import Notification from '@/components/notification-holder/Notification';
 import useChat from '@/hooks/useChat';
 import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import { Linking } from "react-native";
+import polyline from '@mapbox/polyline';
+import { LatLng } from 'react-native-maps';
 
 interface MarkerType {
   latitude: number;
@@ -41,7 +43,8 @@ const getMarkerImage = (title: string) => {
 };
 
 export default function MainPage() {
-  
+  const [routeCoordinates, setRouteCoordinates] = useState<LatLng[][]>([]);
+
   const [markers, setMarkers] = useState<MarkerType[]>([]);
   const [isPressed, setIsPressed] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -65,6 +68,45 @@ export default function MainPage() {
 
 
 
+  const fetchDirections = async (
+    assistanceMarkers: MarkerType[],
+    currentLocation: { latitude: number; longitude: number },
+    setRouteCoordinates: React.Dispatch<React.SetStateAction<LatLng[][]>>
+  ): Promise<void> => {
+    const apiKey = 'AIzaSyA598JrOvVsYPrClcB9vEEnB5z6_a-70Po'; // Restrict in production
+    const allCoordinates: LatLng[][] = [];
+  
+    for (const marker of assistanceMarkers) {
+      const origin = `${currentLocation.latitude},${currentLocation.longitude}`;
+      const destination = `${marker.latitude},${marker.longitude}`;
+      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}`;
+  
+      try {
+        const response = await axios.get(url);
+  
+        const points = response.data.routes?.[0]?.overview_polyline?.points;
+        if (!points) {
+          console.warn(`No polyline data for route to ${marker.title || 'Unknown'}`);
+          continue;
+        }
+  
+        const decoded = polyline.decode(points);
+        const coordinates: LatLng[] = decoded.map(
+          ([lat, lng]: [number, number]) => ({
+            latitude: lat,
+            longitude: lng,
+          })
+        );
+  
+        allCoordinates.push(coordinates);
+      } catch (err: any) {
+        console.error(`Failed to fetch route to ${marker.title || 'Unknown'}:`, err.message);
+      }
+    }
+  
+    setRouteCoordinates(allCoordinates);
+  };
+  
 
   const defaultRegion = {
     latitude: 15.4817,
@@ -712,39 +754,35 @@ export default function MainPage() {
 
       
       <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          initialRegion={defaultRegion}
-        >
-          {/* Render all markers */}
-          {markers.map((marker, index) => (
-            marker.latitude && marker.longitude ? (
-              <Marker
-                key={index}
-                coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-                title={marker.title || "No Title"}
-                description={`Latitude: ${marker.latitude}, Longitude: ${marker.longitude}`}
-              >
-                <Image source={getMarkerImage(marker.title)} style={{ width: 45, height: 45 }} />
-              </Marker>
-            ) : null
-          ))}
+  provider={PROVIDER_GOOGLE}
+  style={styles.map}
+  initialRegion={defaultRegion}
+>
+  {/* Render all markers */}
+  {markers.map((marker, index) =>
+    marker.latitude && marker.longitude ? (
+      <Marker
+        key={index}
+        coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+        title={marker.title || "No Title"}
+        description={`Latitude: ${marker.latitude}, Longitude: ${marker.longitude}`}
+      >
+        <Image source={getMarkerImage(marker.title)} style={{ width: 45, height: 45 }} />
+      </Marker>
+    ) : null
+  )}
 
-          {/* Render polylines from current location to 'Assistance Request' markers */}
-          {currentLocation && markers
-            .filter(marker => marker.title?.includes('Assistance Request'))
-            .map((marker, index) => (
-              <Polyline
-                key={`line-${index}`}
-                coordinates={[
-                  { latitude: currentLocation.latitude, longitude: currentLocation.longitude },
-                  { latitude: marker.latitude, longitude: marker.longitude }
-                ]}
-                strokeColor="#FF0000" // red
-                strokeWidth={3}
-              />
-            ))}
-        </MapView>
+  {/* Render all decoded routes as real road-following polylines */}
+  {routeCoordinates.map((coords: LatLng[], index: number) => (
+  <Polyline
+    key={`route-${index}`}
+    coordinates={coords}
+    strokeColor="#FF0000"
+    strokeWidth={4}
+  />
+))}
+
+</MapView>
 
 
         <View style={styles.tabBarContainer}>
