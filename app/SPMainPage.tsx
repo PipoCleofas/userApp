@@ -44,7 +44,7 @@ const getMarkerImage = (title: string) => {
 
 export default function MainPage() {
   const [routeCoordinates, setRouteCoordinates] = useState<LatLng[][]>([]);
-
+  const [assistanceMarkers, setAssistanceMarkers] = useState<MarkerType[]>([]);
   const [markers, setMarkers] = useState<MarkerType[]>([]);
   const [isPressed, setIsPressed] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -105,6 +105,14 @@ export default function MainPage() {
   
     setRouteCoordinates(allCoordinates);
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDirections(assistanceMarkers, currentLocation);
+    }, 3000); // every 3 seconds
+  
+    return () => clearInterval(interval); // cleanup
+  }, [assistanceMarkers, currentLocation]); // rerun if these change
   
 
   const defaultRegion = {
@@ -237,25 +245,27 @@ export default function MainPage() {
         if (Array.isArray(data)) {
           const updatedMarkers = [...data, ...markerResponseData];
           setMarkers(updatedMarkers);
-    
+        
           // SP marker
           const userMarker = updatedMarkers.find(
             (marker: any) => marker.title === username
           );
-    
+        
           if (userMarker) {
             setCurrentLocation({
               latitude: userMarker.latitude,
               longitude: userMarker.longitude,
             });
           }
-    
-          // Check for Assistance Request
-          const hasAssistanceRequest = updatedMarkers.some(marker =>
+        
+          // Filter for assistance markers and set
+          const assistanceOnly = updatedMarkers.filter(marker =>
             marker.title?.includes('Assistance Request')
           );
-    
-          // Trigger notification if Assistance Request is found
+          setAssistanceMarkers(assistanceOnly);
+        
+          // Check for Assistance Request
+          const hasAssistanceRequest = assistanceOnly.length > 0;
           setTriggerNotification(hasAssistanceRequest);
         }
       } catch (error: any) {
