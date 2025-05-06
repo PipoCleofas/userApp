@@ -115,10 +115,14 @@ const useHandleClicks = () => {
             if (filteredMarkers.length > 0) {
               const responseRider = await fetch(`https://express-production-ac91.up.railway.app/marker/getRider/${station}`);
               const dataRider = await responseRider.json();
-              console.log("DataRider: ", dataRider)
-              const res = [...filteredMarkers, ...dataRider];
-              setMarkers(res);
-              console.log('All station with rider fetched!!')
+
+              const res = [
+                ...filteredMarkers,
+                ...(Array.isArray(dataRider) ? dataRider : []), // fallback to empty array if not valid
+              ];
+              setMarkers(prev => [...prev, ...res]);
+
+
 
             } else {
               // Fallback fetch: No markers within 14 km, so use the backend route to get a station
@@ -128,7 +132,7 @@ const useHandleClicks = () => {
     
               // Check if the backend returned any fallback stations
               if (Array.isArray(fallbackData) && fallbackData.length > 0) {
-                setMarkers(fallbackData);
+                setMarkers(prev => [...prev, ...fallbackData]); // append fallback
                 setArrivalTime('Using fallback station data');
               } else {
                 setArrivalTime('No nearby or fallback stations available');
@@ -282,7 +286,7 @@ const useHandleClicks = () => {
           },
         });
 
-        /*setMarkers((prevMarkers) => {
+        setMarkers((prevMarkers) => {
           if (Array.isArray(prevMarkers)) {
             return [...prevMarkers, markerResponse.data];
           } else {
@@ -290,7 +294,7 @@ const useHandleClicks = () => {
           }
         });
 
-        console.log("KUYAAA MARK")*/
+        console.log("KUYAAA MARK")
 
         let spUsername;
 
