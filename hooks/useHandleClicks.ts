@@ -282,7 +282,7 @@ const useHandleClicks = () => {
           },
         });
 
-        setMarkers((prevMarkers) => {
+        /*setMarkers((prevMarkers) => {
           if (Array.isArray(prevMarkers)) {
             return [...prevMarkers, markerResponse.data];
           } else {
@@ -290,7 +290,7 @@ const useHandleClicks = () => {
           }
         });
 
-        console.log("KUYAAA MARK")
+        console.log("KUYAAA MARK")*/
 
         let spUsername;
 
@@ -322,6 +322,7 @@ const useHandleClicks = () => {
           },
         });
 
+        console.log("Going SP ID")
         const spId = await spResponse.data.userId.toString();
 
         // spID undefined
@@ -345,7 +346,7 @@ const useHandleClicks = () => {
         
         console.log('Marker submission success:', markerResponse.data);
         
-        console.log("KUYA MARK 2")
+        /*console.log("KUYA MARK 2")*/
 
         let  username = await AsyncStorage.getItem('username')
         console.log(username)

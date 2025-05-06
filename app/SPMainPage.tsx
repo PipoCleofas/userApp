@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator, Pressable, Modal, TextInput, Button } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Image, ActivityIndicator, Pressable, Modal, TextInput, Button, ScrollView } from 'react-native';
 import { useNavigation } from 'expo-router';
 import useHandleLogin from '@/hooks/handleSPLogin';
 import axios from 'axios';
@@ -507,6 +507,14 @@ export default function MainPage() {
     setShowTransferModal(false)
   }
 
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
+
   
 
   return (
@@ -621,6 +629,13 @@ export default function MainPage() {
               <View style={modalStyles.messageContainer}>
                 <Text style={modalStyles.sender} >{uname}</Text>
 
+                <ScrollView 
+                  style={modalStyles.scrollView}
+                  ref={scrollViewRef}
+                  onContentSizeChange={() =>
+                    scrollViewRef.current?.scrollToEnd({ animated: true })
+                  }                           
+                  >
                 {messages.map((v) => (
                 <Text
                   key={v.id}
@@ -633,8 +648,9 @@ export default function MainPage() {
                   {v.message}
                 </Text>
               ))}
-
+              </ScrollView>
               </View>
+              
               <View style={modalStyles.inputContainer}>
               <TextInput
                 style={modalStyles.input}
@@ -1166,11 +1182,6 @@ const modalStyles = StyleSheet.create({
     fontFamily: "ReadexPro",
   },
   
-  
-  messageContainer: {
-    marginBottom: 20,
-    width: '100%',
-  },
   message: {
     marginBottom: 10,
     backgroundColor: '#eee',
@@ -1200,5 +1211,14 @@ const modalStyles = StyleSheet.create({
   
   headerStyle: {
     color: 'red',
+  },
+  
+  scrollView: {
+    maxHeight: 200, // Adjust height as needed
+  },
+  
+  messageContainer: {
+    marginVertical: 10,
+    width: '100%',
   },
 });

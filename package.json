@@ -21,7 +21,7 @@
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-picker/picker": "^2.7.5",
     "@react-navigation/native": "^6.0.2",
-    "axios": "^1.7.7",
+    "axios": "^1.9.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "expo": "~51.0.39",
