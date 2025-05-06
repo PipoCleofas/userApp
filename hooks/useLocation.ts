@@ -42,33 +42,40 @@ const useLocation = () => {
     const interval = setInterval(async () => {
       try {
         const id = await AsyncStorage.getItem('id');
-        const station = await AsyncStorage.getItem('serviceChosen'); // can be null
-        if (!id || latitude === null || longitude === null) return;
+        const station = await AsyncStorage.getItem('serviceChosen');
   
-        await axios.post('https://express-production-ac91.up.railway.app/marker/updatePosition', {
-          Stations: station ? JSON.parse(station) : null, // Parse array from string
+        if (!id || latitude === null || longitude === null) {
+          console.log('Missing required data: ', { id, latitude, longitude });
+          return;
+        }
+  
+        const payload = {
+          Stations: station ? [station] : null,
           latitude,
           longitude,
           UserID: id,
-        });
-        
+        };
+  
+        console.log('Sending payload:', payload);
+  
+        await axios.post(
+          'https://express-production-ac91.up.railway.app/marker/updatePosition',
+          payload
+        );
+  
       } catch (err: any) {
-        console.error('Failed to update coordinates:', err.message);
+        console.log('Failed to update coordinates:', err.response?.data || err.message);
       }
     }, 3000);
   
     return () => clearInterval(interval);
   }, [latitude, longitude]);
   
+  
   useEffect(() => {
     fetchLocation();
   }, []);
   
-  
-  useEffect(() => {
-    fetchLocation();
-  }, []); 
-
   return { 
     location, 
     errorMsg, 
