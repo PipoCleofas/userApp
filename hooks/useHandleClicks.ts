@@ -282,6 +282,16 @@ const useHandleClicks = () => {
           },
         });
 
+        setMarkers((prevMarkers) => {
+          if (Array.isArray(prevMarkers)) {
+            return [...prevMarkers, markerResponse.data];
+          } else {
+            return [markerResponse.data];
+          }
+        });
+
+        console.log("KUYAAA MARK")
+
         let spUsername;
 
         switch(requestType){
@@ -312,14 +322,11 @@ const useHandleClicks = () => {
           },
         });
 
-        console.log("Going SP ID")
         const spId = await spResponse.data.userId.toString();
 
         // spID undefined
-        console.log("SP ID: ", spId)
         await AsyncStorage.setItem('spID', spId)
 
-        console.log("Done SP ID")
 
         // convo submit
         const convoResponse = await axios.post('https://express-production-ac91.up.railway.app/messaging/submitConvo', {
@@ -338,6 +345,8 @@ const useHandleClicks = () => {
         
         console.log('Marker submission success:', markerResponse.data);
         
+        console.log("KUYA MARK 2")
+
         let  username = await AsyncStorage.getItem('username')
         console.log(username)
 
@@ -366,6 +375,7 @@ const useHandleClicks = () => {
 
         const markerID = markerResponse.data.id;
 
+        
       } catch (error: any) {
         handleAxiosError(error);
       }
