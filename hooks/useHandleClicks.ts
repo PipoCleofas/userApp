@@ -282,13 +282,13 @@ const useHandleClicks = () => {
           },
         });
 
-        setMarkers((prevMarkers) => {
+        /*setMarkers((prevMarkers) => {
           if (Array.isArray(prevMarkers)) {
             return [...prevMarkers, markerResponse.data];
           } else {
             return [markerResponse.data];
           }
-        });
+        });*/
 
         console.log("KUYAAA MARK")
 
