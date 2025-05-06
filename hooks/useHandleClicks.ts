@@ -115,13 +115,9 @@ const useHandleClicks = () => {
             if (filteredMarkers.length > 0) {
               const responseRider = await fetch(`https://express-production-ac91.up.railway.app/marker/getRider/${station}`);
               const dataRider = await responseRider.json();
-
-              const res = [
-                ...filteredMarkers,
-                ...(Array.isArray(dataRider) ? dataRider : []), // fallback to empty array if not valid
-              ];
+              console.log("DataRider: ", dataRider)
+              const res = [...filteredMarkers, ...dataRider];
               setMarkers(prev => [...prev, ...res]);
-
 
 
             } else {
