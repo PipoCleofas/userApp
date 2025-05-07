@@ -732,7 +732,7 @@ export default function MainPage() {
           <View style={modalStyles.modalView}>
             <Text style={modalStyles.header}>Enter Details</Text>
 
-            <Text style={modalStyles.label}>Name of the person in need</Text>
+            <Text style={modalStyles.label}>First Name and Surname of the person in need</Text>
             <TextInput style={modalStyles.input} onChangeText={setNameInNeed} maxLength={30} />
 
             <Text style={modalStyles.label}>Service Provided</Text>

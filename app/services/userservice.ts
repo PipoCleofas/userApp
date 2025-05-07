@@ -52,10 +52,12 @@ import {Action, Citizen} from '@/app/types/user'
       const user = response.data;
   
       if (user) {
-        const { id, address, username: storedUsername, gender } = user;
-  
+        const { id, address, username: storedUsername, gender, fname, lname } = user;
         if (id) {
           await AsyncStorage.setItem('id', id.toString());
+          await AsyncStorage.setItem('firstname', fname)
+          await AsyncStorage.setItem('lastname', lname)
+          
           console.log('User ID stored in AsyncStorage');
         } else {
           dispatch({
