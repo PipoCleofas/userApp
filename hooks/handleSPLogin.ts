@@ -46,36 +46,117 @@ export default function useHandleLogin(){
 
     switch (username) {
       case "PNP BRGY. SAN ISIDRO":
-        items = ["PNP MABINI", "PNP HILARIO"];
+        items = [
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN NICOLAS",
+          "BFP BRGY. SAN SEBASTIAN",
+          "BFP BRGY. SAN ISIDRO"
+        ];
         break;
       case "PNP BRGY. MABINI":
-        items = ["PNP SAN ISIDRO", "PNP HILARIO"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
         break;
       case "PNP HILARIO STREET":
-        items = ["PNP MABINI", "PNP SAN ISIDRO"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
         break;
       case "TALON GENERAL HOSPITAL":
-        items = ["CLDH", "TPH"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
         break;
       case "CENTRAL LUZON DOCTORS HOSPITAL":
-        items = ["TALON", "TPH"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
         break;
       case "TARLAC PROVINCIAL HOSPITAL":
-        items = ["TALON", "CLDH"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
         break;
       case "BFP BRGY. SAN ISIDRO":
-        items = ["BFP SAN NICOLAS", "BFP SAN SEBASTIAN"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN NICOLAS",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
         break;
       case "BFP BRGY. SAN NICOLAS":
-        items = ["BFP SAN ISIDRO", "BFP SAN SEBASTIAN"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
         break;
       case "BFP BRGY. SAN SEBASTIAN":
-        items = ["BFP SAN ISIDRO", "BFP SAN NICOLAS"];
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS"
+        ];
         break;
-
       default:
         items = [];
     }
+    
 
     const mappedItems = items.map((name, index) => ({ id: index, label: name }));
     setTransferItems(mappedItems);
