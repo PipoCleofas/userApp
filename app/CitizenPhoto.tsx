@@ -53,7 +53,7 @@ const ImageUploadScreen = () => {
           <Pressable
             style={[styles.button, styles.buttonClose]}
             onPress={() => setModal1Visible(!modal1Visible)}>
-            <Text style={styles.textStyle}>Hide Modal</Text>
+            <Text style={styles.textStyle}>Back</Text>
           </Pressable>
         </View>
       </View>
@@ -78,7 +78,7 @@ const ImageUploadScreen = () => {
           <Pressable
             style={[styles.button, styles.buttonClose]}
             onPress={() => setModal2Visible(!modal2Visible)}>
-            <Text style={styles.textStyle}>Hide Modal</Text>
+            <Text style={styles.textStyle}>Back</Text>
           </Pressable>
         </View>
       </View>
@@ -102,7 +102,7 @@ const ImageUploadScreen = () => {
           <Pressable
             style={[styles.button, styles.buttonClose]}
             onPress={() => setModal3Visible(!modal3Visible)}>
-            <Text style={styles.textStyle}>Hide Modal</Text>
+            <Text style={styles.textStyle}>Back</Text>
           </Pressable>
         </View>
       </View>
