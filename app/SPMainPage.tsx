@@ -437,31 +437,31 @@ export default function MainPage() {
       // Modify transferTo before proceeding
       let modifiedTransferTo = transferTo;
       switch (transferTo) {
-        case 'PNP MABINI':
+        case 'PNP BRGY. MABINI':
           modifiedTransferTo = 'pnpmabinimarker';
           break;
-        case 'PNP HILARIO':
+        case 'PNP HILARIO STREET':
           modifiedTransferTo = 'pnphilariomarker';
           break;
-        case 'PNP SAN ISIDRO':
+        case 'PNP BRGY. SAN ISIDRO':
           modifiedTransferTo = 'pnpsanisidromarker';
           break;
-        case 'CLDH':
+        case 'CENTRAL LUZON DOCTORS HOSPITAL':
           modifiedTransferTo = 'centralmarker';
           break;
-        case 'TPH':
+        case 'TARLAC PROVINCIAL HOSPITAL':
           modifiedTransferTo = 'provincialmarker';
           break;
-        case 'TALON':
+        case 'TALON GENERAL HOSPITAL':
           modifiedTransferTo = 'talonmarker';
           break;
-        case 'BFP SAN NICOLAS':
+        case 'BFP BRGY. SAN NICOLAS':
           modifiedTransferTo = 'bfpsannicolasmarker';
           break;
-        case 'BFP SAN SEBASTIAN':
+        case 'BFP BRGY. SAN SEBASTIAN':
           modifiedTransferTo = 'bfpsansebastianmarker';
           break;
-        case 'BFP SAN ISIDRO':
+        case 'BFP BRGY. SAN ISIDRO':
           modifiedTransferTo = 'bfpsanisidromarker';
           break;
       }
