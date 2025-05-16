@@ -247,10 +247,10 @@ const useHandleClicks = () => {
 
         switch(requestType){
           case "BFP":
-            station = "bfpsanisidromarker";
+            station = "bfpsanmanuelmarker";
             break;
           case "PNP":
-            station = "pnpsanisidromarker";
+            station = "pnpsanmanuelmarker";
             break;
           case "Medical":
             station = "talonmarker";
@@ -296,10 +296,10 @@ const useHandleClicks = () => {
 
         switch(requestType){
           case "BFP":
-            spUsername = "BFP BRGY. SAN ISIDRO";
+            spUsername = "BFP BRGY. SAN MANUEL";
             break;
           case "PNP":
-            spUsername = "PNP BRGY. SAN ISIDRO";
+            spUsername = "PNP BRGY. SAN MANUEL";
             break;
           case "Medical":
             spUsername = "TALON GENERAL HOSPITAL";
@@ -356,7 +356,7 @@ const useHandleClicks = () => {
           Username: username,
           requesttype: requestType,  
           requeststatus: requestStatus,  
-          address: 'San Isidro'                  
+          address: 'San Manuel'                  
         }, {
           headers: {
             'Content-Type': 'application/json',

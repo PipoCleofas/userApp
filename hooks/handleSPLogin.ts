@@ -54,7 +54,9 @@ export default function useHandleLogin(){
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN NICOLAS",
           "BFP BRGY. SAN SEBASTIAN",
-          "BFP BRGY. SAN ISIDRO"
+          "BFP BRGY. SAN ISIDRO",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "PNP BRGY. MABINI":
@@ -66,7 +68,9 @@ export default function useHandleLogin(){
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN ISIDRO",
           "BFP BRGY. SAN NICOLAS",
-          "BFP BRGY. SAN SEBASTIAN"
+          "BFP BRGY. SAN SEBASTIAN",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "PNP HILARIO STREET":
@@ -78,7 +82,9 @@ export default function useHandleLogin(){
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN ISIDRO",
           "BFP BRGY. SAN NICOLAS",
-          "BFP BRGY. SAN SEBASTIAN"
+          "BFP BRGY. SAN SEBASTIAN",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "TALON GENERAL HOSPITAL":
@@ -90,7 +96,9 @@ export default function useHandleLogin(){
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN ISIDRO",
           "BFP BRGY. SAN NICOLAS",
-          "BFP BRGY. SAN SEBASTIAN"
+          "BFP BRGY. SAN SEBASTIAN",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "CENTRAL LUZON DOCTORS HOSPITAL":
@@ -102,7 +110,9 @@ export default function useHandleLogin(){
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN ISIDRO",
           "BFP BRGY. SAN NICOLAS",
-          "BFP BRGY. SAN SEBASTIAN"
+          "BFP BRGY. SAN SEBASTIAN",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "TARLAC PROVINCIAL HOSPITAL":
@@ -114,7 +124,9 @@ export default function useHandleLogin(){
           "CENTRAL LUZON DOCTORS HOSPITAL",
           "BFP BRGY. SAN ISIDRO",
           "BFP BRGY. SAN NICOLAS",
-          "BFP BRGY. SAN SEBASTIAN"
+          "BFP BRGY. SAN SEBASTIAN",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "BFP BRGY. SAN ISIDRO":
@@ -126,7 +138,9 @@ export default function useHandleLogin(){
           "CENTRAL LUZON DOCTORS HOSPITAL",
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN NICOLAS",
-          "BFP BRGY. SAN SEBASTIAN"
+          "BFP BRGY. SAN SEBASTIAN",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "BFP BRGY. SAN NICOLAS":
@@ -138,7 +152,9 @@ export default function useHandleLogin(){
           "CENTRAL LUZON DOCTORS HOSPITAL",
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN ISIDRO",
-          "BFP BRGY. SAN SEBASTIAN"
+          "BFP BRGY. SAN SEBASTIAN",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       case "BFP BRGY. SAN SEBASTIAN":
@@ -150,7 +166,9 @@ export default function useHandleLogin(){
           "CENTRAL LUZON DOCTORS HOSPITAL",
           "TARLAC PROVINCIAL HOSPITAL",
           "BFP BRGY. SAN ISIDRO",
-          "BFP BRGY. SAN NICOLAS"
+          "BFP BRGY. SAN NICOLAS",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN MANUEL"
         ];
         break;
       default:
@@ -250,6 +268,12 @@ export default function useHandleLogin(){
                 setMarkerUnameEmoji(require('../app/pictures/fire.png'));
                 break;
               case 'PNP BRGY. SAN ISIDRO':
+                setMarkerUnameEmoji(require('../app/pictures/police.webp'));
+                break;
+              case 'PNP BRGY. SAN MANUEL':
+                setMarkerUnameEmoji(require('../app/pictures/fire.png'));
+                break;
+              case 'BFP BRGY. SAN MANUEL':
                 setMarkerUnameEmoji(require('../app/pictures/police.webp'));
                 break;
               case 'PNP BRGY MABINI':

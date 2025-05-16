@@ -24,6 +24,8 @@ const markerImages: { [key: string]: any } = {
   "BFP BRGY. SAN SEBASTIAN": require('../app/pictures/fire.png'),
   "PNP BRGY. SAN ISIDRO": require('../app/pictures/police.webp'),
   "PNP BRGY. MABINI": require('../app/pictures/police.webp'),
+  "PNP BRGY. SAN MANUEL": require('../app/pictures/police.webp'),
+  "BFP BRGY. SAN MANUEL": require('../app/pictures/fire.png'),
   "PNP HILARIO STREET": require('../app/pictures/police.webp'),
   "TARLAC PROVINCIAL HOSPITAL": require('../app/pictures/medic.png'),
   "CENTRAL LUZON DOCTORS HOSPITAL": require('../app/pictures/medic.png'),
@@ -446,6 +448,9 @@ export default function MainPage() {
         case 'PNP BRGY. SAN ISIDRO':
           modifiedTransferTo = 'pnpsanisidromarker';
           break;
+        case 'PNP BRGY. SAN MANUEL':
+          modifiedTransferTo = 'pnpsanmanuelmarker';
+          break;
         case 'CENTRAL LUZON DOCTORS HOSPITAL':
           modifiedTransferTo = 'centralmarker';
           break;
@@ -464,6 +469,9 @@ export default function MainPage() {
         case 'BFP BRGY. SAN ISIDRO':
           modifiedTransferTo = 'bfpsanisidromarker';
           break;
+        case 'BFP BRGY. SAN MANUEL':
+          modifiedTransferTo = 'bfpsanmanuelmarker';
+          break;
       }
   
       let curTable: string;
@@ -472,6 +480,8 @@ export default function MainPage() {
         case 'BFP BRGY. SAN NICOLAS': curTable = 'bfpsannicolasmarker'; break;
         case 'BFP BRGY. SAN SEBASTIAN': curTable = 'bfpsansebastianmarker'; break;
         case 'PNP BRGY. SAN ISIDRO': curTable = 'pnpsanisidromarker'; break;
+        case 'BFP BRGY. SAN MANUEL': curTable = 'bfpsanmanuelmarker'; break;
+        case 'PNP BRGY. SAN MANUEL': curTable = 'pnpsanmanuelmarker'; break;
         case 'PNP BRGY. MABINI': curTable = 'pnpmabinimarker'; break;
         case 'PNP BRGY. HILARIO': curTable = 'pnphilariomarker'; break;
         case 'TALON GENERAL HOSPITAL': curTable = 'talonmarker'; break;
@@ -498,6 +508,12 @@ export default function MainPage() {
         case 'PNP SAN ISIDRO':
           providerID = '10152';
           break;
+        case 'PNP SAN MANUEL':
+          providerID = '10152';
+          break;
+        case 'BFP SAN MANUEL':
+          providerID = '10152';
+          break;
         case 'CLDH':
           providerID = '10198';
           break;
@@ -515,6 +531,14 @@ export default function MainPage() {
           break;
         case 'BFP SAN ISIDRO':
           providerID = '10154';
+          break;
+
+        case 'PNP SAN MANUEL':
+          providerID = '10205';
+          break;
+
+        case 'BFP SAN MANUEL':
+          providerID = '10206';
           break;
       }
 
