@@ -499,10 +499,10 @@ export default function MainPage() {
       let providerID;
 
       switch (transferTo) {
-        case 'PNP MABINI':
+        case 'PNP BRGY. MABINI':
           providerID = '10151';
           break;
-        case 'PNP HILARIO':
+        case 'PNP HILARIO STREET':
           providerID = '10153';
           break;
         case 'PNP SAN ISIDRO':
@@ -514,22 +514,22 @@ export default function MainPage() {
         case 'BFP SAN MANUEL':
           providerID = '10152';
           break;
-        case 'CLDH':
+        case 'CENTRAL LUZON DOCTORS HOSPITAL':
           providerID = '10198';
           break;
-        case 'TPH':
+        case 'TARLAC PROVINCIAL HOSPITAL':
           providerID = '10187';
           break;
-        case 'TALON':
+        case 'TALON GENERAL HOSPITAL':
           providerID = '10199';
           break;
-        case 'BFP SAN NICOLAS':
+        case 'BFP BRGY. SAN NICOLAS':
           providerID = '10165';
           break;
-        case 'BFP SAN SEBASTIAN':
+        case 'BFP BRGY. SAN SEBASTIAN':
           providerID = '10176';
           break;
-        case 'BFP SAN ISIDRO':
+        case 'BFP BRGY. SAN ISIDRO':
           providerID = '10154';
           break;
 
@@ -541,6 +541,8 @@ export default function MainPage() {
           providerID = '10206';
           break;
       }
+      console.log(transferTo);
+      console.log(providerID);
 
       await axios.put(
         `https://express-production-ac91.up.railway.app/messaging/updateReceiver/${providerID}`,

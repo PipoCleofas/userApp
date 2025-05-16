@@ -7,7 +7,12 @@ import ComboBox from './combobox-holder/ComboBox';
 const ids = [
   { label: 'National ID', value: 'National ID' },
   { label: 'Passport', value: 'Passport' },
-  
+  { label: 'Drivers License', value: 'Drivers License' },
+  { label: 'Philhealth ID', value: 'Philhealth ID' },
+  { label: 'Voters ID', value: 'Voters ID' },
+  { label: 'Postal ID', value: 'Postal ID' },
+  { label: 'PRC ID', value: 'PRC ID' },
+
 ];
 
 
