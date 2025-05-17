@@ -388,7 +388,7 @@ export default function MainPage() {
     const Station = await AsyncStorage.getItem('station');
   
     axios
-      .put("http://express-production-ac91.up.railway.app/marker/updateStatusRequest", {
+      .put("https://express-production-ac91.up.railway.app/marker/updateStatusRequest", {
         Status,
         UserID,
         Station
@@ -396,7 +396,7 @@ export default function MainPage() {
       .then((response1) => {
         console.log("✅ Marker status updated:", response1.data);
   
-        return axios.put("http://express-production-ac91.up.railway.app/updateRequestStatus", {
+        return axios.put("https://express-production-ac91.up.railway.app/servicerequest/updateRequestStatus", {
           UserID,
           RequestStatus,
         });
@@ -505,13 +505,7 @@ export default function MainPage() {
         case 'PNP HILARIO STREET':
           providerID = '10153';
           break;
-        case 'PNP SAN ISIDRO':
-          providerID = '10152';
-          break;
-        case 'PNP SAN MANUEL':
-          providerID = '10152';
-          break;
-        case 'BFP SAN MANUEL':
+        case 'PNP BRGY. SAN ISIDRO':
           providerID = '10152';
           break;
         case 'CENTRAL LUZON DOCTORS HOSPITAL':
@@ -533,11 +527,11 @@ export default function MainPage() {
           providerID = '10154';
           break;
 
-        case 'PNP SAN MANUEL':
+        case 'PNP BRGY. SAN MANUEL':
           providerID = '10205';
           break;
 
-        case 'BFP SAN MANUEL':
+        case 'BFP BRGY. SAN MANUEL':
           providerID = '10206';
           break;
       }
@@ -652,31 +646,33 @@ export default function MainPage() {
         {pendingRequests?.length > 0 ? (
           pendingRequests.map((request: any, index: any) => (
             <View key={index} style={styles.userRow}>
-              {/* Name */}
-              <Text style={styles.nameText}>
-                {request.Firstname} {request.Lastname}
-              </Text>
+        {/* Name + Top Icons Row */}
+        <View style={styles.topRow}>
+          <Text style={styles.nameText}>
+          {request.Firstname} {request.Lastname}
+          </Text>
 
-              {/* Icons */}
-              <View style={styles.actionIconsContainer}>
-              <TouchableOpacity onPress={() => handleApprove(request.UserID)}>
-                <Text style={styles.modalIcon}>✅</Text>
+          <View style={styles.iconGroup}>
+              <TouchableOpacity onPress={() => handleCheckEvidence(request.UserID)}>
+                <Text style={styles.modalIcon}>🖼️</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleShowTransferModalPress()}>
+                <Ionicons name="share-social-outline" size={22} color="black" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+        {/* Accept / Decline Row */}
+        <View style={styles.buttonRow}>
+              <TouchableOpacity onPress={() => handleApprove(request.UserID)} style={styles.acceptButton}>
+                <Text style={styles.buttonText}>ACCEPT</Text>
               </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => handleReject(request.UserID)}>
-                  <Text style={styles.modalIcon}>❌</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => handleCheckEvidence(request.UserID)}>
-                  <Text style={styles.modalIcon}>🖼️</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => handleShowTransferModalPress()}>
-                  <Ionicons name="share-social-outline" size={24} color="black" />
-                </TouchableOpacity>
-
-              </View>
-            </View>
+              <TouchableOpacity onPress={() => handleReject(request.UserID)} style={styles.declineButton}>
+                <Text style={styles.buttonText}>DECLINE</Text>
+              </TouchableOpacity>
+          </View>
+        </View>
           ))
         ) : (
           <Text style={{fontFamily: "ReadexPro"}}>No pending requests</Text>
@@ -915,26 +911,75 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   userRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 12,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
+
+    topRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 10,
+  },
+
   nameText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
     fontFamily: "ReadexPro",
 
   },
+
+  iconGroup: {
+  flexDirection: 'row',
+  gap: 10, // fallback with marginRight if needed
+  },
+
   actionIconsContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
   modalIcon: {
-    fontSize: 20,
+    fontSize: 22,
+    marginRight: 10,
   },
   
+  buttonRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  },
+
+  acceptButton: {
+  backgroundColor: '#4CAF50',
+  flex: 1,
+  marginRight: 5,
+  paddingVertical: 10,
+  borderRadius: 5,
+  alignItems: 'center',
+  },
+
+  declineButton: {
+  backgroundColor: '#F44336',
+  flex: 1,
+  marginLeft: 5,
+  paddingVertical: 10,
+  borderRadius: 5,
+  alignItems: 'center',
+  },
+
+  buttonText: {
+  color: '#fff',
+  fontWeight: 'bold',
+  fontSize: 14,
+  },
+
   header: {
     backgroundColor: "#870D29",
     padding: 12,
@@ -1034,13 +1079,7 @@ const styles = StyleSheet.create({
     height: 60,
     shadowColor: 'transparent',
   },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontFamily: "ReadexPro",
 
-  },
   centeredView: {
     flex: 1,
     justifyContent: 'center',

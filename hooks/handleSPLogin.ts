@@ -171,6 +171,34 @@ export default function useHandleLogin(){
           "BFP BRGY. SAN MANUEL"
         ];
         break;
+        case "BFP BRGY. SAN MANUEL":
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS",
+          "PNP BRGY. SAN MANUEL",
+          "BFP BRGY. SAN SEBASTIAN"
+        ];
+        break;
+        case "PNP BRGY. SAN MANUEL":
+        items = [
+          "PNP BRGY. SAN ISIDRO",
+          "PNP BRGY. MABINI",
+          "PNP HILARIO STREET",
+          "TALON GENERAL HOSPITAL",
+          "CENTRAL LUZON DOCTORS HOSPITAL",
+          "TARLAC PROVINCIAL HOSPITAL",
+          "BFP BRGY. SAN ISIDRO",
+          "BFP BRGY. SAN NICOLAS",
+          "PNP BRGY. SAN SEBASTIAN",
+          "BFP BRGY. SAN MANUEL"
+        ];
+        break;
       default:
         items = [];
     }

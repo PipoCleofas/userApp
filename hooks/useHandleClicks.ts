@@ -242,6 +242,7 @@ const useHandleClicks = () => {
 
         }
 
+
         // for marker submit
         let station: string;
 
@@ -265,6 +266,7 @@ const useHandleClicks = () => {
             throw new Error(`Unhandled requestType: ${requestType}`);
         }
 
+
         const gender = await AsyncStorage.getItem('gender')
 
         console.log("Latest station: " + station)
@@ -281,6 +283,7 @@ const useHandleClicks = () => {
             'Content-Type': 'application/json',
           },
         });
+
 
         /*setMarkers((prevMarkers) => {
           if (Array.isArray(prevMarkers)) {
@@ -339,6 +342,7 @@ const useHandleClicks = () => {
             'Content-Type': 'application/json',
           },
         });
+        console.log("Submit convo log");
 
         const conversation_id = await AsyncStorage.setItem('conversation_id', convoResponse.data.conversation_id)
 
