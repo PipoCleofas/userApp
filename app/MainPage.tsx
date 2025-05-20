@@ -23,6 +23,8 @@ const markerImages = {
   'CENTRAL LUZON DOCTORS HOSPITAL': require('./pictures/medic.png'),
   'TARLAC PROVINCIAL HOSPITAL': require('./pictures/medic.png'),
   'TALON GENERAL HOSPITAL': require('./pictures/medic.png'),
+  'JECSONS HOSPITAL': require('./pictures/medic.png'),
+
   'PNP RIDER': require('./pictures/finalCop.png'),
   'Rider': require('./pictures/finalRescue.png'),
   'FIRE TRUCK': require('./pictures/finalFireTruck.png'),

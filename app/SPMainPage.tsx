@@ -29,6 +29,8 @@ const markerImages: { [key: string]: any } = {
   "PNP HILARIO STREET": require('../app/pictures/police.webp'),
   "TARLAC PROVINCIAL HOSPITAL": require('../app/pictures/medic.png'),
   "CENTRAL LUZON DOCTORS HOSPITAL": require('../app/pictures/medic.png'),
+  "JECSONS HOSPITAL": require('../app/pictures/medic.png'),
+
   "TALON GENERAL HOSPITAL": require('../app/pictures/medic.png'),
   "PDRRMO Station": require('../app/pictures/ndrrmc.png'),
   "BFP Assistance Request": require('../app/pictures/finalPerson.png'),
@@ -472,6 +474,12 @@ export default function MainPage() {
         case 'BFP BRGY. SAN MANUEL':
           modifiedTransferTo = 'bfpsanmanuelmarker';
           break;
+        case 'JECSONS HOSPITAL':
+          modifiedTransferTo = 'jecsonmarker';
+          break;
+        case 'PDRRMO':
+          modifiedTransferTo = 'pdrrrmomarker';
+          break;
       }
   
       let curTable: string;
@@ -486,6 +494,8 @@ export default function MainPage() {
         case 'PNP BRGY. HILARIO': curTable = 'pnphilariomarker'; break;
         case 'TALON GENERAL HOSPITAL': curTable = 'talonmarker'; break;
         case 'CENTRAL LUZON DOCTORS HOSPITAL': curTable = 'centralmarker'; break;
+        case 'JECSONS HOSPITAL': curTable = 'centralmarker'; break;
+
         case 'TARLAC PROVINCIAL HOSPITAL': curTable = 'provincialmarker'; break;
         case 'PDRRMO Station': curTable = 'pdrrmomarker'; break;
         default: curTable = 'bfpsanisidromarker';
@@ -533,6 +543,12 @@ export default function MainPage() {
 
         case 'BFP BRGY. SAN MANUEL':
           providerID = '10206';
+          break;
+        case 'JECSONS HOSPITAL':
+          providerID = '10207';
+          break;
+        case 'PDRRMO':
+          providerID = '10200';
           break;
       }
       console.log(transferTo);

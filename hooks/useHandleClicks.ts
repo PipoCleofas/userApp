@@ -254,7 +254,7 @@ const useHandleClicks = () => {
             station = "pnpsanmanuelmarker";
             break;
           case "Medical":
-            station = "talonmarker";
+            station = "jecsonsmarker";
             break;
           case "PDRRMO":
             station = "pdrrrmomarker";
@@ -305,7 +305,7 @@ const useHandleClicks = () => {
             spUsername = "PNP BRGY. SAN MANUEL";
             break;
           case "Medical":
-            spUsername = "TALON GENERAL HOSPITAL";
+            spUsername = "JECSONS HOSPITAL";
             break;
           case "PDRRMO":
             spUsername = "PDRRMO Station";

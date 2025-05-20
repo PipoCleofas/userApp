@@ -173,30 +173,25 @@ export default function useHandleLogin(){
         break;
         case "BFP BRGY. SAN MANUEL":
         items = [
-          "PNP BRGY. SAN ISIDRO",
-          "PNP BRGY. MABINI",
-          "PNP HILARIO STREET",
-          "TALON GENERAL HOSPITAL",
-          "CENTRAL LUZON DOCTORS HOSPITAL",
-          "TARLAC PROVINCIAL HOSPITAL",
-          "BFP BRGY. SAN ISIDRO",
-          "BFP BRGY. SAN NICOLAS",
+         
           "PNP BRGY. SAN MANUEL",
-          "BFP BRGY. SAN SEBASTIAN"
+          "JECSONS HOSPITAL",
+          "PDRRMO"
         ];
         break;
         case "PNP BRGY. SAN MANUEL":
         items = [
-          "PNP BRGY. SAN ISIDRO",
-          "PNP BRGY. MABINI",
-          "PNP HILARIO STREET",
-          "TALON GENERAL HOSPITAL",
-          "CENTRAL LUZON DOCTORS HOSPITAL",
-          "TARLAC PROVINCIAL HOSPITAL",
-          "BFP BRGY. SAN ISIDRO",
-          "BFP BRGY. SAN NICOLAS",
-          "PNP BRGY. SAN SEBASTIAN",
-          "BFP BRGY. SAN MANUEL"
+          "BFP BRGY. SAN MANUEL",
+          "JECSONS HOSPITAL",
+          "PDRRMO"
+        ];
+        break;
+      case "JECSONS HOSPITAL":
+        items = [
+          "BFP BRGY. SAN MANUEL",
+          "PNP BRGY. SAN MANUEL",
+
+          "PDRRMO"
         ];
         break;
       default:
@@ -317,6 +312,9 @@ export default function useHandleLogin(){
                 setMarkerUnameEmoji(require('../app/pictures/medic.png'));
                 break;
               case 'TALON GENERAL HOSPITAL':
+                setMarkerUnameEmoji(require('../app/pictures/medic.png'));
+                break;
+              case 'JECSONS HOSPITAL':
                 setMarkerUnameEmoji(require('../app/pictures/medic.png'));
                 break;
               case 'PDRRMO Station':
