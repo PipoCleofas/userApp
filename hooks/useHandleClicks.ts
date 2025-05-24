@@ -117,6 +117,7 @@ const useHandleClicks = () => {
               const dataRider = await responseRider.json();
               console.log("DataRider: ", dataRider)
               const res = [...filteredMarkers, ...dataRider];
+              console.log("Res res: " + res)
               setMarkers(prev => [...prev, ...res]);
 
 

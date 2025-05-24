@@ -106,7 +106,14 @@ export default function MainPage() {
   }
   
 
+useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('Markers markers:', markers);
+    }, 5000);
 
+    // Cleanup the interval on unmount
+    return () => clearInterval(interval);
+  }, [markers]);
   
 
   async function emerAssReq(
